@@ -1,19 +1,8 @@
 "use strict";
-exports.__esModule = true;
-var react_1 = require("react");
-var logo_svg_1 = require("./logo.svg");
+Object.defineProperty(exports, "__esModule", { value: true });
+const jsx_runtime_1 = require("react/jsx-runtime");
 require("./App.css");
 function App() {
-    return (<div className="App">
-      <header className="App-header">
-        <img src={logo_svg_1["default"]} className="App-logo" alt="logo"/>
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a className="App-link" href="https://reactjs.org" target="_blank" rel="noopener noreferrer">
-          Learn React
-        </a>
-      </header>
-    </div>);
+    return ((0, jsx_runtime_1.jsx)("div", { className: "App" }));
 }
-exports["default"] = App;
+exports.default = App;
