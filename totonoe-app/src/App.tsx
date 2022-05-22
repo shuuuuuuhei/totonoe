@@ -3,8 +3,9 @@ import {BrowserRouter, Routes, Route} from 'react-router-dom'
 import { FaBeer } from 'react-icons/fa';
 
 import { Header } from './components/Header';
-import { Home } from './components/Home';
-import { Profile } from './components/Proofile';
+import { Home } from './pages/HomePage';
+import { Profile } from './components/Profile';
+import { ProfilePage } from './pages/ProfilePage';
 
 function App() {
   return (
@@ -13,7 +14,7 @@ function App() {
       <div>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile" element={<ProfilePage />}></Route>
         </Routes>
       </div>
     </BrowserRouter>
