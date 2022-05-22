@@ -1,7 +1,6 @@
 import React, { useState, Fragment, useEffect } from 'react'
 import {Card, Button} from "react-bootstrap"
 import "../style/Header.css"
-import {  FaGithub } from 'react-icons/fa';
 import { HiOutlineLogin, HiOutlinePencilAlt } from "react-icons/hi";
 import { CgProfile } from "react-icons/cg";
 import { Link } from 'react-router-dom';
@@ -21,7 +20,7 @@ export const Header = () => {
                                 <Link to="/"><HiOutlineLogin/></Link>
                             </li>
                             <li className="col">
-                            <   Link to="/"><CgProfile /></Link>
+                                <Link to="/profile"><CgProfile /></Link>
                             </li>
                             <li className="col">
                                 <Link to="/"><HiOutlinePencilAlt /></Link>
@@ -30,8 +29,8 @@ export const Header = () => {
                     </ul>
                 </div>
                 <div className="d-flex justify-content-center">
-                    <div className="header-top-right">
-                        <h1>Totonoe</h1>
+                    <div className="header-title">
+                        <Link to="/"><h1>Totonoe</h1></Link>
                     </div>
                 </div>
             </div>
