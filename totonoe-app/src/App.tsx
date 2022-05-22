@@ -4,16 +4,16 @@ import { FaBeer } from 'react-icons/fa';
 
 import { Header } from './components/Header';
 import { Home } from './components/Home';
-import { SearchBox } from './components/SearchBox';
+import { Profile } from './components/Proofile';
 
 function App() {
   return (
     <BrowserRouter>
     <Header />
-    <SearchBox/>
       <div>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </div>
     </BrowserRouter>

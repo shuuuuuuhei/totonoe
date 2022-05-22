@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const jsx_runtime_1 = require("react/jsx-runtime");
 const react_1 = __importDefault(require("react"));
 const client_1 = __importDefault(require("react-dom/client"));
-require("./index.css");
+require("./style/index.css");
 const App_1 = __importDefault(require("./App"));
 const reportWebVitals_1 = __importDefault(require("./reportWebVitals"));
 const root = client_1.default.createRoot(document.getElementById('root'));
