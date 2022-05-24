@@ -1,5 +1,5 @@
 import React, { Component, useEffect } from 'react'
-import { Profile } from '../@types/article/Profile'
+import { Profile } from '../@types/Profile'
 
 const url: string = 'http://localhost:4000/articles'
 

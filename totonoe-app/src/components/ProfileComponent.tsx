@@ -3,7 +3,7 @@ import { Button } from 'react-bootstrap';
 import '../style/Profile.css'
 import {MdInsertEmoticon} from 'react-icons/md'
 import {CgDetailsMore} from 'react-icons/cg'
-import { Profile } from '../@types/article/Profile';
+import { Profile } from '../@types/Profile';
 
 type ProfileProps = {
     profile: Profile

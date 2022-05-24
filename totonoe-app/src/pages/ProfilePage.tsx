@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { Profile } from '../@types/article/Profile'
+import { Profile } from '../@types/Profile'
 import { ArticleList } from '../components/ArticleList'
 import { ProfileComponent } from '../components/ProfileComponent'
 import { useFetchUserInfo } from '../hooks/useFetchUserProfile'
