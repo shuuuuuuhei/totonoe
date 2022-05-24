@@ -1,11 +1,15 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, VFC } from 'react';
 import { Button } from 'react-bootstrap';
 import '../style/Profile.css'
 import {MdInsertEmoticon} from 'react-icons/md'
 import {CgDetailsMore} from 'react-icons/cg'
+import { Profile } from '../@types/article/Profile';
 
+type ProfileProps = {
+    profile: Profile
+}
 
-export const Profile = () => {
+export const ProfileComponent: React.VFC<ProfileProps> = (props) => {
     return (
         <Fragment>
             <h3>Profile</h3>
@@ -17,7 +21,7 @@ export const Profile = () => {
                         </div>
                         <div className="col-2 user-name">
                             <div className="name">
-                                山田太郎
+                                {props.profile.name}
                             </div>
                             <div className="email">
                                 @yamada
@@ -29,8 +33,8 @@ export const Profile = () => {
                                 <CgDetailsMore />
                             </div>
                             <div className="follow-info row">
-                                <p className="col-6">フォロワー300人</p>
-                                <p className="col-6">フォロワー300人</p>
+                                <p className="col-6">フォロワー{props.profile.followerCount}人</p>
+                                <p className="col-6">フォロワー{props.profile.following}人</p>
                             </div>
                         </div>
                     </div>

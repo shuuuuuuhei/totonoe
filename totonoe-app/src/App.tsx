@@ -4,7 +4,7 @@ import { FaBeer } from 'react-icons/fa';
 
 import { Header } from './components/Header';
 import { Home } from './pages/HomePage';
-import { Profile } from './components/Profile';
+import { ProfileComponent } from './components/ProfileComponent';
 import { ProfilePage } from './pages/ProfilePage';
 
 function App() {
