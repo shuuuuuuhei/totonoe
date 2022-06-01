@@ -1,16 +1,11 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	"fmt"
+	"main.go/infra"
 )
 
 func main() {
-	fmt.Printf("hello world")
-	router := gin.Default()
-
-}
-
-func getUserInfo() {
-
+	db := infra.NewDB()
+	r := infra.Init(db)
+	r.Run()
 }
