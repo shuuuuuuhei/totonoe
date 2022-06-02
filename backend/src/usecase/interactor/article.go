@@ -1,10 +1,11 @@
 package interactor
 
 import (
+	"github.com/gin-gonic/gin"
 	"main.go/usecase/port"
-	"context"
 )
 
+// Article 返り値とリポジトリ
 type Article struct {
 	OutputPort  port.ArticleOutputPort
 	ArticleRepo port.ArticleRepository
@@ -18,12 +19,32 @@ func NewArticleInputPort(outputPort port.ArticleOutputPort, articleRepository po
 	}
 }
 
-// GetArticleByID は ArticleRepositoryに宣言されているGetArticleByIDを呼び出し、その結果を
-func (a *Article) GetArticleByID(ctx context.Context, articleID string) {
+// GetArticleByID は ArticleRepositoryに宣言されているGetArticleByIDを呼び出しArticleを受け取りOutputPortに結果を渡す
+func (a *Article) GetArticleByID(ctx *gin.Context, articleID string) {
 	article, err := a.ArticleRepo.GetArticleByID(ctx, articleID)
 	if err != nil {
 		a.OutputPort.RenderError(err)
 		return
 	}
-	a.OutputPort.Render(article)
+	a.OutputPort.RenderArticle(article)
+}
+
+// CreateArticle Articlを作成する。Err or nilを返す
+func (a *Article) CreateArticle(ctx *gin.Context) {
+	_, err := a.ArticleRepo.CreateArticle(ctx)
+	if err != nil {
+		a.OutputPort.RenderError(err)
+		return
+	}
+	return
+}
+
+// UpdateArticleByID ArticleRepositoryに登録されているUpdateArticleByIDを呼び出してArticleを更新してOutputPortに結果を渡す
+func (a *Article) UpdateArticleByID(ctx *gin.Context) {
+	article, err := a.ArticleRepo.UpdateArticleByID(ctx)
+	if err != nil {
+		a.OutputPort.RenderError(err)
+		return
+	}
+	a.OutputPort.RenderArticle(article)
 }

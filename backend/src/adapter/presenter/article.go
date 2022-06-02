@@ -1,14 +1,15 @@
 package presenter
 
 import (
-	"main.go/domain/model"
 	"fmt"
-	"main.go/usecase/port"
 	"net/http"
+
+	"main.go/domain/model"
+	"main.go/usecase/port"
 )
 
 // Article は型宣言
-type Article struct{
+type Article struct {
 	w http.ResponseWriter
 }
 
@@ -16,15 +17,15 @@ type Article struct{
 // usercase.UserOutputPortを実装している
 // 出力に関するアダプター
 func NewArticleOutputport(w http.ResponseWriter) port.ArticleOutputPort {
-	return &Article {
+	return &Article{
 		w: w,
 	}
 }
 
-// Render はArticle.Nameを出力する
-func (a *Article) Render(article *model.Article) {
+// RenderArticle はArticleを返す
+func (a *Article) RenderArticle(article *model.Article) {
 	a.w.WriteHeader(http.StatusOK)
-	fmt.Fprint(a.w, article.Title)	
+	fmt.Fprint(a.w, article.Title)
 }
 
 // RenderError はErrorを出力する

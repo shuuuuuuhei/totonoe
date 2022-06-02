@@ -8,12 +8,14 @@ import (
 	"main.go/usecase/interactor"
 )
 
+// Routing DB, Gin, Port の設定を書き込む型
 type Routing struct {
 	DB   *DB
 	Gin  *gin.Engine
 	Port string
 }
 
+// Init DB初期設定
 func Init(db *DB) *Routing {
 	r := &Routing{
 		DB:   db,
@@ -32,9 +34,13 @@ func (r *Routing) setRouting() {
 		Conn:              r.DB.Connection,
 	}
 
-	r.Gin.GET("/article", articleControler.GetArticleByID)
+	r.Gin.GET("/articles/:articleID", articleControler.GetArticleByID)
+	r.Gin.POST("/articles/new", articleControler.CreateArticle)
+	// ↓まだ試してない
+	r.Gin.PUT("/articles", articleControler.UpdateArticleByID)
 }
 
+// Run サーバ処理開始
 func (r *Routing) Run() {
 	r.Gin.Run(r.Port)
 }

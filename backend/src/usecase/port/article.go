@@ -1,19 +1,27 @@
 package port
 
 import (
+	"github.com/gin-gonic/gin"
+
 	"main.go/domain/model"
-	"context"
 )
 
+// ArticleInputPort 入力インタフェース
 type ArticleInputPort interface {
-	GetArticleByID(ctx context.Context, articleID string)
+	GetArticleByID(ctx *gin.Context, articleID string)
+	CreateArticle(ctx *gin.Context)
+	UpdateArticleByID(ctx *gin.Context)
 }
 
+// ArticleOutputPort 出力インタフェース
 type ArticleOutputPort interface {
-	Render(*model.Article)
+	RenderArticle(*model.Article)
 	RenderError(error)
 }
 
+// ArticleRepository ロジックインタフェース
 type ArticleRepository interface {
-	GetArticleByID(ctx context.Context, articleID string) (*model.Article, error)
+	GetArticleByID(ctx *gin.Context, articleID string) (*model.Article, error)
+	CreateArticle(ctx *gin.Context) (string, error)
+	UpdateArticleByID(ctx *gin.Context) (*model.Article, error)
 }

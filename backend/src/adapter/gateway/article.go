@@ -1,11 +1,13 @@
 package gateway
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 	"fmt"
 	"log"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
 
 	"gorm.io/gorm"
 	"main.go/domain/model"
@@ -25,13 +27,11 @@ func NewArticleRepository(conn *gorm.DB) port.ArticleRepository {
 }
 
 // GetArticleByID はDBからデータを取得
-func (a *ArticleRepository) GetArticleByID(ctx context.Context, articleID string) (*model.Article, error) {
+func (a *ArticleRepository) GetArticleByID(ctx *gin.Context, articleID string) (*model.Article, error) {
 	conn := a.GetDBConn()
 	article := model.Article{}
 
-	conn.First(&article)
-
-	if err := conn.First(&article).Error; err != nil {
+	if err := conn.First(&article, articleID).Error; err != nil {
 		if err == sql.ErrNoRows {
 			return nil, fmt.Errorf("User Not Found. ArticleID = %s", articleID)
 		}
@@ -41,7 +41,56 @@ func (a *ArticleRepository) GetArticleByID(ctx context.Context, articleID string
 	return &article, nil
 }
 
+// CreateArticle Articleを作成&登録
+func (a *ArticleRepository) CreateArticle(ctx *gin.Context) (string, error) {
+	conn := a.GetDBConn()
+	article := model.Article{
+		Title:   "test",
+		Content: "This is test",
+	}
+	conn.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(&article).Error; err != nil {
+			if err == sql.ErrNoRows {
+				return fmt.Errorf("Can't create Article")
+			}
+			log.Println(err)
+			return err
+		}
+		return nil
+	})
+	return "ok", nil
+}
+
+// UpdateArticleByID update article by articleID
+func (a *ArticleRepository) UpdateArticleByID(c *gin.Context) (*model.Article, error) {
+	conn := a.GetDBConn()
+	article := newArticleFromForm(c)
+	if err := conn.Model(&article).Where("id = ?", article.ID).Update("title", "content").Error; err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("can not update an article")
+		}
+		log.Println(err)
+		return nil, err
+	}
+
+	return article, nil
+}
+
 // GetDBConn はDB接続を確立
 func (a *ArticleRepository) GetDBConn() *gorm.DB {
 	return a.conn
+}
+
+func newArticleFromForm(c *gin.Context) *model.Article {
+	id, err := strconv.Atoi(c.Param("artileID"))
+	if err != nil {
+		panic(err)
+	}
+	title := c.PostForm("title")
+	content := c.PostForm("content")
+	return &model.Article{
+		ID:      id,
+		Content: content,
+		Title:   title,
+	}
 }

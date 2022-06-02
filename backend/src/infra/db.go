@@ -29,7 +29,9 @@ func NewDB() *DB {
 func newDB(d *DB) *DB {
 	dsn := d.UserName + "://" + d.Password + "@" + d.Host + "/" + d.DBName + "?sslmode=disable"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		NamingStrategy: schema.NamingStrategy{SingularTable: true},
+		NamingStrategy: schema.NamingStrategy{
+			SingularTable: true,
+		},
 	})
 	if err != nil {
 		panic(err.Error())
