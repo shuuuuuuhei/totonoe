@@ -5,10 +5,10 @@ import (
 )
 
 type Article struct {
-	ID int
-	Title string
-	Content string
-	UserID string
-	UserName string
+	ID        string
+	Title     string
+	Content   string
+	UserID    string
+	UserName  string
 	CreatedAt time.Time
 }
