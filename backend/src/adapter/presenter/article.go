@@ -1,8 +1,7 @@
 package presenter
 
 import (
-	"fmt"
-	"net/http"
+	"github.com/gin-gonic/gin"
 
 	"main.go/domain/model"
 	"main.go/usecase/port"
@@ -10,26 +9,24 @@ import (
 
 // Article は型宣言
 type Article struct {
-	w http.ResponseWriter
+	c *gin.Context
 }
 
 // NewArticleOutputport output portを生成
 // usercase.UserOutputPortを実装している
 // 出力に関するアダプター
-func NewArticleOutputport(w http.ResponseWriter) port.ArticleOutputPort {
+func NewArticleOutputport(c *gin.Context) port.ArticleOutputPort {
 	return &Article{
-		w: w,
+		c: c,
 	}
 }
 
 // RenderArticle はArticleを返す
 func (a *Article) RenderArticle(article *model.Article) {
-	a.w.WriteHeader(http.StatusOK)
-	fmt.Fprint(a.w, article.Title)
+	a.c.JSON(200, article)
 }
 
 // RenderError はErrorを出力する
 func (a *Article) RenderError(err error) {
-	a.w.WriteHeader(http.StatusInternalServerError)
-	fmt.Fprint(a.w, err)
+	a.c.JSON(500, err)
 }
