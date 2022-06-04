@@ -34,10 +34,20 @@ func (r *Routing) setRouting() {
 		Conn:              r.DB.Connection,
 	}
 
+	userController := controller.User{
+		OutputFactory:     presenter.NewUserOutputPort,
+		InputFactory:      interactor.NewUserInport,
+		RepositoryFactory: gateway.NewUserRepository,
+		Conn:              r.DB.Connection,
+	}
+
 	r.Gin.GET("/articles/:articleID", articleControler.GetArticleByID)
 	r.Gin.POST("/articles/new", articleControler.CreateArticle)
 	// ↓まだ試してない
 	r.Gin.PUT("/articles", articleControler.UpdateArticleByID)
+
+	r.Gin.POST("/login", userController.Login)
+	r.Gin.POST("/signup", userController.SignUp)
 }
 
 // Run サーバ処理開始
