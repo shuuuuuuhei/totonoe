@@ -5,10 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
-
 	"gorm.io/gorm"
 	"main.go/domain/model"
 	"main.go/usecase/port"
@@ -81,13 +79,12 @@ func (a *ArticleRepository) GetDBConn() *gorm.DB {
 	return a.conn
 }
 
+// context.form からFormに入力された値を受け取る
 func newArticleFromForm(c *gin.Context) *model.Article {
-	id, err := strconv.Atoi(c.Param("artileID"))
-	if err != nil {
-		panic(err)
-	}
+	id := c.Param("artileID")
 	title := c.PostForm("title")
 	content := c.PostForm("content")
+
 	return &model.Article{
 		ID:      id,
 		Content: content,
