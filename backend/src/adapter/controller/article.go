@@ -34,6 +34,12 @@ func (article *Article) UpdateArticleByID(c *gin.Context) {
 	inputPort.UpdateArticleByID(c)
 }
 
+// DeleteArticleByID IDを取得してArticleを削除
+func (article *Article) DeleteArticleByID(c *gin.Context) {
+	inputPort := article.newInputport(c)
+	inputPort.DeleteArticleByID(c)
+}
+
 func (article *Article) newInputport(c *gin.Context) port.ArticleInputPort {
 	outputPort := article.OutputFactory(c)
 	respository := article.RepositoryFactory(article.Conn)

@@ -48,3 +48,13 @@ func (a *Article) UpdateArticleByID(ctx *gin.Context) {
 	}
 	a.OutputPort.RenderArticle(article)
 }
+
+// DeleteArticleByID 成功：200、失敗：エラーを返す
+func (a *Article) DeleteArticleByID(c *gin.Context) {
+	err := a.ArticleRepo.DeleteArticleByID(c)
+	if err != nil {
+		a.OutputPort.RenderError(err)
+		return
+	}
+	a.OutputPort.RenderOK(c)
+}

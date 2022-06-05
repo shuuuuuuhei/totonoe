@@ -74,6 +74,27 @@ func (a *ArticleRepository) UpdateArticleByID(c *gin.Context) (*model.Article, e
 	return article, nil
 }
 
+// DeleteArticleByID コンテキストを受け取り、IDからArticleを削除する
+func (a *ArticleRepository) DeleteArticleByID(c *gin.Context) error {
+	conn := a.GetDBConn()
+	articleID := c.Param("articleID")
+
+	result := conn.Where("id = ?", articleID).Delete(&model.Article{ID: articleID})
+
+	// エラー
+	if result.Error != nil {
+		return result.Error
+	}
+
+	// 削除レコードなし
+	if result.RowsAffected < 1 {
+		return fmt.Errorf("削除対象の記事が見つかりませんでした。ID = %s", articleID)
+	}
+
+	// 正常時
+	return nil
+}
+
 // GetDBConn はDB接続を確立
 func (a *ArticleRepository) GetDBConn() *gorm.DB {
 	return a.conn
