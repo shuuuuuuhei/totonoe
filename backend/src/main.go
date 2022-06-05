@@ -1,9 +1,11 @@
 package main
 
 import (
-	"fmt"
+	"main.go/infra"
 )
 
 func main() {
-	fmt.Printf("hello world")
+	db := infra.NewDB()
+	r := infra.Init(db)
+	r.Run()
 }
