@@ -1,4 +1,4 @@
-package infra
+package database
 
 //Config DB型宣言
 type Config struct {

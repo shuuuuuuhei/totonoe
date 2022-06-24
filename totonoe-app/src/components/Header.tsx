@@ -4,9 +4,24 @@ import "../style/Header.css"
 import { HiOutlineLogin, HiOutlinePencilAlt } from "react-icons/hi";
 import { CgProfile } from "react-icons/cg";
 import { Link } from 'react-router-dom';
-import { IconContext } from 'react-icons'
+import { IconContext } from 'react-icons';
+import { useAuth0 } from '@auth0/auth0-react';
+import { useAuth0Token } from '../hooks/useAuth0Token';
 
 export const Header = () => {
+    const { loginWithRedirect, isAuthenticated, logout, user } = useAuth0();
+    const token = useAuth0Token();
+    
+    const authenticateUser = () => {
+        
+        // 認証処理
+        loginWithRedirect()
+    }
+
+    const logoutUser = () => {
+        logout({returnTo: window.location.origin})
+    }
+
     return (
         <Fragment>
             <div className="header row">
@@ -16,12 +31,23 @@ export const Header = () => {
                     </div>
                     <ul className="header-top-right row">
                         <IconContext.Provider value={{ color: '#000000', size: '50' }}>
-                            <li className="col">
-                                <Link to="/"><HiOutlineLogin/></Link>
-                            </li>
+                            {isAuthenticated ? 
                             <li className="col">
                                 <Link to="/profile"><CgProfile /></Link>
+                                <Button 
+                                    onClick={logoutUser}
+                                    variant="outline-primary"
+                                >
+                                    ログアウト
+                                </Button>
                             </li>
+                            :
+                                <li className="col">
+                                    <Button onClick={authenticateUser}>
+                                        <HiOutlineLogin/>
+                                    </Button>
+                                </li>
+                            }
                             <li className="col">
                                 <Link to="/"><HiOutlinePencilAlt /></Link>
                             </li>

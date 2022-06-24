@@ -34,7 +34,7 @@ export const ProfileComponent: React.VFC<ProfileProps> = (props) => {
                             </div>
                             <div className="follow-info row">
                                 <p className="col-6">フォロワー{props.profile.followerCount}人</p>
-                                <p className="col-6">フォロワー{props.profile.following}人</p>
+                                <p className="col-6">フォロワー{props.profile.followingCount}人</p>
                             </div>
                         </div>
                     </div>

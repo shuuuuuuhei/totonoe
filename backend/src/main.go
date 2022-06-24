@@ -1,11 +1,12 @@
 package main
 
 import (
-	"main.go/infra"
+	"main.go/infra/database"
+	"main.go/infra/server"
 )
 
 func main() {
-	db := infra.NewDB()
-	r := infra.Init(db)
+	db := database.NewDB()
+	r := server.Init(db)
 	r.Run()
 }
