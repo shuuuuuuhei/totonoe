@@ -7,18 +7,17 @@ import (
 
 // UserInputPort 入力部
 type UserInputPort interface {
-	Login(c *gin.Context)
-	SignUp(c *gin.Context)
+	GetProfile(c *gin.Context)
 }
 
 // UserOutputPort ResponseWriter
 type UserOutputPort interface {
 	RenderError(error)
-	RenderUser(*model.User)
+	RenderProfile(*model.User)
 }
 
 // UserRepository 実装部
 type UserRepository interface {
-	Login(c *gin.Context) (*model.User, error)
+	GetProfile(c *gin.Context) (*model.Profile, error)
 	SignUp(c *gin.Context) (*model.User, error)
 }

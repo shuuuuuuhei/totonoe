@@ -22,7 +22,7 @@ func (u *User) RenderError(err error) {
 	u.c.JSON(500, err)
 }
 
-// RenderUser 200 Userを返す
-func (u *User) RenderUser(user *model.User) {
+// RenderProfile 200 Userを返す
+func (u *User) RenderProfile(user *model.User) {
 	u.c.JSON(200, user)
 }

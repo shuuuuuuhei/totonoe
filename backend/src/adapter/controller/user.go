@@ -15,16 +15,12 @@ type User struct {
 	Conn              *gorm.DB
 }
 
-// Login ログイン処理を呼び出す
-func (u *User) Login(c *gin.Context) {
+// GetProfile Profileを取得する
+func (u *User) GetProfile(c *gin.Context) {
 	inputport := u.newInputport(c)
-	inputport.Login(c)
-}
 
-// SignUp ユーザ登録処理を呼び出す
-func (u *User) SignUp(c *gin.Context) {
-	inputport := u.newInputport(c)
-	inputport.SignUp(c)
+	
+	inputport.GetProfile(c)
 }
 
 func (u *User) newInputport(c *gin.Context) port.UserInputPort {

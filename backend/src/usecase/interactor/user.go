@@ -17,24 +17,13 @@ func NewUserInport(o port.UserOutputPort, u port.UserRepository) port.UserInputP
 	}
 }
 
-// Login repositry ユーザログイン機能を呼び出す。結果をOutputportに渡す。
-func (u User) Login(c *gin.Context) {
-	user, err := u.UserRepo.Login(c)
+// GetProfile repositry ユーザログイン機能を呼び出す。結果をOutputportに渡す。
+func (u User) GetProfile(c *gin.Context) {
+	user, err := u.UserRepo.GetProfile(c)
 	if err != nil {
 		u.OutputPort.RenderError(err)
 		return
 	}
-	u.OutputPort.RenderUser(user)
-	return
-}
-
-// SignUp サインアップ機能を呼びだす。
-func (u User) SignUp(c *gin.Context) {
-	user, err := u.UserRepo.SignUp(c)
-	if err != nil {
-		u.OutputPort.RenderError(err)
-		return
-	}
-	u.OutputPort.RenderUser(user)
+	u.OutputPort.RenderProfile(user)
 	return
 }
