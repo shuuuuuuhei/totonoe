@@ -13,7 +13,7 @@ type UserInputPort interface {
 // UserOutputPort ResponseWriter
 type UserOutputPort interface {
 	RenderError(error)
-	RenderProfile(*model.User)
+	RenderProfile(*model.Profile)
 }
 
 // UserRepository 実装部
