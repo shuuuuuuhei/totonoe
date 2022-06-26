@@ -9,7 +9,7 @@ import (
 // User ユーザモデル
 type User struct {
 	gorm.Model
-	UserID      string `gorm:"primryKey;serializer:json"`
+	ID          string `gorm:"primryKey;serializer:json"`
 	Name        string `gorm:"primryKey;serializer:json"`
 	Email       string `gorm:"primryKey;serializer:json"`
 	Articles    []Article
