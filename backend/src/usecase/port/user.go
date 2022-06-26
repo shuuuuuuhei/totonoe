@@ -2,7 +2,7 @@ package port
 
 import (
 	"github.com/gin-gonic/gin"
-	"main.go/domain/model"
+	"main.go/model"
 )
 
 // UserInputPort 入力部

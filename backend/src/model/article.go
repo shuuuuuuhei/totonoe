@@ -6,9 +6,10 @@ import (
 	"gorm.io/gorm"
 )
 
-// Article 記事モデル(DB同一)
+// Article 記事モデル
 type Article struct {
 	gorm.Model
+	ID          uint32   `gorm:"primryKey;serializer:json"`
 	Title       string `gorm:"primryKey;serializer:json"`
 	Content     string `gorm:"serializer:json"`
 	UserID      string `gorm:"primryKey;serializer:json;foreignKey:UserID"`

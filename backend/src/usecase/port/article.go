@@ -2,8 +2,7 @@ package port
 
 import (
 	"github.com/gin-gonic/gin"
-
-	"main.go/domain/model"
+	"main.go/model"
 )
 
 // ArticleInputPort 入力インタフェース

@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"main.go/domain/model"
+	"main.go/model"
 	"main.go/usecase/port"
 )
 
@@ -79,7 +79,7 @@ func (a *ArticleRepository) DeleteArticleByID(c *gin.Context) error {
 	conn := a.GetDBConn()
 	articleID := c.Param("articleID")
 
-	result := conn.Where("id = ?", articleID).Delete(&model.Article{ID: articleID})
+	result := conn.Where("id = ?", articleID).Delete(&model.Article{ArticleID: articleID})
 
 	// エラー
 	if result.Error != nil {
@@ -107,8 +107,8 @@ func newArticleFromForm(c *gin.Context) *model.Article {
 	content := c.PostForm("content")
 
 	return &model.Article{
-		ID:      id,
-		Content: content,
-		Title:   title,
+		ArticleID: id,
+		Content:   content,
+		Title:     title,
 	}
 }
