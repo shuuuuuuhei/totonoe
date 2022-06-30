@@ -7,7 +7,7 @@ import (
 
 // ArticleInputPort 入力インタフェース
 type ArticleInputPort interface {
-	GetArticleByID(ctx *gin.Context, articleID string)
+	GetArticleByID(ctx *gin.Context)
 	CreateArticle(ctx *gin.Context)
 	UpdateArticleByID(ctx *gin.Context)
 	DeleteArticleByID(ctx *gin.Context)
@@ -22,8 +22,8 @@ type ArticleOutputPort interface {
 
 // ArticleRepository ロジックインタフェース
 type ArticleRepository interface {
-	GetArticleByID(ctx *gin.Context, articleID string) (*model.Article, error)
-	CreateArticle(ctx *gin.Context) (string, error)
+	GetArticleByID(ctx *gin.Context) (*model.Article, error)
+	CreateArticle(ctx *gin.Context) (*model.Article, error)
 	UpdateArticleByID(ctx *gin.Context) (*model.Article, error)
 	DeleteArticleByID(ctx *gin.Context) error
 }
