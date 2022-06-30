@@ -8,17 +8,17 @@ import {BsChevronDoubleLeft, BsChevronDoubleRight} from 'react-icons/bs'
 const initialArticlesState: Article[] = [{
     id: "",
     title: "",
-    description: "",
+    content: "",
 },
 {
     id: "",
     title: "",
-    description: "",
+    content: "",
 },
 {
     id: "",
     title: "",
-    description: "",
+    content: "",
 }];
 
 export const ArticlesBox = () => {

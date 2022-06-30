@@ -6,14 +6,11 @@ import { CgProfile } from "react-icons/cg";
 import { Link } from 'react-router-dom';
 import { IconContext } from 'react-icons';
 import { useAuth0 } from '@auth0/auth0-react';
-import { useAuth0Token } from '../hooks/useAuth0Token';
 
 export const Header = () => {
     const { loginWithRedirect, isAuthenticated, logout, user } = useAuth0();
-    const token = useAuth0Token();
     
     const authenticateUser = () => {
-        
         // 認証処理
         loginWithRedirect()
     }
@@ -49,7 +46,7 @@ export const Header = () => {
                                 </li>
                             }
                             <li className="col">
-                                <Link to="/"><HiOutlinePencilAlt /></Link>
+                                <Link to="/articles/new"><HiOutlinePencilAlt /></Link>
                             </li>
                         </IconContext.Provider>
                     </ul>
