@@ -20,8 +20,8 @@ func NewArticleInputPort(outputPort port.ArticleOutputPort, articleRepository po
 }
 
 // GetArticleByID は ArticleRepositoryに宣言されているGetArticleByIDを呼び出しArticleを受け取りOutputPortに結果を渡す
-func (a *Article) GetArticleByID(ctx *gin.Context, articleID string) {
-	article, err := a.ArticleRepo.GetArticleByID(ctx, articleID)
+func (a *Article) GetArticleByID(ctx *gin.Context) {
+	article, err := a.ArticleRepo.GetArticleByID(ctx)
 	if err != nil {
 		a.OutputPort.RenderError(err)
 		return
@@ -31,11 +31,12 @@ func (a *Article) GetArticleByID(ctx *gin.Context, articleID string) {
 
 // CreateArticle Articlを作成する。Err or nilを返す
 func (a *Article) CreateArticle(ctx *gin.Context) {
-	_, err := a.ArticleRepo.CreateArticle(ctx)
+	article, err := a.ArticleRepo.CreateArticle(ctx)
 	if err != nil {
 		a.OutputPort.RenderError(err)
 		return
 	}
+	a.OutputPort.RenderArticle(article)
 	return
 }
 

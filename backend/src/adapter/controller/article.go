@@ -17,9 +17,8 @@ type Article struct {
 // GetArticleByID は，httpを受け取り，portを組み立てて，inputPort.GetArticleByIDを呼び出す
 // 入力に関するアダプター
 func (article *Article) GetArticleByID(c *gin.Context) {
-	articlID := c.Param("articleID")
 	inputPort := article.newInputport(c)
-	inputPort.GetArticleByID(c, articlID)
+	inputPort.GetArticleByID(c)
 }
 
 // CreateArticle portを組み立てinputport.CreateArticleを呼び出す
@@ -39,6 +38,8 @@ func (article *Article) DeleteArticleByID(c *gin.Context) {
 	inputPort := article.newInputport(c)
 	inputPort.DeleteArticleByID(c)
 }
+
+func 
 
 func (article *Article) newInputport(c *gin.Context) port.ArticleInputPort {
 	outputPort := article.OutputFactory(c)

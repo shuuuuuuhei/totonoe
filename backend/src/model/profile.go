@@ -9,7 +9,7 @@ import (
 // Profile プロフィールモデル(DB同様)
 type Profile struct {
 	gorm.Model
-	ProfileID    string `gorm:"primryKey;serializer:json"`
+	ID           uint32 `gorm:"primryKey;serializer:json"`
 	NickName     string `gorm:"primryKey;serializer:json"`
 	Introduction string `gorm:"serializer:json"`
 	UserID       string

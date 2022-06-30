@@ -71,18 +71,19 @@ func (r *Routing) setRouting() {
 		Conn:              r.DB.Connection,
 	}
 	r.Gin.Use(corsMiddleware(), adapter.Wrap(jwtMiddleware.CheckJWT))
-
-	r.Gin.POST("/profile", userController.GetProfile)
-	r.Gin.POST("/articles/new", articleControler.CreateArticle)
-
+	
 	/**
 	@description All Auth Route
 	*/
+	r.Gin.POST("/profile", userController.GetProfile)
+	r.Gin.GET("/profile", articleControler.GetArticlesByUser)
+	r.Gin.POST("/articles/new", articleControler.CreateArticle)
 	r.Gin.DELETE("/articles/:articleID", articleControler.DeleteArticleByID)
 	// ↓まだ試してない
 	r.Gin.PUT("/articles", articleControler.UpdateArticleByID)
 }
 
+// corsMiddleware CORSの設定
 func corsMiddleware() gin.HandlerFunc {
 	return (cors.New(cors.Config{
 		// アクセス許可するオリジン
@@ -95,6 +96,7 @@ func corsMiddleware() gin.HandlerFunc {
 			"GET",
 			"PUT",
 			"DELETE",
+			"OPTION",
 		},
 		// 許可するHTTPリクエストヘッダ
 		AllowHeaders: []string{

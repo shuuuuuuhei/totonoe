@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"main.go/domain/model"
+	"main.go/model"
 	"main.go/usecase/port"
 )
 
@@ -83,9 +83,9 @@ func newUserByParams(p Params) (*model.User, error) {
 	}
 
 	return &model.User{
-		ID:    p.ID,
-		Name:  p.Name,
-		Email: p.Email,
+		UserID: p.ID,
+		Name:   p.Name,
+		Email:  p.Email,
 	}, nil
 }
 

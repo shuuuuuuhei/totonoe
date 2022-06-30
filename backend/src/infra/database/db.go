@@ -1,7 +1,6 @@
 package database
 
 import (
-	"strconv"
 	"fmt"
 	"log"
 	"os"
@@ -11,7 +10,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
-	"main.go/domain/model"
+	"main.go/model"
 )
 
 // DB 型宣言
@@ -55,10 +54,10 @@ func createNewLogger() logger.Interface {
 	return (logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
 		logger.Config{
-			SlowThreshold:             time.Second,   // Slow SQL threshold
+			SlowThreshold:             time.Second, // Slow SQL threshold
 			LogLevel:                  logger.Info, // Log level
-			IgnoreRecordNotFoundError: true,          // Ignore ErrRecordNotFound error for logger
-			Colorful:                  false,         // Disable color
+			IgnoreRecordNotFoundError: true,        // Ignore ErrRecordNotFound error for logger
+			Colorful:                  false,       // Disable color
 		},
 	))
 }
@@ -68,17 +67,20 @@ func (d *DB) DBMigrate() {
 	err := d.Connection.Migrator().DropTable(model.User{}, model.Profile{}, model.Article{}, model.Sauna{}, model.UserRelationShips{}, model.Comment{}, model.ArticleLike{})
 	fmt.Println("delete: ", err)
 	err = d.Connection.AutoMigrate(model.User{}, model.Profile{}, model.Article{}, model.Sauna{}, model.UserRelationShips{}, model.Comment{}, model.ArticleLike{})
-	fmt.Println("migrate: ",err)
+	fmt.Println("migrate: ", err)
 }
 
 // CreateData サンプルデータ作成
 func (d *DB) CreateData() {
 	for i := 1; i <= 10; i++ {
 		user := model.User{}
-		user.UserID = strconv.Itoa(i)
 		user.Email = "aaa@test.com"
 		user.Name = "test"
-		user.Profile.UserID = user.UserID
-		d.Connection.Create(&user)
+		err := d.Connection.Create(&user)
+
+		if err != nil {
+			fmt.Println(err)
+			break
+		}
 	}
 }

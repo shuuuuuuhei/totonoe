@@ -2,13 +2,14 @@ package gateway
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"main.go/domain/model"
+	"main.go/model"
 	"main.go/usecase/port"
 )
 
@@ -24,12 +25,18 @@ func NewArticleRepository(conn *gorm.DB) port.ArticleRepository {
 	}
 }
 
+type params struct {
+	UserID  string `json:"user_id"`
+	Article model.Article
+}
+
 // GetArticleByID はDBからデータを取得
-func (a *ArticleRepository) GetArticleByID(ctx *gin.Context, articleID string) (*model.Article, error) {
+func (a *ArticleRepository) GetArticleByID(c *gin.Context) (*model.Article, error) {
 	conn := a.GetDBConn()
 	article := model.Article{}
+	articleID := c.PostForm("articleID")
 
-	if err := conn.First(&article, articleID).Error; err != nil {
+	if err := conn.First(&article).Error; err != nil {
 		if err == sql.ErrNoRows {
 			return nil, fmt.Errorf("User Not Found. ArticleID = %s", articleID)
 		}
@@ -40,23 +47,37 @@ func (a *ArticleRepository) GetArticleByID(ctx *gin.Context, articleID string) (
 }
 
 // CreateArticle Articleを作成&登録
-func (a *ArticleRepository) CreateArticle(ctx *gin.Context) (string, error) {
+func (a *ArticleRepository) CreateArticle(c *gin.Context) (*model.Article, error) {
 	conn := a.GetDBConn()
-	article := model.Article{
-		Title:   "test",
-		Content: "This is test",
+	params := params{}
+	json.NewDecoder(c.Request.Body).Decode(&params)
+
+	// ユーザ存在チェック
+	err := CheckUserByID(params.UserID, conn)
+	if err != nil {
+		return nil, err
 	}
-	conn.Transaction(func(tx *gorm.DB) error {
+
+	article := params.Article
+	article.UserID = params.UserID
+
+	err = conn.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(&article).Error; err != nil {
 			if err == sql.ErrNoRows {
 				return fmt.Errorf("Can't create Article")
 			}
 			log.Println(err)
-			return err
+			return errors.New("Internal Server Error. adapter/gateway/CreateArticle")
 		}
 		return nil
 	})
-	return "ok", nil
+
+	if err != nil {
+		return nil, err
+	}
+
+	// 登録成功
+	return &article, nil
 }
 
 // UpdateArticleByID update article by articleID
@@ -76,20 +97,19 @@ func (a *ArticleRepository) UpdateArticleByID(c *gin.Context) (*model.Article, e
 
 // DeleteArticleByID コンテキストを受け取り、IDからArticleを削除する
 func (a *ArticleRepository) DeleteArticleByID(c *gin.Context) error {
-	conn := a.GetDBConn()
-	articleID := c.Param("articleID")
+	//conn := a.GetDBConn()
 
-	result := conn.Where("id = ?", articleID).Delete(&model.Article{ID: articleID})
+	// result := conn.Where("id = ?", articleID).Delete(&model.Article{ID: })
 
-	// エラー
-	if result.Error != nil {
-		return result.Error
-	}
+	// // エラー
+	// if result.Error != nil {
+	// 	return result.Error
+	// }
 
-	// 削除レコードなし
-	if result.RowsAffected < 1 {
-		return fmt.Errorf("削除対象の記事が見つかりませんでした。ID = %s", articleID)
-	}
+	// // 削除レコードなし
+	// if result.RowsAffected < 1 {
+	// 	return fmt.Errorf("削除対象の記事が見つかりませんでした。ID = %s", articleID)
+	// }
 
 	// 正常時
 	return nil
@@ -102,13 +122,25 @@ func (a *ArticleRepository) GetDBConn() *gorm.DB {
 
 // context.form からFormに入力された値を受け取る
 func newArticleFromForm(c *gin.Context) *model.Article {
-	id := c.Param("artileID")
 	title := c.PostForm("title")
 	content := c.PostForm("content")
 
 	return &model.Article{
-		ID:      id,
 		Content: content,
 		Title:   title,
 	}
+}
+
+// CheckUserByID ユーザ存在チェック
+func CheckUserByID(userID string, conn *gorm.DB) error {
+	user := model.User{}
+
+	if err := conn.Where("id = ?", userID).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("ユーザが見つかりませんでした。ID = %s", userID)
+		}
+		log.Println(err)
+		return errors.New("Internal Server Error. adapter/gateway/CreateArticle")
+	}
+	return nil
 }

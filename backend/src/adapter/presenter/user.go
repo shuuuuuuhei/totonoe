@@ -2,8 +2,8 @@ package presenter
 
 import (
 	"github.com/gin-gonic/gin"
-	"main.go/domain/model"
 
+	"main.go/model"
 	"main.go/usecase/port"
 )
 
