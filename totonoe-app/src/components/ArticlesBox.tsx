@@ -5,21 +5,29 @@ import { ArticleBox } from './Article';
 import '../style/Articles.css'
 import {BsChevronDoubleLeft, BsChevronDoubleRight} from 'react-icons/bs'
 
-const initialArticlesState: Article[] = [{
-    id: "",
-    title: "",
-    content: "",
-},
-{
-    id: "",
-    title: "",
-    content: "",
-},
-{
-    id: "",
-    title: "",
-    content: "",
-}];
+const initialArticlesState: Article[] = [
+    {
+        ID: "",
+        Title: "",
+        Content: "",
+        CreatedAt: "",
+        UserName: "",
+    },
+    {
+        ID: "",
+        Title: "",
+        Content: "",
+        CreatedAt: "",
+        UserName: "",
+    },
+    {
+        ID: "",
+        Title: "",
+        Content: "",
+        CreatedAt: "",
+        UserName: "",
+    },
+];
 
 export const ArticlesBox = () => {
     const [articlesStore, articlesDispach] = useReducer(articlesReducer, initialArticlesState);
