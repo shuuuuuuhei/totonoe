@@ -1,8 +1,8 @@
 export type Profile = {
-    id: string
-    user_id: string
-    nick_name: string
+    ID: string
+    UserID: string
+    NickName: string
     followingCount: number
     followerCount: number
-    introduce: string
+    Introduction: string
 }
