@@ -11,11 +11,13 @@ type ArticleInputPort interface {
 	CreateArticle(ctx *gin.Context)
 	UpdateArticleByID(ctx *gin.Context)
 	DeleteArticleByID(ctx *gin.Context)
+	GetArticlesByUserID(ctx *gin.Context)
 }
 
 // ArticleOutputPort 出力インタフェース
 type ArticleOutputPort interface {
 	RenderArticle(*model.Article)
+	RenderArticles(*[]model.Article)
 	RenderError(error)
 	RenderOK(c *gin.Context)
 }
@@ -26,4 +28,5 @@ type ArticleRepository interface {
 	CreateArticle(ctx *gin.Context) (*model.Article, error)
 	UpdateArticleByID(ctx *gin.Context) (*model.Article, error)
 	DeleteArticleByID(ctx *gin.Context) error
+	GetArticlesByUserID(ctx *gin.Context) (*[]model.Article, error)
 }

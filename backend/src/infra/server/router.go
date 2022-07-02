@@ -71,12 +71,12 @@ func (r *Routing) setRouting() {
 		Conn:              r.DB.Connection,
 	}
 	r.Gin.Use(corsMiddleware(), adapter.Wrap(jwtMiddleware.CheckJWT))
-	
+
 	/**
 	@description All Auth Route
 	*/
 	r.Gin.POST("/profile", userController.GetProfile)
-	r.Gin.GET("/profile", articleControler.GetArticlesByUser)
+	r.Gin.GET("/articles/:userID", articleControler.GetArticlesByUserID)
 	r.Gin.POST("/articles/new", articleControler.CreateArticle)
 	r.Gin.DELETE("/articles/:articleID", articleControler.DeleteArticleByID)
 	// ↓まだ試してない

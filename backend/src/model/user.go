@@ -15,6 +15,6 @@ type User struct {
 	Articles    []Article
 	Profile     Profile
 	AricleLikes []ArticleLike
-	CreatedAt   time.Time `gorm:"serializer:json;autoCreateTime"`
-	UpdatedAt   time.Time `gorm:"serializer:json;autoUpdateTime"`
+	CreatedAt   time.Time `gorm:"autoCreateTime"`
+	UpdatedAt   time.Time `gorm:"autoUpdateTime"`
 }

@@ -46,6 +46,27 @@ func (a *ArticleRepository) GetArticleByID(c *gin.Context) (*model.Article, erro
 	return &article, nil
 }
 
+// GetArticlesByUserID ユーザIDから記事一覧を取得
+func (a *ArticleRepository) GetArticlesByUserID(c *gin.Context) (*[]model.Article, error) {
+	conn := a.GetDBConn()
+
+	articles := []model.Article{}
+	userID := c.Param("userID")
+
+	if err := CheckUserByID(userID, conn); err != nil {
+		return nil, err
+	}
+
+	if err := conn.Where("user_id = ?", userID).Find(&articles).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Println("記事が見つかりませんでした。)")
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &articles, nil
+}
+
 // CreateArticle Articleを作成&登録
 func (a *ArticleRepository) CreateArticle(c *gin.Context) (*model.Article, error) {
 	conn := a.GetDBConn()

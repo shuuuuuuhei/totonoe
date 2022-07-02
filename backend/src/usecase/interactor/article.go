@@ -59,3 +59,13 @@ func (a *Article) DeleteArticleByID(c *gin.Context) {
 	}
 	a.OutputPort.RenderOK(c)
 }
+
+// GetArticlesByUserID 成功：Articles、失敗:エラーを返す
+func (a *Article) GetArticlesByUserID(c *gin.Context) {
+	articles, err := a.ArticleRepo.GetArticlesByUserID(c)
+	if err != nil {
+		a.OutputPort.RenderError(err)
+		return
+	}
+	a.OutputPort.RenderArticles(articles)
+}

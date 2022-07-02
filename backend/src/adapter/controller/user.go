@@ -18,8 +18,6 @@ type User struct {
 // GetProfile Profileを取得する
 func (u *User) GetProfile(c *gin.Context) {
 	inputport := u.newInputport(c)
-
-	
 	inputport.GetProfile(c)
 }
 

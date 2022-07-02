@@ -9,10 +9,10 @@ import (
 // Sauna サウナモデル
 type Sauna struct {
 	gorm.Model
-	ID        uint32 `gorm:"primryKey;serializer:json"`
-	Name      string `gorm:"primryKey;serializer:json"`
-	AdressID  string `gorm:"primryKey;serializer:json"`
+	ID        uint32 `gorm:"primryKey"`
+	Name      string `gorm:"primryKey"`
+	AdressID  string `gorm:"primryKey"`
 	Articles  []Article
-	CreatedAt time.Time `gorm:"serializer:json;autoCreateTime"`
-	UpdatedAt time.Time `gorm:"serializer:json;autoUpdateTime"`
+	CreatedAt time.Time `gorm:"autoCreateTime"`
+	UpdatedAt time.Time `gorm:"autoUpdateTime"`
 }

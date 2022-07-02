@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"gorm.io/driver/postgres"
@@ -72,15 +73,42 @@ func (d *DB) DBMigrate() {
 
 // CreateData サンプルデータ作成
 func (d *DB) CreateData() {
-	for i := 1; i <= 10; i++ {
-		user := model.User{}
-		user.Email = "aaa@test.com"
-		user.Name = "test"
-		err := d.Connection.Create(&user)
+	user := model.User{}
+	user.Email = "aaa@test.com"
+	user.Name = "test"
+	user.ID = "103026814924860204848"
+	if err := d.Connection.Create(&user).Error; err != nil {
+		fmt.Println(err)
+		return
+	}
 
-		if err != nil {
+	profile := model.Profile{}
+	profile.NickName = "test"
+	profile.Introduction = "こんちは"
+	profile.UserID = user.ID
+	if err := d.Connection.Create(&profile).Error; err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	sauna := model.Sauna{Name: "test"}
+
+	if err := d.Connection.Create(&sauna).Error; err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	for i := 0; i < 10; i++ {
+		article := model.Article{}
+		article.Title = "test_" + strconv.Itoa(i)
+		article.Content = "content_" + strconv.Itoa(i)
+		article.SaunaID = sauna.ID
+		article.UserID = user.ID
+		if err := d.Connection.Create(&article).Error; err != nil {
 			fmt.Println(err)
-			break
+			return
 		}
 	}
+
+	fmt.Println("Create Data")
 }
