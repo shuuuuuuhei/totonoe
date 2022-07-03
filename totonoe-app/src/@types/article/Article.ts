@@ -1,7 +1,10 @@
 export type Article = {
     ID: string,
     Title: string,
-    UserName: string,
     Content: string,
-    CreatedAt: string,
+    user_name?: string,
+    like_count?: number,
+    comment_count?: number,
+    sauna_name?: string,
+    CreatedAt?: string,
 }
