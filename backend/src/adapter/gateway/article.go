@@ -28,6 +28,7 @@ func NewArticleRepository(conn *gorm.DB) port.ArticleRepository {
 type params struct {
 	UserID  string `json:"user_id"`
 	Article model.Article
+	SaunaID uint32 `json:"sauna_id"`
 }
 
 // GetArticleByID はDBからデータを取得
@@ -53,12 +54,19 @@ func (a *ArticleRepository) GetArticlesByUserID(c *gin.Context) (*[]model.Articl
 	articles := []model.Article{}
 	userID := c.Param("userID")
 
-	if err := CheckUserByID(userID, conn); err != nil {
+	if err := checkUserByID(userID, conn); err != nil {
 		return nil, err
 	}
 
-	if err := conn.Where("user_id = ?", userID).Find(&articles).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+	if err := conn.Debug().Table("article").
+								Select(`article.*,"user".name AS user_name, sauna.name AS sauna_name, count(article_like.id) AS like_count, count(comment.id) AS comment_count`).
+								Joins(`left join  "user" on "user".id = article.user_id`).
+								Joins("left join sauna on sauna.id = article.sauna_id").
+								Joins("left join article_like on article_like.article_id = article.id").
+								Joins("left join comment on comment.article_id = article.id").
+								Where("article.user_id = ?", userID).Group(`article.id, "user".name, sauna.name`).
+								Scan(&articles).Error; err != nil {
+	if errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Println("記事が見つかりませんでした。)")
 			return nil, nil
 		}
@@ -74,15 +82,20 @@ func (a *ArticleRepository) CreateArticle(c *gin.Context) (*model.Article, error
 	json.NewDecoder(c.Request.Body).Decode(&params)
 
 	// ユーザ存在チェック
-	err := CheckUserByID(params.UserID, conn)
-	if err != nil {
+	if err := checkUserByID(params.UserID, conn); err != nil {
+		return nil, err
+	}
+
+	// サウナ存在チェック
+	if err := checkSaunaByID(params.SaunaID, conn); err != nil {
 		return nil, err
 	}
 
 	article := params.Article
 	article.UserID = params.UserID
+	article.SaunaID = params.SaunaID
 
-	err = conn.Transaction(func(tx *gorm.DB) error {
+	err := conn.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(&article).Error; err != nil {
 			if err == sql.ErrNoRows {
 				return fmt.Errorf("Can't create Article")
@@ -152,13 +165,27 @@ func newArticleFromForm(c *gin.Context) *model.Article {
 	}
 }
 
-// CheckUserByID ユーザ存在チェック
-func CheckUserByID(userID string, conn *gorm.DB) error {
+// checkUserByID ユーザ存在チェック
+func checkUserByID(userID string, conn *gorm.DB) error {
 	user := model.User{}
 
 	if err := conn.Where("id = ?", userID).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return fmt.Errorf("ユーザが見つかりませんでした。ID = %s", userID)
+		}
+		log.Println(err)
+		return errors.New("Internal Server Error. adapter/gateway/CreateArticle")
+	}
+	return nil
+}
+
+// checkSaunaByID サウナ存在チェック
+func checkSaunaByID(saunaID uint32, conn *gorm.DB) error {
+	sauna := model.Sauna{}
+
+	if err := conn.Where("id = ?", saunaID).First(&sauna).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("サウナが見つかりませんでした = %s", saunaID)
 		}
 		log.Println(err)
 		return errors.New("Internal Server Error. adapter/gateway/CreateArticle")
