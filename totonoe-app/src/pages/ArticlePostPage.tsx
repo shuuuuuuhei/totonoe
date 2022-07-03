@@ -13,12 +13,11 @@ type Data = {
 
 export const ArticlePostPage = () => {
     const [article, setArticle] = useState<Article>({
-        id: "",
-        title: "",
-        content: "",
+        ID: "",
+        Title: "",
+        Content: "",
     });
     const {getAccessTokenSilently, user} = useAuth0();
-    //const accessToken = useAuth0Token();
     
     const handleChange: React.ChangeEventHandler<HTMLSelectElement> = (event) => {
         const name = event.target.name;
@@ -28,9 +27,9 @@ export const ArticlePostPage = () => {
             ...article,
             [name]: value,
         });
+        console.log(article)
     }
-    console.log(article)
-
+    
     const handleSubmit = async(evt: any) => {
         evt.preventDefault();
         var err: Error|null = new Error
@@ -56,7 +55,7 @@ export const ArticlePostPage = () => {
                     Authorization: `Bearer ${accessToken}`,
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({article, 'user_id': user.sub?.split('|').at(1)})
+                body: JSON.stringify({article, 'user_id': user.sub?.split('|').at(1), "sauna_id": 1})
             }
             console.log(requestOption)
             fetch(uri, requestOption)
@@ -64,7 +63,7 @@ export const ArticlePostPage = () => {
             .then(data => {
                 setArticle({
                     ...article,
-                    id: data.ID,
+                    ID: data.ID,
                 })
             })
         }
@@ -86,7 +85,7 @@ export const ArticlePostPage = () => {
                         type="text"
                         className="input-sm"
                         name="title"
-                        value={article.title}
+                        value={article.Title}
                         onChange={handleChange}
                         errorDiv=""
                         errorMsg=""
@@ -95,9 +94,9 @@ export const ArticlePostPage = () => {
                             内容
                         </label>
                     <Textarea 
-                        name="content"
+                        name="Content"
                         rows={5}
-                        value={article.content}
+                        value={article.Content}
                         onChange={handleChange}
                     />
                     <hr />
@@ -111,10 +110,10 @@ export const ArticlePostPage = () => {
 }
 
 function CheckForm(article: Article): Error|null {
-    if(article.title === "") {
+    if(article.Title === "") {
         return new Error("タイトルが未入力です")
     }
-    if(article.content === "") {
+    if(article.Content === "") {
         return new Error("内容が未入力です")
     }
 
