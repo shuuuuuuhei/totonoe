@@ -5,27 +5,36 @@ import { ArticleBox } from './Article';
 import '../style/Articles.css'
 import {BsChevronDoubleLeft, BsChevronDoubleRight} from 'react-icons/bs'
 
-const initialArticlesState: Article[] = [{
-    id: "",
-    title: "",
-    content: "",
-},
-{
-    id: "",
-    title: "",
-    content: "",
-},
-{
-    id: "",
-    title: "",
-    content: "",
-}];
+// const initialArticlesState: Article[] = [
+//     {
+//         ID: "",
+//         Title: "",
+//         Content: "",
+//         CreatedAt: "",
+//         UserName: "",
+//     },
+//     {
+//         ID: "",
+//         Title: "",
+//         Content: "",
+//         CreatedAt: "",
+//         UserName: "",
+//     },
+//     {
+//         ID: "",
+//         Title: "",
+//         Content: "",
+//         CreatedAt: "",
+//         UserName: "",
+//     },
+// ];
 
 export const ArticlesBox = () => {
-    const [articlesStore, articlesDispach] = useReducer(articlesReducer, initialArticlesState);
+    // const [articlesStore, articlesDispach] = useReducer(articlesReducer, initialArticlesState);
     return(
         <Fragment>
-            <div className="list-wrap">
+            モデルが決まるまで一旦保留
+            {/* <div className="list-wrap">
                 <div className="articles-box container-fluid">
                     <div className="row justify-content-center align-items-center">
                         <BsChevronDoubleLeft className="col-1" size={45}/>
@@ -33,7 +42,7 @@ export const ArticlesBox = () => {
                         <BsChevronDoubleRight className="col-1" size={45}/>
                     </div>
                 </div>
-            </div>
+            </div> */}
         </Fragment>
     )
 }

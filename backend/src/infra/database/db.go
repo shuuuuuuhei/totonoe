@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"gorm.io/driver/postgres"
@@ -64,23 +65,71 @@ func createNewLogger() logger.Interface {
 
 // DBMigrate DBマイグレーションを行う
 func (d *DB) DBMigrate() {
-	err := d.Connection.Migrator().DropTable(model.User{}, model.Profile{}, model.Article{}, model.Sauna{}, model.UserRelationShips{}, model.Comment{}, model.ArticleLike{})
+	err := d.Connection.Migrator().DropTable(model.User{}, model.Profile{}, model.Article{}, model.Sauna{}, model.Comment{}, model.ArticleLike{}, model.UserRelationShip{})
 	fmt.Println("delete: ", err)
-	err = d.Connection.AutoMigrate(model.User{}, model.Profile{}, model.Article{}, model.Sauna{}, model.UserRelationShips{}, model.Comment{}, model.ArticleLike{})
+	err = d.Connection.AutoMigrate(model.User{}, model.Profile{}, model.Article{}, model.Sauna{}, model.Comment{}, model.ArticleLike{})
 	fmt.Println("migrate: ", err)
 }
 
 // CreateData サンプルデータ作成
 func (d *DB) CreateData() {
-	for i := 1; i <= 10; i++ {
-		user := model.User{}
-		user.Email = "aaa@test.com"
-		user.Name = "test"
-		err := d.Connection.Create(&user)
+	fmt.Println("----start create db----")
+	user := model.User{}
+	user.Email = "aaa@test.com"
+	user.Name = "test"
+	user.ID = "103026814924860204848"
+	if err := d.Connection.Create(&user).Error; err != nil {
+		fmt.Println(err)
+		return
+	}
 
-		if err != nil {
+	profile := model.Profile{}
+	profile.NickName = "test"
+	profile.Introduction = "こんちは"
+	profile.UserID = user.ID
+	if err := d.Connection.Create(&profile).Error; err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	sauna := model.Sauna{Name: "test"}
+
+	if err := d.Connection.Create(&sauna).Error; err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	tmpUser := model.User{}
+	tmpUser.ID = "test"
+	tmpUser.Email = "bbb@test.com"
+	tmpUser.Name = "test_2"
+	if err := d.Connection.Create(&tmpUser).Error; err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	if err := d.Connection.Create(&model.UserRelationShip{UserID: user.ID, FollowingID: tmpUser.ID}).Error; err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	for i := 0; i < 10; i++ {
+		article := model.Article{}
+		article.Title = "test_" + strconv.Itoa(i)
+		article.Content = "content_" + strconv.Itoa(i)
+		article.SaunaID = sauna.ID
+		article.UserID = user.ID
+		if err := d.Connection.Create(&article).Error; err != nil {
 			fmt.Println(err)
-			break
+			return
+		}
+		likes := model.ArticleLike{}
+		likes.ArticleID = article.ID
+		likes.UserID = tmpUser.ID
+		if err := d.Connection.Create(&likes).Error; err != nil {
+			fmt.Println(err)
+			return
 		}
 	}
+	fmt.Println("Create Data")
 }

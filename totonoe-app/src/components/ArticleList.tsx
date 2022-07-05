@@ -6,65 +6,75 @@ import {FaRegCommentDots} from 'react-icons/fa'
 import { Article } from '../@types/article/Article';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Navigate } from 'react-router-dom';
-export const ArticleList = () => {
-    const [articles, setArticles] = useState<[Article]>();
-    const {getAccessTokenSilently, user} = useAuth0();
+import { ProfilePage } from '../pages/ProfilePage';
 
-    useEffect(() => {
-        const fetchArticle = async() => {
-            const uri = "http://localhost:4000/articles";
-            const accessToken = await getAccessTokenSilently({
-                audience: 'https://totonoe-app.com',
-                scope: 'read:posts',
-            });
-
-            if (!accessToken || !user) {
-                throw Error("アクセストークンがありません。");
-            }
-
-            const requestOption: RequestInit = {
-                method: "GET",
-                mode: "cors",
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    user_id: user.sub?.split('|').at(1)
-                })
-            };
-            await fetch(uri, requestOption)
-            .then((response) => {
-                if (!response.ok) {
-                    const err = new Error;
-                    console.log(response);
-                    err.message = "記事が見つかりませんでした。" + response.status;
-                    throw err;
-                };
-                return response.json();
-            })
-            .then((resData) => {
-                setArticles(resData);
-            })
-            .catch(err => {
-                console.log(err)
-            });
-        }
-    })
-    if(!articles) {
-        return(
-            <Navigate to="/profile" />
-        )
-    }
+type ArticlesProps = {
+    articles: [Article]|undefined;
+}
+export const ArticleList: React.VFC<ArticlesProps> = ({articles}) => {
+    
     return (
         <Fragment>
             <div className="article-list container">
                 {articles?.map((article) => {
                     return(
-                        <div>addd</div>
+                        <div className="article-wrap">
+                            <div className="article-header row justify-content-center">
+                                <div className="col-10 article-title">
+                                    <h3>{article.Title}</h3>
+                                </div>
+                                <div className="col-2 article-top-right">
+                                    <div className="row justify-content-center">
+                                        <div className="col-2 article-like-count">
+                                            <GrLike size={30}/>
+                                            <p>{article.like_count}</p>
+                                        </div>
+                                        <div className="col-2 article-comment-count">
+                                            <FaRegCommentDots size={30}/>
+                                            <p>{article.comment_count}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="article-contents">
+                                <div className="article-top row">
+                                    <div className="col-1 user-icon">
+                                        <MdInsertEmoticon size={30}/>
+                                    </div>
+                                    <div className="col-3 user">
+                                        <p className="user-name">{article.user_name}</p>
+                                        <p className="article-date">{setDateFormat(article.CreatedAt)}</p>
+                                    </div>
+                                    <div className="col-8 sauna text-center">
+                                        <div className="sauna-name">
+                                        <h3>{article.sauna_name}</h3>
+                                        </div>
+                                        <div className="sauna-place">
+                                            {article.sauna_name}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="article-bottom row">
+                                    <div className="col-5 article-evaluate">
+                                        評価
+                                    </div>
+                                    <div className="col-7 article-content">
+                                        <p>{article.Content}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     )
                 })}
-            </div>
+                </div>                
         </Fragment>
     )
 }
+function setDateFormat(rowDate: string|undefined): string|undefined {
+    if(!rowDate) {
+        return rowDate
+    }
+    var convertedDate = rowDate.split('T').at(0)
+    return convertedDate
+}
+

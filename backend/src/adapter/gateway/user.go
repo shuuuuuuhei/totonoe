@@ -45,9 +45,15 @@ func (u *User) GetProfile(c *gin.Context) (*model.Profile, error) {
 
 	profile := model.Profile{}
 
-	if err := conn.Where("user_id = ?", params.UserID).First(&profile).Error; err != nil {
+	if err := conn.Debug().Table(`"profile"`).
+		Select(`"profile".*, count(tbl_following.user_id) AS following_count, count(tbl_followed.following_id) AS followed_count`).
+		Joins(`left join user_relation_ship tbl_following on tbl_following.user_id = profile.user_id`).
+		Joins(`left join user_relation_ship tbl_followed on tbl_followed.following_id = profile.user_id`).
+		Where(`profile.user_id = ?`, params.UserID).
+		Group(`profile.id`).
+		Scan(&profile).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, fmt.Errorf("ユーザが見つかりませんでした。 user_id = %s", params.ID)
+			return nil, fmt.Errorf("プロフィールが見つかりませんでした。 user_id = %s", params.ID)
 		}
 		log.Println(err)
 		return nil, errors.New("Internal Server Error. adapter/gateway/Login")

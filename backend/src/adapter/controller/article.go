@@ -39,7 +39,11 @@ func (article *Article) DeleteArticleByID(c *gin.Context) {
 	inputPort.DeleteArticleByID(c)
 }
 
-func 
+// GetArticlesByUserID ユーザIDから記事一覧を取得
+func (article *Article) GetArticlesByUserID(c *gin.Context) {
+	inputPort := article.newInputport(c)
+	inputPort.GetArticlesByUserID(c)
+}
 
 func (article *Article) newInputport(c *gin.Context) port.ArticleInputPort {
 	outputPort := article.OutputFactory(c)
