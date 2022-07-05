@@ -35,14 +35,14 @@ export const ProfileComponent: React.VFC<profileProps> = ({profile}) => {
                                 <CgDetailsMore />
                             </div>
                             <div className="follow-info row">
-                                <p className="col-6">フォロワー{profile?.followerCount}人</p>
-                                <p className="col-6">フォロワー{profile?.followingCount}人</p>
+                                <p className="col-6">フォロワー{profile?.followed_count}人</p>
+                                <p className="col-6">フォロワー{profile?.following_count}人</p>
                             </div>
                         </div>
                     </div>
                     <div className="row justify-content-center">
-                        <div className="col-12 user-introduce">
-                            サウナ歴10年目です！
+                        <div className="user-introduce">
+                            {profile?.Introduction}
                         </div>
                     </div>
                 </div>
