@@ -65,14 +65,15 @@ func createNewLogger() logger.Interface {
 
 // DBMigrate DBマイグレーションを行う
 func (d *DB) DBMigrate() {
-	err := d.Connection.Migrator().DropTable(model.User{}, model.Profile{}, model.Article{}, model.Sauna{}, model.UserRelationShips{}, model.Comment{}, model.ArticleLike{})
+	err := d.Connection.Migrator().DropTable(model.User{}, model.Profile{}, model.Article{}, model.Sauna{}, model.Comment{}, model.ArticleLike{}, model.UserRelationShip{})
 	fmt.Println("delete: ", err)
-	err = d.Connection.AutoMigrate(model.User{}, model.Profile{}, model.Article{}, model.Sauna{}, model.UserRelationShips{}, model.Comment{}, model.ArticleLike{})
+	err = d.Connection.AutoMigrate(model.User{}, model.Profile{}, model.Article{}, model.Sauna{}, model.Comment{}, model.ArticleLike{})
 	fmt.Println("migrate: ", err)
 }
 
 // CreateData サンプルデータ作成
 func (d *DB) CreateData() {
+	fmt.Println("----start create db----")
 	user := model.User{}
 	user.Email = "aaa@test.com"
 	user.Name = "test"
@@ -98,6 +99,20 @@ func (d *DB) CreateData() {
 		return
 	}
 
+	tmpUser := model.User{}
+	tmpUser.ID = "test"
+	tmpUser.Email = "bbb@test.com"
+	tmpUser.Name = "test_2"
+	if err := d.Connection.Create(&tmpUser).Error; err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	if err := d.Connection.Create(&model.UserRelationShip{UserID: user.ID, FollowingID: tmpUser.ID}).Error; err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	for i := 0; i < 10; i++ {
 		article := model.Article{}
 		article.Title = "test_" + strconv.Itoa(i)
@@ -108,7 +123,13 @@ func (d *DB) CreateData() {
 			fmt.Println(err)
 			return
 		}
+		likes := model.ArticleLike{}
+		likes.ArticleID = article.ID
+		likes.UserID = tmpUser.ID
+		if err := d.Connection.Create(&likes).Error; err != nil {
+			fmt.Println(err)
+			return
+		}
 	}
-
 	fmt.Println("Create Data")
 }
