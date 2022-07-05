@@ -15,6 +15,7 @@ type User struct {
 	Articles    []Article
 	Profile     Profile
 	AricleLikes []ArticleLike
+	Following   []*User   `gorm:"many2many:user_relation_ship"`
 	CreatedAt   time.Time `gorm:"autoCreateTime"`
 	UpdatedAt   time.Time `gorm:"autoUpdateTime"`
 }
