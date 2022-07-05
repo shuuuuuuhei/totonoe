@@ -2,7 +2,7 @@ export type Profile = {
     ID: string
     UserID: string
     NickName: string
-    followingCount: number
-    followerCount: number
+    following_count?: number
+    followed_count?: number
     Introduction: string
 }
