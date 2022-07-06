@@ -9,7 +9,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 
 export const Header = () => {
     const { loginWithRedirect, isAuthenticated, logout, user } = useAuth0();
-    
+    const userID = user?.sub?.split('|').at(1);
     const authenticateUser = () => {
         // 認証処理
         loginWithRedirect()
@@ -28,9 +28,9 @@ export const Header = () => {
                     </div>
                     <ul className="header-top-right row">
                         <IconContext.Provider value={{ color: '#000000', size: '50' }}>
-                            {isAuthenticated ? 
+                            {isAuthenticated || typeof userID !== 'undefined' ?
                             <li className="col">
-                                <Link to="/profile"><CgProfile /></Link>
+                                <Link to={'profile/'+userID}><CgProfile /></Link>
                                 <Button 
                                     onClick={logoutUser}
                                     variant="outline-primary"
