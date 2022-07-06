@@ -4,5 +4,6 @@ export type Profile = {
     NickName: string
     following_count?: number
     followed_count?: number
+    IsMe: boolean
     Introduction: string
 }
