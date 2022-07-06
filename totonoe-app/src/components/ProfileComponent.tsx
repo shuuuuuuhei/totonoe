@@ -30,10 +30,14 @@ export const ProfileComponent: React.VFC<profileProps> = ({profile}) => {
                             </div>
                         </div>
                         <div className="col-4 follow-wrap float-right">
-                            <div className="follow-btn">
-                                <Button>フォローする</Button>
-                                <CgDetailsMore />
-                            </div>
+                            
+                                {profile?.IsMe
+                                    ? ""
+                                    : <div className="follow-btn">
+                                        <Button>フォローする</Button>
+                                        <CgDetailsMore />
+                                        </div>
+                                }
                             <div className="follow-info row">
                                 <p className="col-6">フォロワー{profile?.followed_count}人</p>
                                 <p className="col-6">フォロワー{profile?.following_count}人</p>
