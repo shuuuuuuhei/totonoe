@@ -108,6 +108,15 @@ func (d *DB) CreateData() {
 		return
 	}
 
+	profile2 := model.Profile{}
+	profile2.NickName = "test2"
+	profile2.Introduction = "こんちは2"
+	profile2.UserID = tmpUser.ID
+	if err := d.Connection.Create(&profile2).Error; err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	if err := d.Connection.Create(&model.UserRelationShip{UserID: user.ID, FollowingID: tmpUser.ID}).Error; err != nil {
 		fmt.Println(err)
 		return
@@ -126,6 +135,24 @@ func (d *DB) CreateData() {
 		likes := model.ArticleLike{}
 		likes.ArticleID = article.ID
 		likes.UserID = tmpUser.ID
+		if err := d.Connection.Create(&likes).Error; err != nil {
+			fmt.Println(err)
+			return
+		}
+	}
+	for i := 0; i < 10; i++ {
+		article := model.Article{}
+		article.Title = "test2_" + strconv.Itoa(i)
+		article.Content = "content2_" + strconv.Itoa(i)
+		article.SaunaID = sauna.ID
+		article.UserID = tmpUser.ID
+		if err := d.Connection.Create(&article).Error; err != nil {
+			fmt.Println(err)
+			return
+		}
+		likes := model.ArticleLike{}
+		likes.ArticleID = article.ID
+		likes.UserID = user.ID
 		if err := d.Connection.Create(&likes).Error; err != nil {
 			fmt.Println(err)
 			return
