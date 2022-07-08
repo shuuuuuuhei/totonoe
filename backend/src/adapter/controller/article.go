@@ -16,39 +16,44 @@ type Article struct {
 
 // GetArticleByID は，httpを受け取り，portを組み立てて，inputPort.GetArticleByIDを呼び出す
 // 入力に関するアダプター
-func (article *Article) GetArticleByID(c *gin.Context) {
-	inputPort := article.newInputport(c)
+func (a *Article) GetArticleByID(c *gin.Context) {
+	inputPort := a.newInputport(c)
 	inputPort.GetArticleByID(c)
 }
 
 // CreateArticle portを組み立てinputport.CreateArticleを呼び出す
-func (article *Article) CreateArticle(c *gin.Context) {
-	inputPort := article.newInputport(c)
+func (a *Article) CreateArticle(c *gin.Context) {
+	inputPort := a.newInputport(c)
 	inputPort.CreateArticle(c)
 }
 
 // UpdateArticleByID IDを取得してArticleを更新
-func (article *Article) UpdateArticleByID(c *gin.Context) {
-	inputPort := article.newInputport(c)
+func (a *Article) UpdateArticleByID(c *gin.Context) {
+	inputPort := a.newInputport(c)
 	inputPort.UpdateArticleByID(c)
 }
 
 // DeleteArticleByID IDを取得してArticleを削除
-func (article *Article) DeleteArticleByID(c *gin.Context) {
-	inputPort := article.newInputport(c)
+func (a *Article) DeleteArticleByID(c *gin.Context) {
+	inputPort := a.newInputport(c)
 	inputPort.DeleteArticleByID(c)
 }
 
 // GetArticlesByUserID ユーザIDから記事一覧を取得
-func (article *Article) GetArticlesByUserID(c *gin.Context) {
-	inputPort := article.newInputport(c)
+func (a *Article) GetArticlesByUserID(c *gin.Context) {
+	inputPort := a.newInputport(c)
 	inputPort.GetArticlesByUserID(c)
 }
 
-func (article *Article) newInputport(c *gin.Context) port.ArticleInputPort {
-	outputPort := article.OutputFactory(c)
-	respository := article.RepositoryFactory(article.Conn)
-	inputPort := article.InputFactory(outputPort, respository)
+func (a *Article) GetArticlesOrderByDate(c *gin.Context) {
+	inputPort := a.newInputport(c)
+	inputPort.GetArticlesOrderByDate(c)
+}
+
+func (a *Article) newInputport(c *gin.Context) port.ArticleInputPort {
+	outputPort := a.OutputFactory(c)
+	respository := a.RepositoryFactory(a.Conn)
+	inputPort := a.InputFactory(outputPort, respository)
 
 	return inputPort
 }
