@@ -69,3 +69,14 @@ func (a *Article) GetArticlesByUserID(c *gin.Context) {
 	}
 	a.OutputPort.RenderArticles(articles)
 }
+
+// GetArticlesOrderByDate 成功：Articles、失敗エラーを返す
+func (a *Article) GetArticlesOrderByDate(ctx *gin.Context) {
+	articles, err := a.ArticleRepo.GetArticlesOrderByDate(ctx)
+	if err != nil {
+		a.OutputPort.RenderError(err)
+		return
+	}
+	a.OutputPort.RenderArticles(articles)
+	return
+}
