@@ -76,7 +76,7 @@ export const ProfilePage = () => {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    user_id: userID
+                    user_id: userID, my_id: user?.sub?.split('|').at(1),
                 })
             };
             console.log(requestOption)
@@ -118,7 +118,7 @@ export const ProfilePage = () => {
 
     return (
         <Fragment>
-            <ProfileComponent profile={profile} />
+            <ProfileComponent profile={profile} setProfile={setProfile} />
             <ArticleList articles={articles}/>
         </Fragment>
     )
