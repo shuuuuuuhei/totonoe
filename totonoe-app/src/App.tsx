@@ -15,7 +15,7 @@ function App() {
       <div>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/profile/:userID" element={<ProfilePage/>}></Route>
+          <Route path="/profile" element={<ProfilePage />}></Route>
           <Route path="/articles/new" element={<ArticlePostPage />}></Route>
         </Routes>
       </div>

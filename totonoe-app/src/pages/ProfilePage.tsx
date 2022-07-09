@@ -1,21 +1,18 @@
 import { useAuth0 } from '@auth0/auth0-react'
 import React, { Component, Fragment, useEffect, useState } from 'react'
-import {Navigate, useParams} from 'react-router-dom'
+import {Navigate} from 'react-router-dom'
 import { Article } from '../@types/article/Article'
 import { Profile } from '../@types/Profile'
 import { ArticleList } from '../components/ArticleList'
 import { ProfileComponent } from '../components/ProfileComponent'
 
-type ProfilePageProps = {
-    userID: string
-}
+
 
 export const ProfilePage = () => {
-    const [profile, setProfile] = useState<Profile|null>();
+    const [profile, setProfile] = useState<Profile>();
     const [articles, setArticles] = useState<[Article]>();
     const {getAccessTokenSilently, user} = useAuth0();
-    //ユーザIDをURIパラメータから取得
-    const {userID} = useParams();
+
     useEffect(() => {
         const fetchArticle = async() => {
             
@@ -27,7 +24,7 @@ export const ProfilePage = () => {
             if (!accessToken || !user) {
                 throw Error("アクセストークンがありません。");
             }
-            const uri = "http://localhost:4000/articles/"+userID;
+            const uri = "http://localhost:4000/articles/"+user.sub?.split('|').at(1);
 
             const requestOption: RequestInit = {
                 method: "GET",
@@ -56,7 +53,6 @@ export const ProfilePage = () => {
             });        
         }
         const fetchProfile = async() => {
-            
             const uri = "http://localhost:4000/profile";
             const accessToken = await getAccessTokenSilently({
                 audience: 'https://totonoe-app.com',
@@ -67,7 +63,6 @@ export const ProfilePage = () => {
                 throw Error("アクセストークンがありません。");
             }
 
-
             const requestOption: RequestInit = {
                 method: "POST",
                 mode: "cors",
@@ -76,10 +71,9 @@ export const ProfilePage = () => {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    user_id: userID, my_id: user?.sub?.split('|').at(1),
+                    user_id: user.sub?.split('|').at(1)
                 })
             };
-            console.log(requestOption)
             await fetch(uri, requestOption)
             .then((response) => {
                 if (!response.ok) {
@@ -92,9 +86,6 @@ export const ProfilePage = () => {
             })
             .then((resData) => {
                 setProfile(resData);
-                setProfile((prevState) => (
-                    prevState ? { ...prevState, IsMe: userID === user?.sub?.split('|').at(1),} : null
-                ))
                 console.log(profile)
             })
             .catch(err => {
@@ -108,17 +99,9 @@ export const ProfilePage = () => {
         fetchArticle();
     }, [user]);
 
-    if(!profile) {
-        return(
-            <Fragment>
-                <p>ロード中...</p>
-            </Fragment>
-        )
-    }
-
     return (
         <Fragment>
-            <ProfileComponent profile={profile} setProfile={setProfile} />
+            <ProfileComponent profile={profile} />
             <ArticleList articles={articles}/>
         </Fragment>
     )
