@@ -22,11 +22,6 @@ func (u *User) RenderError(err error) {
 	u.c.JSON(500, err)
 }
 
-// RenderOK 200 のみ返す
-func (u *User) RenderOK() {
-	u.c.JSON(200, nil)
-}
-
 // RenderProfile 200 Userを返す
 func (u *User) RenderProfile(user *model.Profile) {
 	u.c.JSON(200, user)

@@ -27,23 +27,3 @@ func (u User) GetProfile(c *gin.Context) {
 	u.OutputPort.RenderProfile(user)
 	return
 }
-
-// Follow 成功：200, 失敗：400
-func (u User) Follow(c *gin.Context) {
-	err := u.UserRepo.Follow(c)
-	if err != nil {
-		u.OutputPort.RenderError(err)
-		return
-	}
-	u.OutputPort.RenderOK()
-}
-
-// Unfollow 成功：200, 失敗：400
-func (u User) Unfollow(c *gin.Context) {
-	err := u.UserRepo.Unfollow(c)
-	if err != nil {
-		u.OutputPort.RenderError(err)
-		return
-	}
-	u.OutputPort.RenderOK()
-}

@@ -12,7 +12,6 @@ type ArticleInputPort interface {
 	UpdateArticleByID(ctx *gin.Context)
 	DeleteArticleByID(ctx *gin.Context)
 	GetArticlesByUserID(ctx *gin.Context)
-	GetArticlesOrderByDate(ctx *gin.Context)
 }
 
 // ArticleOutputPort 出力インタフェース
@@ -30,5 +29,4 @@ type ArticleRepository interface {
 	UpdateArticleByID(ctx *gin.Context) (*model.Article, error)
 	DeleteArticleByID(ctx *gin.Context) error
 	GetArticlesByUserID(ctx *gin.Context) (*[]model.Article, error)
-	GetArticlesOrderByDate(ctx *gin.Context) (*[]model.Article, error)
 }
