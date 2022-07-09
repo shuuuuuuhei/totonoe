@@ -1,10 +1,13 @@
 package gateway
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
+
+	"main.go/adapter/gateway/common"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -18,10 +21,12 @@ type User struct {
 
 // Params クライアントパラメータ
 type Params struct {
-	ID       string `json:"id"`
-	UserID   string `json:"user_id"`
-	Email    string `json:"email"`
-	NickName string `json:"nickname"`
+	ID          string `json:"id"`
+	UserID      string `json:"user_id"`
+	FollowingID string `json:"following_id"`
+	Email       string `json:"email"`
+	NickName    string `json:"nickname"`
+	MyID        string `json:"my_id"`
 }
 
 const (
@@ -59,7 +64,92 @@ func (u *User) GetProfile(c *gin.Context) (*model.Profile, error) {
 		return nil, errors.New("Internal Server Error. adapter/gateway/Login")
 	}
 
+	// フォローチェック
+	if params.UserID != params.MyID {
+		var count int64
+		if err := conn.Debug().Table(`"user_relation_ship"`).
+			Select(`"Count(1) AS count"`).
+			Where(`user_relation_ship.user_id = ? AND user_relation_ship.following_id = ?`, params.MyID, params.UserID).
+			Count(&count).Error; err != nil {
+			return nil, errors.New("Internal Server Error. adapter/gateway/Login")
+		}
+
+		if count > 0 {
+			profile.IsFollowing = true
+		}
+	}
 	return &profile, nil
+}
+
+// Follow ユーザIDを取得してユーザをフォローする
+func (u *User) Follow(c *gin.Context) error {
+	conn := u.conn
+	var params Params
+	json.NewDecoder(c.Request.Body).Decode(&params)
+
+	// ログインユーザチェック
+	if err := common.CheckUserByID(params.UserID, conn); err != nil {
+		return err
+	}
+
+	// フォロー対象のユーザチェック
+	if err := common.CheckUserByID(params.FollowingID, conn); err != nil {
+		return err
+	}
+
+	relation := model.UserRelationShip{
+		UserID:      params.UserID,
+		FollowingID: params.FollowingID,
+	}
+
+	if err := conn.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(&relation).Error; err != nil {
+			if err == sql.ErrNoRows {
+				return fmt.Errorf("フォローに失敗しました。")
+			}
+			log.Println(err)
+			return errors.New("Internal Server Error. adapter/gateway/Follow")
+		}
+		return nil
+	}); err != nil {
+		return err
+	}
+
+	// 登録成功
+	return nil
+}
+
+// Unfollow ユーザIDを取得してユーザをフォローする
+func (u *User) Unfollow(c *gin.Context) error {
+	conn := u.conn
+	var params Params
+	json.NewDecoder(c.Request.Body).Decode(&params)
+
+	// ログインユーザチェック
+	if err := common.CheckUserByID(params.UserID, conn); err != nil {
+		return err
+	}
+
+	// フォロー中のユーザチェック
+	if err := common.CheckUserByID(params.FollowingID, conn); err != nil {
+		return err
+	}
+
+	if err := conn.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("user_id=? AND following_id=?", params.UserID, params.FollowingID).Delete(&model.UserRelationShip{}).Error; err != nil {
+			if err == sql.ErrNoRows {
+				return fmt.Errorf("アンフォローに失敗しました。")
+			}
+			log.Println(err)
+			return errors.New("Internal Server Error. adapter/gateway/Unfollow")
+		}
+		return nil
+	}); err != nil {
+		return err
+	}
+
+	// 登録成功
+	return nil
 }
 
 func (u *User) SignUp(c *gin.Context) (*model.User, error) {

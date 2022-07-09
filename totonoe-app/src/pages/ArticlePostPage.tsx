@@ -16,6 +16,7 @@ export const ArticlePostPage = () => {
         ID: "",
         Title: "",
         Content: "",
+        UserID: "",
     });
     const {getAccessTokenSilently, user} = useAuth0();
     

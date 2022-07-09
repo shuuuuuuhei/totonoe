@@ -70,12 +70,16 @@ func (r *Routing) setRouting() {
 		RepositoryFactory: gateway.NewUserRepository,
 		Conn:              r.DB.Connection,
 	}
-	r.Gin.Use(corsMiddleware(), adapter.Wrap(jwtMiddleware.CheckJWT))
+	r.Gin.Use(corsMiddleware())
 
+	r.Gin.GET("/articles", articleControler.GetArticlesOrderByDate)
 	/**
 	@description All Auth Route
 	*/
+	r.Gin.Use(corsMiddleware(), adapter.Wrap(jwtMiddleware.CheckJWT))
 	r.Gin.POST("/profile", userController.GetProfile)
+	r.Gin.POST("/follow", userController.Follow)
+	r.Gin.POST("/unfollow", userController.Unfollow)
 	r.Gin.GET("/articles/:userID", articleControler.GetArticlesByUserID)
 	r.Gin.POST("/articles/new", articleControler.CreateArticle)
 	r.Gin.DELETE("/articles/:articleID", articleControler.DeleteArticleByID)
