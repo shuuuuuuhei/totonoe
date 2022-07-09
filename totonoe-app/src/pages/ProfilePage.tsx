@@ -16,6 +16,7 @@ export const ProfilePage = () => {
     const {getAccessTokenSilently, user} = useAuth0();
     //ユーザIDをURIパラメータから取得
     const {userID} = useParams();
+    console.log("for rest commit")
     useEffect(() => {
         const fetchArticle = async() => {
             
@@ -76,7 +77,7 @@ export const ProfilePage = () => {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    user_id: userID
+                    user_id: userID, my_id: user?.sub?.split('|').at(1),
                 })
             };
             console.log(requestOption)
@@ -118,7 +119,7 @@ export const ProfilePage = () => {
 
     return (
         <Fragment>
-            <ProfileComponent profile={profile} />
+            <ProfileComponent profile={profile} setProfile={setProfile} />
             <ArticleList articles={articles}/>
         </Fragment>
     )
