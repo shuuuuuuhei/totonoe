@@ -1,3 +1,5 @@
+import React from "react"
+
 type inputProps = {
     type: string,
     name: string,

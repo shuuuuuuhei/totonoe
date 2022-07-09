@@ -4,6 +4,7 @@ import { articlesReducer } from '../reducer/ArticlesReducer';
 import { ArticleBox } from './Article';
 import '../style/Articles.css'
 import {BsChevronDoubleLeft, BsChevronDoubleRight} from 'react-icons/bs'
+import React from 'react';
 
 export const ArticlesBox = () => {
     const [articles, setArticles] = useState<[Article]>();
