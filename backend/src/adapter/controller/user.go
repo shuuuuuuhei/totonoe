@@ -21,18 +21,6 @@ func (u *User) GetProfile(c *gin.Context) {
 	inputport.GetProfile(c)
 }
 
-// Follow ユーザフォロー機能
-func (u *User) Follow(c *gin.Context) {
-	inputport := u.newInputport(c)
-	inputport.Follow(c)
-}
-
-// Unfollow ユーザフォロー機能
-func (u *User) Unfollow(c *gin.Context) {
-	inputport := u.newInputport(c)
-	inputport.Unfollow(c)
-}
-
 func (u *User) newInputport(c *gin.Context) port.UserInputPort {
 	outputport := u.OutputFactory(c)
 	repository := u.RepositoryFactory(u.Conn)
