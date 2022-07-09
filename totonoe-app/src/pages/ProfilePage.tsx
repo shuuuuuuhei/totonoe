@@ -16,6 +16,7 @@ export const ProfilePage = () => {
     const {getAccessTokenSilently, user} = useAuth0();
     //ユーザIDをURIパラメータから取得
     const {userID} = useParams();
+    console.log("for rest commit")
     useEffect(() => {
         const fetchArticle = async() => {
             
