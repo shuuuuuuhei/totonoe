@@ -25,4 +25,5 @@ type UserRepository interface {
 	Follow(c *gin.Context) error
 	Unfollow(c *gin.Context) error
 	SignUp(c *gin.Context) (*model.User, error)
+	//adsf
 }
