@@ -1,7 +1,7 @@
 import { Component, Fragment, useEffect, useReducer, useState } from 'react';
 import type { Article } from '../@types/article/Article';
 import { articlesReducer } from '../reducer/ArticlesReducer';
-import { ArticleBox } from './Article';
+import { ArticleBox } from './ArticleBox';
 import '../style/Articles.css'
 import {BsChevronDoubleLeft, BsChevronDoubleRight} from 'react-icons/bs'
 import React from 'react';

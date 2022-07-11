@@ -27,7 +27,7 @@ export const ProfilePage = () => {
             if (!accessToken || !user) {
                 throw Error("アクセストークンがありません。");
             }
-            const uri = "http://localhost:4000/articles/"+userID;
+            const uri = "http://localhost:4000/users/"+userID+"/articles/";
 
             const requestOption: RequestInit = {
                 method: "GET",

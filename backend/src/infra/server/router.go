@@ -73,6 +73,7 @@ func (r *Routing) setRouting() {
 	r.Gin.Use(corsMiddleware())
 
 	r.Gin.GET("/articles", articleControler.GetArticlesOrderByDate)
+	r.Gin.GET("/saunas/:saunaID/articles/:articleID", articleControler.GetArticleByID)
 	/**
 	@description All Auth Route
 	*/
@@ -80,7 +81,7 @@ func (r *Routing) setRouting() {
 	r.Gin.POST("/profile", userController.GetProfile)
 	r.Gin.POST("/follow", userController.Follow)
 	r.Gin.POST("/unfollow", userController.Unfollow)
-	r.Gin.GET("/articles/:userID", articleControler.GetArticlesByUserID)
+	r.Gin.GET("/users/:userID/articles/", articleControler.GetArticlesByUserID)
 	r.Gin.POST("/articles/new", articleControler.CreateArticle)
 	r.Gin.DELETE("/articles/:articleID", articleControler.DeleteArticleByID)
 	// ↓まだ試してない

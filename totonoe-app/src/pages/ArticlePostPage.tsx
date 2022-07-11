@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { Article } from '../@types/article/Article'
 import { Input } from '../components/form-components/Input'
 import { Textarea } from '../components/form-components/Textarea'
+import { NewArticle } from '../@types/article/NewArticle'
 
 type Data = {
     article: Article,
@@ -12,11 +13,12 @@ type Data = {
 }
 
 export const ArticlePostPage = () => {
-    const [article, setArticle] = useState<Article>({
+    const [article, setArticle] = useState<NewArticle>({
         ID: "",
         Title: "",
         Content: "",
         UserID: "",
+        SaunaID: "",
     });
     const {getAccessTokenSilently, user} = useAuth0();
     
@@ -110,7 +112,7 @@ export const ArticlePostPage = () => {
     )
 }
 
-function CheckForm(article: Article): Error|null {
+function CheckForm(article: NewArticle): Error|null {
     if(article.Title === "") {
         return new Error("タイトルが未入力です")
     }

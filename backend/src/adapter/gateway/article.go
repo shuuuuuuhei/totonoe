@@ -37,7 +37,7 @@ type params struct {
 func (a *ArticleRepository) GetArticleByID(c *gin.Context) (*model.Article, error) {
 	conn := a.GetDBConn()
 	article := model.Article{}
-	articleID := c.PostForm("articleID")
+	articleID := c.Param("articleID")
 
 	if err := conn.First(&article).Error; err != nil {
 		if err == sql.ErrNoRows {
