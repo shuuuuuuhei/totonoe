@@ -57,35 +57,56 @@ func (r *Routing) Run() {
 }
 
 func (r *Routing) setRouting() {
-	articleControler := controller.Article{
-		OutputFactory:     presenter.NewArticleOutputport,
+	articleController := controller.Article{
 		InputFactory:      interactor.NewArticleInputPort,
+		OutputFactory:     presenter.NewArticleOutputport,
 		RepositoryFactory: gateway.NewArticleRepository,
 		Conn:              r.DB.Connection,
 	}
 
 	userController := controller.User{
-		OutputFactory:     presenter.NewUserOutputPort,
 		InputFactory:      interactor.NewUserInport,
+		OutputFactory:     presenter.NewUserOutputPort,
 		RepositoryFactory: gateway.NewUserRepository,
 		Conn:              r.DB.Connection,
 	}
+
+	commentController := controller.Comment{
+		InputFactory:      interactor.NewCommentInputport,
+		OutputFactory:     presenter.NewCommentOutputPort,
+		RepositoryFactory: gateway.NewCommentRepository,
+	}
+
 	r.Gin.Use(corsMiddleware())
 
-	r.Gin.GET("/articles", articleControler.GetArticlesOrderByDate)
-	r.Gin.GET("/saunas/:saunaID/articles/:articleID", articleControler.GetArticleByID)
+	r.Gin.POST("/login", adapter.Wrap(jwtMiddleware.CheckJWT), userController.Login)
+
+	r.Gin.GET("/articles", articleController.GetArticlesOrderByDate)
+	r.Gin.GET("/saunas/:saunaID/articles/:articleID", articleController.GetArticleByID)
 	/**
 	@description All Auth Route
 	*/
 	r.Gin.Use(corsMiddleware(), adapter.Wrap(jwtMiddleware.CheckJWT))
+
+	// 記事
+	r.Gin.POST("/articles/new", articleController.CreateArticle)
+	r.Gin.POST("/articles/:articleID/like", articleController.LikeArticle)
+	r.Gin.GET("/users/:userID/articles/", articleController.GetArticlesByUserID)
+	r.Gin.DELETE("/articles/:articleID/like", articleController.DeleteLikedArtile)
+	// ↓まだ試してない
+	r.Gin.DELETE("/articles/:articleID", articleController.DeleteArticleByID)
+	r.Gin.PUT("/articles", articleController.UpdateArticleByID)
+
+	// ユーザー
 	r.Gin.POST("/profile", userController.GetProfile)
 	r.Gin.POST("/follow", userController.Follow)
 	r.Gin.POST("/unfollow", userController.Unfollow)
-	r.Gin.GET("/users/:userID/articles/", articleControler.GetArticlesByUserID)
-	r.Gin.POST("/articles/new", articleControler.CreateArticle)
-	r.Gin.DELETE("/articles/:articleID", articleControler.DeleteArticleByID)
-	// ↓まだ試してない
-	r.Gin.PUT("/articles", articleControler.UpdateArticleByID)
+
+	// 記事コメント
+	r.Gin.GET("/articles/:articleID/comments", commentController.GetAllCommentsByArticleID)
+	r.Gin.GET("/articles/:articleID/comments/:commentID", commentController.GetCommentsByArticleID)
+	r.Gin.POST("/articles/:articleID/comments/new", commentController.CreateComment)
+	r.Gin.DELETE("/articles/:articleID/comment/new", commentController.DeleteComment)
 }
 
 // corsMiddleware CORSの設定
