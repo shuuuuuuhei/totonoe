@@ -29,25 +29,24 @@ func (a *Article) GetArticleByID(ctx *gin.Context) {
 	a.OutputPort.RenderArticle(article)
 }
 
-// CreateArticle Articlを作成する。Err or nilを返す
+// CreateArticle Articleを作成する。Err or nilを返す
 func (a *Article) CreateArticle(ctx *gin.Context) {
-	article, err := a.ArticleRepo.CreateArticle(ctx)
+	err := a.ArticleRepo.CreateArticle(ctx)
 	if err != nil {
 		a.OutputPort.RenderError(err)
 		return
 	}
-	a.OutputPort.RenderArticle(article)
-	return
+	a.OutputPort.RenderOK(ctx)
 }
 
 // UpdateArticleByID ArticleRepositoryに登録されているUpdateArticleByIDを呼び出してArticleを更新してOutputPortに結果を渡す
 func (a *Article) UpdateArticleByID(ctx *gin.Context) {
-	article, err := a.ArticleRepo.UpdateArticleByID(ctx)
+	err := a.ArticleRepo.UpdateArticleByID(ctx)
 	if err != nil {
 		a.OutputPort.RenderError(err)
 		return
 	}
-	a.OutputPort.RenderArticle(article)
+	a.OutputPort.RenderOK(ctx)
 }
 
 // DeleteArticleByID 成功：200、失敗：エラーを返す
@@ -78,5 +77,24 @@ func (a *Article) GetArticlesOrderByDate(ctx *gin.Context) {
 		return
 	}
 	a.OutputPort.RenderArticles(articles)
-	return
+}
+
+// LikeArticle 成功：200、失敗エラーを返す
+func (a *Article) LikeArticle(ctx *gin.Context) {
+	err := a.ArticleRepo.LikeArticle(ctx)
+	if err != nil {
+		a.OutputPort.RenderError(err)
+		return
+	}
+	a.OutputPort.RenderOK(ctx)
+}
+
+// UnLikedArticle 成功：200、失敗エラーを返す
+func (a *Article) UnLikedArticle(ctx *gin.Context) {
+	err := a.ArticleRepo.UnLikedArticle(ctx)
+	if err != nil {
+		a.OutputPort.RenderError(err)
+		return
+	}
+	a.OutputPort.RenderOK(ctx)
 }
