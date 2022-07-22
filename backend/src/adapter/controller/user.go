@@ -9,8 +9,8 @@ import (
 
 // User 各ポートの宣言
 type User struct {
-	OutputFactory     func(c *gin.Context) port.UserOutputPort
 	InputFactory      func(o port.UserOutputPort, u port.UserRepository) port.UserInputPort
+	OutputFactory     func(c *gin.Context) port.UserOutputPort
 	RepositoryFactory func(c *gorm.DB) port.UserRepository
 	Conn              *gorm.DB
 }
@@ -31,6 +31,10 @@ func (u *User) Follow(c *gin.Context) {
 func (u *User) Unfollow(c *gin.Context) {
 	inputport := u.newInputport(c)
 	inputport.Unfollow(c)
+}
+
+func (u *User) Login(c *gin.Context) {
+	
 }
 
 func (u *User) newInputport(c *gin.Context) port.UserInputPort {
