@@ -1,17 +1,14 @@
-package model
+package Domain
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // Sauna サウナモデル
 type Sauna struct {
-	gorm.Model
-	ID        uint32 `gorm:"primryKey"`
-	Name      string `gorm:"primryKey"`
-	AdressID  string `gorm:"primryKey"`
+	ID        uint32 `gorm:"primaryKey"`
+	Name      string `gorm:"not null"`
+	AddressID string `gorm:"not null"`
 	Articles  []Article
 	CreatedAt time.Time `gorm:"autoCreateTime"`
 	UpdatedAt time.Time `gorm:"autoUpdateTime"`
