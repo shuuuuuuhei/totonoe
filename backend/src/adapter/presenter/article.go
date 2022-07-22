@@ -2,8 +2,8 @@ package presenter
 
 import (
 	"github.com/gin-gonic/gin"
+	"main.go/model/ValueObject"
 
-	"main.go/model"
 	"main.go/usecase/port"
 )
 
@@ -22,12 +22,12 @@ func NewArticleOutputport(c *gin.Context) port.ArticleOutputPort {
 }
 
 // RenderArticle はArticleを返す
-func (a *Article) RenderArticle(article *model.Article) {
+func (a *Article) RenderArticle(article *ValueObject.ArticleVO) {
 	a.c.JSON(200, article)
 }
 
 // RenderArticles はArticlesを返す
-func (a *Article) RenderArticles(articles *[]model.Article) {
+func (a *Article) RenderArticles(articles *[]ValueObject.ArticleVO) {
 	a.c.JSON(200, articles)
 }
 

@@ -6,12 +6,14 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"main.go/model/Domain"
+	"main.go/model/ValueObject"
 
 	"main.go/adapter/gateway/common"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"main.go/model"
+
 	"main.go/usecase/port"
 )
 
@@ -20,7 +22,7 @@ type User struct {
 }
 
 // Params クライアントパラメータ
-type Params struct {
+type userParams struct {
 	ID          string `json:"id"`
 	UserID      string `json:"user_id"`
 	FollowingID string `json:"following_id"`
@@ -43,19 +45,19 @@ func NewUserRepository(conn *gorm.DB) port.UserRepository {
 }
 
 // GetProfile メールアドレスからユーザを検索し、パスワード照合を行う
-func (u *User) GetProfile(c *gin.Context) (*model.Profile, error) {
+func (u *User) GetProfile(c *gin.Context) (*ValueObject.ProfileVO, error) {
 	conn := u.conn
-	var params Params
+	var params userParams
 	json.NewDecoder(c.Request.Body).Decode(&params)
 
-	profile := model.Profile{}
+	profile := ValueObject.ProfileVO{}
 
 	if err := conn.Debug().Table(`"profile"`).
-		Select(`"profile".*, count(tbl_following.user_id) AS following_count, count(tbl_followed.following_id) AS followed_count`).
+		Select(`profile.id, profile.user_id, profile.nick_name, profile.introduction, count(tbl_following.user_id) AS following_count, count(tbl_followed.following_id) AS followed_count`).
 		Joins(`left join user_relation_ship tbl_following on tbl_following.user_id = profile.user_id`).
 		Joins(`left join user_relation_ship tbl_followed on tbl_followed.following_id = profile.user_id`).
 		Where(`profile.user_id = ?`, params.UserID).
-		Group(`profile.id`).
+		Group(`profile.id, profile.user_id, profile.nick_name, profile.introduction`).
 		Scan(&profile).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("プロフィールが見つかりませんでした。 user_id = %s", params.ID)
@@ -84,7 +86,7 @@ func (u *User) GetProfile(c *gin.Context) (*model.Profile, error) {
 // Follow ユーザIDを取得してユーザをフォローする
 func (u *User) Follow(c *gin.Context) error {
 	conn := u.conn
-	var params Params
+	var params userParams
 	json.NewDecoder(c.Request.Body).Decode(&params)
 
 	// ログインユーザチェック
@@ -97,7 +99,7 @@ func (u *User) Follow(c *gin.Context) error {
 		return err
 	}
 
-	relation := model.UserRelationShip{
+	relation := Domain.UserRelationShip{
 		UserID:      params.UserID,
 		FollowingID: params.FollowingID,
 	}
@@ -122,7 +124,7 @@ func (u *User) Follow(c *gin.Context) error {
 // Unfollow ユーザIDを取得してユーザをフォローする
 func (u *User) Unfollow(c *gin.Context) error {
 	conn := u.conn
-	var params Params
+	var params userParams
 	json.NewDecoder(c.Request.Body).Decode(&params)
 
 	// ログインユーザチェック
@@ -136,7 +138,7 @@ func (u *User) Unfollow(c *gin.Context) error {
 	}
 
 	if err := conn.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Where("user_id=? AND following_id=?", params.UserID, params.FollowingID).Delete(&model.UserRelationShip{}).Error; err != nil {
+		if err := tx.Where("user_id=? AND following_id=?", params.UserID, params.FollowingID).Delete(&Domain.UserRelationShip{}).Error; err != nil {
 			if err == sql.ErrNoRows {
 				return fmt.Errorf("アンフォローに失敗しました。")
 			}
@@ -152,9 +154,9 @@ func (u *User) Unfollow(c *gin.Context) error {
 	return nil
 }
 
-func (u *User) SignUp(c *gin.Context) (*model.User, error) {
+func (u *User) SignUp(c *gin.Context) (*Domain.User, error) {
 	conn := u.conn
-	var params Params
+	var params userParams
 	json.NewDecoder(c.Request.Body).Decode(&params)
 
 	user, err := newUserByParams(params)
@@ -170,7 +172,7 @@ func (u *User) SignUp(c *gin.Context) (*model.User, error) {
 	return user, nil
 }
 
-func newUserByParams(p Params) (*model.User, error) {
+func newUserByParams(p userParams) (*Domain.User, error) {
 
 	//params check
 	err := checkParams(p)
@@ -179,7 +181,7 @@ func newUserByParams(p Params) (*model.User, error) {
 		return nil, err
 	}
 
-	return &model.User{
+	return &Domain.User{
 		ID:    p.ID,
 		Name:  p.NickName,
 		Email: p.Email,
@@ -187,7 +189,7 @@ func newUserByParams(p Params) (*model.User, error) {
 }
 
 // タイプ別パラメータ存在チェック
-func checkParams(p Params) error {
+func checkParams(p userParams) error {
 
 	// switch p.ParamsType {
 	// case SIGN_UP:
