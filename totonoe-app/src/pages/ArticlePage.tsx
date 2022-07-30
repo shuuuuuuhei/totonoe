@@ -7,9 +7,7 @@ import { DetailArticle } from '../components/Article';
 export const ArticlePage = () => {
     const [article, setArticle] = useState<Article>();
     const params = useParams();
-
-    console.log()
-    
+       
     useEffect(() => {
         if(!params.articleID) {
             console.log("articleIDなし")
@@ -32,7 +30,7 @@ export const ArticlePage = () => {
                     console.log(response);
                     err.message = "記事が見つかりませんでした。記事ID："+ params.articleID + ", レスポンスコード：" + response.status;
                     throw err;
-                };
+                }
                 return response.json();
             })
             .then((resData) => {
@@ -45,6 +43,11 @@ export const ArticlePage = () => {
         }
         fetchArticle();
     }, [])
+    if(!article) {
+        return(
+            <div>ロード中...</div>
+        )
+    }
     return(
         <Fragment>
             <DetailArticle article={article}/>

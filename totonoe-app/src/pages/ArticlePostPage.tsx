@@ -6,6 +6,7 @@ import { Article } from '../@types/article/Article'
 import { Input } from '../components/form-components/Input'
 import { Textarea } from '../components/form-components/Textarea'
 import { NewArticle } from '../@types/article/NewArticle'
+import { useCookies } from "react-cookie";
 
 type Data = {
     article: Article,
@@ -21,6 +22,7 @@ export const ArticlePostPage = () => {
         SaunaID: "",
     });
     const {getAccessTokenSilently, user} = useAuth0();
+    const [cookies] = useCookies();
     
     const handleChange: React.ChangeEventHandler<HTMLSelectElement> = (event) => {
         const name = event.target.name;
@@ -51,14 +53,13 @@ export const ArticlePostPage = () => {
                 audience: 'https://totonoe-app.com',
                 scope: 'read:posts',
             })
-            console.log(accessToken)
             const requestOption: RequestInit = {
             method: "POST",
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({article, 'user_id': user.sub?.split('|').at(1), "sauna_id": 1})
+                body: JSON.stringify({article, 'user_id': cookies.userID, "sauna_id": 1})
             }
             console.log(requestOption)
             fetch(uri, requestOption)

@@ -5,6 +5,7 @@ import { Article } from '../@types/article/Article'
 import { Profile } from '../@types/Profile'
 import { ArticleList } from '../components/ArticleList'
 import { ProfileComponent } from '../components/ProfileComponent'
+import { useCookies } from "react-cookie";
 
 type ProfilePageProps = {
     userID: string
@@ -14,6 +15,8 @@ export const ProfilePage = () => {
     const [profile, setProfile] = useState<Profile|null>();
     const [articles, setArticles] = useState<[Article]>();
     const {getAccessTokenSilently, user} = useAuth0();
+    const [cookies] = useCookies();
+
     //ユーザIDをURIパラメータから取得
     const {userID} = useParams();
     useEffect(() => {
@@ -49,7 +52,6 @@ export const ProfilePage = () => {
             })
             .then((resData) => {
                 setArticles(resData)
-                console.log(resData)
             })
             .catch(err => {
                 console.log(err)
@@ -67,16 +69,16 @@ export const ProfilePage = () => {
                 throw Error("アクセストークンがありません。");
             }
 
-
             const requestOption: RequestInit = {
                 method: "POST",
                 mode: "cors",
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
                     "Content-Type": "application/json",
+                    "User-ID": cookies.userID,
                 },
                 body: JSON.stringify({
-                    user_id: userID, my_id: user?.sub?.split('|').at(1),
+                    user_id: userID,
                 })
             };
             console.log(requestOption)
@@ -93,7 +95,7 @@ export const ProfilePage = () => {
             .then((resData) => {
                 setProfile(resData);
                 setProfile((prevState) => (
-                    prevState ? { ...prevState, IsMe: userID === user?.sub?.split('|').at(1),} : null
+                    prevState ? { ...prevState, IsMe: userID === cookies.userID,} : null
                 ))
                 console.log(profile)
             })
@@ -119,7 +121,7 @@ export const ProfilePage = () => {
     return (
         <Fragment>
             <ProfileComponent profile={profile} setProfile={setProfile} />
-            <ArticleList articles={articles}/>
+            <ArticleList articles={articles} />
         </Fragment>
     )
 }
