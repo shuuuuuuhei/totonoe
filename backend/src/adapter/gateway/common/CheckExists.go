@@ -13,6 +13,10 @@ import (
 func CheckUserByID(userID string, conn *gorm.DB) error {
 	user := Domain.User{}
 
+	if userID == "" {
+		return nil
+	}
+	
 	if err := conn.Where("id = ?", userID).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return fmt.Errorf("ユーザが見つかりませんでした。ID = %s", userID)
