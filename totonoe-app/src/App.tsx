@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
 import { FaBeer } from 'react-icons/fa';
 
@@ -12,15 +12,17 @@ import { useCookies } from 'react-cookie';
 
 function App() {
   const {user} = useAuth0();
-  const [cookies, setCookie] = useCookies();
+  const [cookies, setCookie, removeCookie] = useCookies();
   
   const userID = user?.sub?.split('|').at(1)
-  
-  if(cookies.userID == '' && typeof userID !== 'undefined') {
-    var now = new Date();
-    now.setTime(now.getTime() + 1 );
-    setCookie("userID", userID, { expires: now, path: '/' })
-  }
+  console.log(cookies.userID)
+  useEffect(() => {
+    if(typeof cookies.userID == 'undefined' && typeof userID !== 'undefined') {
+      var now = new Date();
+      now.setTime(now.getTime() + 1 * 3600 * 1000);
+      setCookie("userID", userID, { expires: now, path: '/' })
+    }
+  }, [userID])
 
   return (
     <BrowserRouter>

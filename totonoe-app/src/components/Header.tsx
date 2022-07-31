@@ -10,7 +10,7 @@ import { useCookies } from 'react-cookie';
 
 export const Header = () => {
     const { loginWithRedirect, isAuthenticated, logout } = useAuth0();
-    const [cookies, removeCookie] = useCookies();
+    const [cookies, setCookie,removeCookie] = useCookies();
     
     const authenticateUser = () => {
         // 認証処理
@@ -18,8 +18,8 @@ export const Header = () => {
     }
 
     const logoutUser = () => {
-        removeCookie("userID", cookies.userID)
-        logout({returnTo: window.location.origin})
+        removeCookie("userID",{path:'/'});
+        logout({returnTo: window.location.origin});
     }
 
     return (
@@ -31,7 +31,7 @@ export const Header = () => {
                     </div>
                     <ul className="header-top-right row">
                         <IconContext.Provider value={{ color: '#000000', size: '50' }}>
-                            {isAuthenticated ?
+                            {isAuthenticated || typeof cookies.userID != 'undefined'? 
                             <li className="col">
                                 <Link to={'profile/'+cookies.userID}><CgProfile /></Link>
                                 <Button 

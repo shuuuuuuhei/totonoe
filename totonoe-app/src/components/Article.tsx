@@ -5,6 +5,7 @@ import { MdInsertEmoticon } from 'react-icons/md'
 import { FaRegCommentDots } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
+import { useCookies } from 'react-cookie'
 
 type ArticleProps = {
     article: Article|undefined
@@ -13,6 +14,7 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
 
     const [article, setArticle] = useState<Article|undefined>(props.article);
     const {getAccessTokenSilently, user} = useAuth0();
+    const [cookies, setCookie, removeCookie] = useCookies();
 
     const handleLike = async() => {
         
@@ -20,15 +22,11 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
             audience: 'https://totonoe-app.com',
             scope: 'read:posts',
         });
+        const articleID = article?.id;
 
         if (!accessToken || !user) {
             throw Error("アクセストークンがありません。");
         }
-
-        const articleID = article?.id;
-        const userID = user.sub?.split('|').at(1);
-
-        console.log(article)
 
         // 未いいねの場合
         if(!article?.is_liked) {
@@ -41,7 +39,7 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
                         Authorization: `Bearer ${accessToken}`,
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({'user_id': userID})
+                    body: JSON.stringify({'user_id': cookies.userID})
                 };
                 await fetch(uri, requestOption)
                 .then((response) => {
@@ -75,7 +73,7 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
                     Authorization: `Bearer ${accessToken}`,
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({'user_id': userID})
+                body: JSON.stringify({'user_id': cookies.userID})
             };
             await fetch(uri, requestOption)
             .then((response) => {

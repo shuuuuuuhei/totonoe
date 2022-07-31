@@ -15,7 +15,7 @@ export const ProfilePage = () => {
     const [profile, setProfile] = useState<Profile|null>();
     const [articles, setArticles] = useState<[Article]>();
     const {getAccessTokenSilently, user} = useAuth0();
-    const [cookies] = useCookies();
+    const [cookies, setCookie,removeCookie] = useCookies();
 
     //ユーザIDをURIパラメータから取得
     const {userID} = useParams();

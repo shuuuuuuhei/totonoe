@@ -22,7 +22,7 @@ export const ArticlePostPage = () => {
         SaunaID: "",
     });
     const {getAccessTokenSilently, user} = useAuth0();
-    const [cookies] = useCookies();
+    const [cookies, setCookie,removeCookie] = useCookies();
     
     const handleChange: React.ChangeEventHandler<HTMLSelectElement> = (event) => {
         const name = event.target.name;
