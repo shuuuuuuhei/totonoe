@@ -40,8 +40,22 @@ func (a *ArticleRepository) GetArticleByID(c *gin.Context) (*ValueObject.Article
 	conn := a.conn
 	article := ValueObject.ArticleVO{}
 	articleID := c.Param("articleID")
+	userID := c.Request.Header.Get("User-ID")
 
-	if err := conn.Debug().Table("article").Select("article.*").Scan(&article).Error; err != nil {
+	if err := common.CheckUserByID(userID, conn); err != nil {
+		return nil, err
+	}
+
+	if err := conn.Debug().Table("article").
+		Select(`article.*,"user".name AS user_name, sauna.name AS sauna_name, count(likes_count.id) AS like_count,  case when liked.id is null  then false else true end AS is_liked, count(comment.id) AS comment_count`).
+		Joins(`left join  "user" on "user".id = article.user_id`).
+		Joins("left join sauna on sauna.id = article.sauna_id").
+		Joins("left join article_like likes_count on likes_count.article_id = article.id").
+		Joins("left join article_like liked on liked.article_id = article.id AND liked.user_id=?", userID).
+		Joins("left join comment on comment.article_id = article.id").
+		Where("article.id=?", articleID).
+		Group(`article.id, "user".name, sauna.name, liked.id`).
+		Scan(&article).Error; err != nil {
 		if err == sql.ErrNoRows {
 			return nil, fmt.Errorf("User Not Found. ArticleID = %s", articleID)
 		}
@@ -69,7 +83,8 @@ func (a *ArticleRepository) GetArticlesByUserID(c *gin.Context) (*[]ValueObject.
 		Joins("left join article_like likes_count on likes_count.article_id = article.id").
 		Joins("left join article_like liked on liked.article_id = article.id AND liked.user_id=?", userID).
 		Joins("left join comment on comment.article_id = article.id").
-		Where("article.user_id = ?", userID).Group(`article.id, "user".name, sauna.name, liked.id`).
+		Where("article.user_id = ?", userID).
+		Group(`article.id, "user".name, sauna.name, liked.id`).
 		Scan(&articles).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Println("記事が見つかりませんでした。)")
