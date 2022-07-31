@@ -49,6 +49,10 @@ func (u *User) GetProfile(c *gin.Context) (*ValueObject.ProfileVO, error) {
 	conn := u.conn
 	var params userParams
 	json.NewDecoder(c.Request.Body).Decode(&params)
+	token := c.Request.Header.Get("User-ID")
+	if token == "" {
+		return nil, errors.New("認証情報がありません")
+	}
 
 	profile := ValueObject.ProfileVO{}
 
@@ -67,11 +71,11 @@ func (u *User) GetProfile(c *gin.Context) (*ValueObject.ProfileVO, error) {
 	}
 
 	// フォローチェック
-	if params.UserID != params.MyID {
+	if params.UserID != token {
 		var count int64
 		if err := conn.Debug().Table(`"user_relation_ship"`).
 			Select(`"Count(1) AS count"`).
-			Where(`user_relation_ship.user_id = ? AND user_relation_ship.following_id = ?`, params.MyID, params.UserID).
+			Where(`user_relation_ship.user_id = ? AND user_relation_ship.following_id = ?`, token, params.UserID).
 			Count(&count).Error; err != nil {
 			return nil, errors.New("Internal Server Error. adapter/gateway/Login")
 		}
