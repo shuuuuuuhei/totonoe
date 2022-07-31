@@ -33,10 +33,6 @@ func (u *User) Unfollow(c *gin.Context) {
 	inputport.Unfollow(c)
 }
 
-func (u *User) Login(c *gin.Context) {
-	
-}
-
 func (u *User) newInputport(c *gin.Context) port.UserInputPort {
 	outputport := u.OutputFactory(c)
 	repository := u.RepositoryFactory(u.Conn)
