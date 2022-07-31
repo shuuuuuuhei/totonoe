@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 	"log"
+	"main.go/model/Domain"
 	"os"
 	"strconv"
 	"time"
@@ -11,7 +12,6 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
-	"main.go/model"
 )
 
 // DB 型宣言
@@ -65,16 +65,26 @@ func createNewLogger() logger.Interface {
 
 // DBMigrate DBマイグレーションを行う
 func (d *DB) DBMigrate() {
-	err := d.Connection.Migrator().DropTable(model.User{}, model.Profile{}, model.Article{}, model.Sauna{}, model.Comment{}, model.ArticleLike{}, model.UserRelationShip{})
+	err := d.Connection.Migrator().DropTable(Domain.User{}, Domain.Profile{}, Domain.Article{}, Domain.Sauna{}, Domain.Comment{}, Domain.ArticleLike{}, Domain.UserRelationShip{})
 	fmt.Println("delete: ", err)
-	err = d.Connection.AutoMigrate(model.User{}, model.Profile{}, model.Article{}, model.Sauna{}, model.Comment{}, model.ArticleLike{})
+	err = d.Connection.AutoMigrate(Domain.Sauna{})
+	fmt.Println("migrate: ", err)
+	err = d.Connection.AutoMigrate(Domain.User{})
+	fmt.Println("migrate: ", err)
+	err = d.Connection.AutoMigrate(Domain.Profile{})
+	fmt.Println("migrate: ", err)
+	err = d.Connection.AutoMigrate(Domain.Article{})
+	fmt.Println("migrate: ", err)
+	err = d.Connection.AutoMigrate(Domain.Comment{})
+	fmt.Println("migrate: ", err)
+	err = d.Connection.AutoMigrate(Domain.ArticleLike{})
 	fmt.Println("migrate: ", err)
 }
 
 // CreateData サンプルデータ作成
 func (d *DB) CreateData() {
 	fmt.Println("----start create db----")
-	user := model.User{}
+	user := Domain.User{}
 	user.Email = "aaa@test.com"
 	user.Name = "test"
 	user.ID = "103026814924860204848"
@@ -83,7 +93,7 @@ func (d *DB) CreateData() {
 		return
 	}
 
-	profile := model.Profile{}
+	profile := Domain.Profile{}
 	profile.NickName = "test"
 	profile.Introduction = "こんちは"
 	profile.UserID = user.ID
@@ -92,14 +102,14 @@ func (d *DB) CreateData() {
 		return
 	}
 
-	sauna := model.Sauna{Name: "test"}
+	sauna := Domain.Sauna{Name: "test"}
 
 	if err := d.Connection.Create(&sauna).Error; err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	tmpUser := model.User{}
+	tmpUser := Domain.User{}
 	tmpUser.ID = "test"
 	tmpUser.Email = "bbb@test.com"
 	tmpUser.Name = "test_2"
@@ -108,7 +118,7 @@ func (d *DB) CreateData() {
 		return
 	}
 
-	profile2 := model.Profile{}
+	profile2 := Domain.Profile{}
 	profile2.NickName = "test2"
 	profile2.Introduction = "こんちは2"
 	profile2.UserID = tmpUser.ID
@@ -117,13 +127,13 @@ func (d *DB) CreateData() {
 		return
 	}
 
-	if err := d.Connection.Create(&model.UserRelationShip{UserID: user.ID, FollowingID: tmpUser.ID}).Error; err != nil {
+	if err := d.Connection.Create(&Domain.UserRelationShip{UserID: user.ID, FollowingID: tmpUser.ID}).Error; err != nil {
 		fmt.Println(err)
 		return
 	}
 
 	for i := 0; i < 10; i++ {
-		article := model.Article{}
+		article := Domain.Article{}
 		article.Title = "test_" + strconv.Itoa(i)
 		article.Content = "content_" + strconv.Itoa(i)
 		article.SaunaID = sauna.ID
@@ -132,7 +142,7 @@ func (d *DB) CreateData() {
 			fmt.Println(err)
 			return
 		}
-		likes := model.ArticleLike{}
+		likes := Domain.ArticleLike{}
 		likes.ArticleID = article.ID
 		likes.UserID = tmpUser.ID
 		if err := d.Connection.Create(&likes).Error; err != nil {
@@ -141,7 +151,7 @@ func (d *DB) CreateData() {
 		}
 	}
 	for i := 0; i < 10; i++ {
-		article := model.Article{}
+		article := Domain.Article{}
 		article.Title = "test2_" + strconv.Itoa(i)
 		article.Content = "content2_" + strconv.Itoa(i)
 		article.SaunaID = sauna.ID
@@ -150,7 +160,7 @@ func (d *DB) CreateData() {
 			fmt.Println(err)
 			return
 		}
-		likes := model.ArticleLike{}
+		likes := Domain.ArticleLike{}
 		likes.ArticleID = article.ID
 		likes.UserID = user.ID
 		if err := d.Connection.Create(&likes).Error; err != nil {

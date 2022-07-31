@@ -8,8 +8,8 @@ import (
 
 // Article ArticleControllerの型宣言
 type Article struct {
-	OutputFactory     func(c *gin.Context) port.ArticleOutputPort
 	InputFactory      func(o port.ArticleOutputPort, a port.ArticleRepository) port.ArticleInputPort
+	OutputFactory     func(c *gin.Context) port.ArticleOutputPort
 	RepositoryFactory func(c *gorm.DB) port.ArticleRepository
 	Conn              *gorm.DB
 }
@@ -50,10 +50,22 @@ func (a *Article) GetArticlesOrderByDate(c *gin.Context) {
 	inputPort.GetArticlesOrderByDate(c)
 }
 
+// LikeArticle 記事をいいねする
+func (a *Article) LikeArticle(c *gin.Context) {
+	inputPort := a.newInputport(c)
+	inputPort.LikeArticle(c)
+}
+
+// DeleteLikedArtile 記事のいいねを解除する
+func (a *Article) DeleteLikedArtile(c *gin.Context) {
+	inputPort := a.newInputport(c)
+	inputPort.UnLikedArticle(c)
+}
+
 func (a *Article) newInputport(c *gin.Context) port.ArticleInputPort {
 	outputPort := a.OutputFactory(c)
-	respository := a.RepositoryFactory(a.Conn)
-	inputPort := a.InputFactory(outputPort, respository)
+	repository := a.RepositoryFactory(a.Conn)
+	inputPort := a.InputFactory(outputPort, repository)
 
 	return inputPort
 }

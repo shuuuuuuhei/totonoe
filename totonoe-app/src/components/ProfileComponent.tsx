@@ -18,7 +18,6 @@ export const ProfileComponent: React.VFC<profileProps> = ({profile, setProfile})
         if(!user) {
             return
         }
-
         try {
             const uri = "http://localhost:4000/follow";
             const accessToken = await getAccessTokenSilently({

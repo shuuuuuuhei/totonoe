@@ -17,7 +17,7 @@ func NewUserInport(o port.UserOutputPort, u port.UserRepository) port.UserInputP
 	}
 }
 
-// GetProfile repositry ユーザログイン機能を呼び出す。結果をOutputportに渡す。
+// GetProfile repository ユーザログイン機能を呼び出す。結果をOutputportに渡す。
 func (u User) GetProfile(c *gin.Context) {
 	user, err := u.UserRepo.GetProfile(c)
 	if err != nil {
@@ -25,7 +25,6 @@ func (u User) GetProfile(c *gin.Context) {
 		return
 	}
 	u.OutputPort.RenderProfile(user)
-	return
 }
 
 // Follow 成功：200, 失敗：400

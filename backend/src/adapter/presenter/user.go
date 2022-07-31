@@ -2,8 +2,8 @@ package presenter
 
 import (
 	"github.com/gin-gonic/gin"
+	"main.go/model/ValueObject"
 
-	"main.go/model"
 	"main.go/usecase/port"
 )
 
@@ -28,6 +28,6 @@ func (u *User) RenderOK() {
 }
 
 // RenderProfile 200 Userを返す
-func (u *User) RenderProfile(user *model.Profile) {
+func (u *User) RenderProfile(user *ValueObject.ProfileVO) {
 	u.c.JSON(200, user)
 }
