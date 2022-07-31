@@ -1,11 +1,10 @@
 package server
 
 import (
-	"encoding/json"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"time"
 
-	jwtmiddleware "github.com/auth0/go-jwt-middleware/v2"
-	"github.com/auth0/go-jwt-middleware/v2/validator"
 	adapter "github.com/gwatts/gin-adapter"
 
 	"github.com/gin-contrib/cors"
@@ -27,19 +26,6 @@ type Routing struct {
 
 var jwtMiddleware = middleware.EnsureValidToken()
 
-var handlerWithJWT = gin.HandlerFunc(func(c *gin.Context) {
-	claims := c.Value(jwtmiddleware.ContextKey{}).(*validator.ValidatedClaims)
-
-	payload, err := json.Marshal(claims)
-	if err != nil {
-		c.AbortWithError(500, err)
-		return
-	}
-
-	c.Writer.Header().Set("Content-Type", "application/json")
-	c.Writer.Write(payload)
-})
-
 // Init DB初期設定
 func Init(db *database.DB) *Routing {
 	r := &Routing{
@@ -47,7 +33,7 @@ func Init(db *database.DB) *Routing {
 		Gin:  gin.Default(),
 		Port: ":4000",
 	}
-	r.setRouting()
+
 	return r
 }
 
@@ -79,19 +65,21 @@ func (r *Routing) setRouting() {
 
 	r.Gin.Use(corsMiddleware())
 
-	r.Gin.POST("/login", adapter.Wrap(jwtMiddleware.CheckJWT), userController.Login)
+	store := cookie.NewStore([]byte("secret"))
+	r.Gin.Use(sessions.Sessions("auth-session", store))
 
 	r.Gin.GET("/articles", articleController.GetArticlesOrderByDate)
-	r.Gin.GET("/saunas/:saunaID/articles/:articleID", articleController.GetArticleByID)
+
 	/**
 	@description All Auth Route
 	*/
 	r.Gin.Use(corsMiddleware(), adapter.Wrap(jwtMiddleware.CheckJWT))
 
 	// 記事
+	r.Gin.GET("/users/:userID/articles/", articleController.GetArticlesByUserID)
+	r.Gin.GET("/articles/:articleID", articleController.GetArticleByID)
 	r.Gin.POST("/articles/new", articleController.CreateArticle)
 	r.Gin.POST("/articles/:articleID/like", articleController.LikeArticle)
-	r.Gin.GET("/users/:userID/articles/", articleController.GetArticlesByUserID)
 	r.Gin.DELETE("/articles/:articleID/like", articleController.DeleteLikedArtile)
 	// ↓まだ試してない
 	r.Gin.DELETE("/articles/:articleID", articleController.DeleteArticleByID)
@@ -133,9 +121,10 @@ func corsMiddleware() gin.HandlerFunc {
 			"Content-Length",
 			"Accept-Encoding",
 			"Authorization",
+			"User-ID",
 		},
 		// cookieなどの情報を必要とするかどうか
-		AllowCredentials: false,
+		AllowCredentials: true,
 		// preflightリクエストの結果をキャッシュする時間
 		MaxAge: 24 * time.Hour,
 	}))
