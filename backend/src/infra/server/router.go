@@ -124,7 +124,7 @@ func corsMiddleware() gin.HandlerFunc {
 			"User-ID",
 		},
 		// cookieなどの情報を必要とするかどうか
-		AllowCredentials: true,
+		AllowCredentials: falseS,
 		// preflightリクエストの結果をキャッシュする時間
 		MaxAge: 24 * time.Hour,
 	}))
