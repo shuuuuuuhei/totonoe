@@ -7,3 +7,19 @@
     width: 80%;
     margin: 30px auto;
 }
+
+.comment-wrap {
+    padding: 2em 20%;
+}
+
+.comments {
+    padding: 2em 0;
+}
+
+.comment-content {
+    padding: 0 10%;
+}
+
+.comment-form {
+    padding: 20px 0;
+}
