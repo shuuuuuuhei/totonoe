@@ -21,7 +21,7 @@ export const ArticlePostPage = () => {
         UserID: "",
         SaunaID: "",
     });
-    const {getAccessTokenSilently, user} = useAuth0();
+    const {getAccessTokenSilently} = useAuth0();
     const [cookies, setCookie,removeCookie] = useCookies();
     
     const handleChange: React.ChangeEventHandler<HTMLSelectElement> = (event) => {
@@ -43,7 +43,7 @@ export const ArticlePostPage = () => {
         if(!typeof(err)) {
             window.alert(err)
         }
-        if(!user) {
+        if(!cookies.userID) {
             return
         }
        
@@ -61,7 +61,6 @@ export const ArticlePostPage = () => {
                 },
                 body: JSON.stringify({article, 'user_id': cookies.userID, "sauna_id": 1})
             }
-            console.log(requestOption)
             fetch(uri, requestOption)
             .then((response) => response.json())
             .then(data => {

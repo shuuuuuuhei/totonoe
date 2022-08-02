@@ -15,7 +15,6 @@ function App() {
   const [cookies, setCookie, removeCookie] = useCookies();
   
   const userID = user?.sub?.split('|').at(1)
-  console.log(cookies.userID)
   useEffect(() => {
     if(typeof cookies.userID == 'undefined' && typeof userID !== 'undefined') {
       var now = new Date();
