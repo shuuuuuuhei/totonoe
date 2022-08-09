@@ -12,7 +12,7 @@ jobs:
         # 10分
         timeout-minutes: 10
         outputs:
-            docker_image_tag_ci: ${{ steps.generate_docker_image_tag,outputs.docker_image_tag_ci }}
+            docker_image_tag_ci: ${{ steps.generate_docker_image_tag.outputs.docker_image_tag_ci }}
         steps:
             -   name: Git Checkout
                 uses: actions/checkout@v3
