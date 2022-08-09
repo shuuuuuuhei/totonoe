@@ -94,9 +94,6 @@ export const ProfilePage = () => {
             })
             .then((resData) => {
                 setProfile(resData);
-                setProfile((prevState) => (
-                    prevState ? { ...prevState, IsMe: userID === cookies.userID,} : null
-                ))
                 console.log(profile)
             })
             .catch(err => {

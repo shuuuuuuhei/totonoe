@@ -8,6 +8,7 @@ li {
 .header {
     background-color: #FFE4E1;
     padding-bottom: 100px;
+    margin: 0;
 }
 
 .header-top-right {
