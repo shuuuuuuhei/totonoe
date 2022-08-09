@@ -51,7 +51,7 @@ jobs:
                         docker-registry-
 
             -   name: Boot-up Local Docker Registry
-                run: docker run -d -p 3000:3000 --restart=always --name registry
+                run: docker run -d -p 3000:3000 --restart=always --name registry -v /tmp/docker-registry:/var/lib/registry registry:2
 
             -   name: Wait for Docker Registry
                 run: npx wait-on tcp:3000
