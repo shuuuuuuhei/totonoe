@@ -4,66 +4,24 @@ on:
     [ push ]
 
 env:
-    COMPOSE_FILE: 'docker-compose.yml'
+    COMPOSE_FILE: '../../docker-compose.yml'
 
 jobs:
     docker-build:
         runs-on: ubuntu-latest
         # 10分
         timeout-minutes: 10
-        outputs:
-            docker_image_tag_ci: ${{ steps.generate_docker_image_tag.outputs.docker_image_tag_ci }}
+
+        #アクションを定義
         steps:
-            -   name: Git Checkout
-                uses: actions/checkout@v3
-
-            -   name: Cache Docker Build Cache
-                uses: actions/cache@v3
-                with:
-                    path: /tmp/.buildx-cache
-                    key: docker-build-cache-${{ github.ref }}-${{ github.sha }}
-                    restore-keys: |
-                        docker-build-cache-${{ github.ref }}
-                        docker-build-cache-
-
-            -   name: Set up Docker Buildx
-                id: buildx
-                uses: docker/setup-buildx-action@v1
-                with:
-                    driver-opts: network=host
-
-            -   name: Generate Docker Image Tag
-                id: generate_docker_image_tag
-                run: |
-                    SHA=${{ github.sha }}
-                    TAG=$(TZ=UTC-9 date '+%Y%m')-${SHA:0:7}
-                    echo "DOCKER_IMAGE_TAG_CI=$TAG" >> $GITHUB_ENV
-                    echo TAG $TAG
-                    echo "::set-output name=docker_image_tag_ci::$TAG"
-
-            -   name: Cache Docker Registry
-                uses: actions/cache@v3
-                with:
-                    path: /tmp/docker-registry
-                    key: docker-registry-${{ github.ref }}-${{ github.sha }}
-                    restore-keys: |
-                        docker-registry-${{ github.ref }}
-                        docker-registry-
-
-            -   name: Boot-up Local Docker Registry
-                run: docker run -d -p 3000:3000 --restart=always --name registry -v /tmp/docker-registry:/var/lib/registry registry:2
-
-            -   name: Wait for Docker Registry
-                run: npx wait-on tcp:3000
-
-            -   name: Build Docker Image
-                env:
-                    GITHUB_TOKEN : ${{ secrets.GITHUB_TOKEN }}
-                run: |
-                    cd ../../ &&
-                    docker buildx bake \
-                        --builder="${{ steps.buildx.outputs.name }}"
-                        --set='*.cache-from=type=local,src=/tmp/.buildx-cache' \
-                        --set='*.cache-to=type=local,dest=/tmp/.buildx-cache' \
-                        --push \
-                        -f "${COMPOSE_FILE}"
+        -   name: checkout pushed commit
+            # ソースコードをチェックアウト
+            uses: actions/checkout@v3
+            with:
+            # PRのHEADブランチを使う
+             ref: ${{ github.event.pull_request.head.sha }}
+        
+        # Docker Composeで実行する
+        -   name: run test on docker-compose
+            run: |
+                docker-compose -f ${COMPOSE_FILE}
