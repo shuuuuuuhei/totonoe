@@ -26,6 +26,6 @@ type CommentOutputPort interface {
 type CommentRepository interface {
 	GetAllCommentsByArticleID(ctx *gin.Context) (*[]ValueObject.CommentVO, error)
 	GetCommentsByArticleID(ctx *gin.Context) (*[]ValueObject.CommentVO, error)
-	CreateComment(ctx *gin.Context) error
+	CreateComment(ctx *gin.Context) (*ValueObject.CommentVO, error)
 	DeleteComment(ctx *gin.Context) error
 }

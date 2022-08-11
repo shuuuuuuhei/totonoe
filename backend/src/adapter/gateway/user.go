@@ -23,12 +23,10 @@ type User struct {
 
 // Params クライアントパラメータ
 type userParams struct {
-	ID          string `json:"id"`
 	UserID      string `json:"user_id"`
 	FollowingID string `json:"following_id"`
 	Email       string `json:"email"`
 	NickName    string `json:"nickname"`
-	MyID        string `json:"my_id"`
 }
 
 const (
@@ -64,14 +62,17 @@ func (u *User) GetProfile(c *gin.Context) (*ValueObject.ProfileVO, error) {
 		Group(`profile.id, profile.user_id, profile.nick_name, profile.introduction`).
 		Scan(&profile).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, fmt.Errorf("プロフィールが見つかりませんでした。 user_id = %s", params.ID)
+			return nil, fmt.Errorf("プロフィールが見つかりませんでした。 user_id = %s", params.UserID)
 		}
 		log.Println(err)
 		return nil, errors.New("Internal Server Error. adapter/gateway/Login")
 	}
 
+	// Me?
+	profile.IsMe = common.IsMe(profile.UserID, token)
+
 	// フォローチェック
-	if params.UserID != token {
+	if !profile.IsMe {
 		var count int64
 		if err := conn.Debug().Table(`"user_relation_ship"`).
 			Select(`"Count(1) AS count"`).
@@ -186,7 +187,7 @@ func newUserByParams(p userParams) (*Domain.User, error) {
 	}
 
 	return &Domain.User{
-		ID:    p.ID,
+		ID:    "",
 		Name:  p.NickName,
 		Email: p.Email,
 	}, nil

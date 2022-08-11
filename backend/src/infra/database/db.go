@@ -149,6 +149,16 @@ func (d *DB) CreateData() {
 			fmt.Println(err)
 			return
 		}
+
+		comment := Domain.Comment{}
+		comment.ArticleID = article.ID
+		comment.Content = "comment_" + strconv.Itoa(i)
+		comment.UserID = user.ID
+		if err := d.Connection.Create(&comment).Error; err != nil {
+			fmt.Println(err)
+			return
+		}
+
 	}
 	for i := 0; i < 10; i++ {
 		article := Domain.Article{}
@@ -166,6 +176,17 @@ func (d *DB) CreateData() {
 		if err := d.Connection.Create(&likes).Error; err != nil {
 			fmt.Println(err)
 			return
+		}
+
+		for i := 0; i < 10; i++ {
+			comment := Domain.Comment{}
+			comment.ArticleID = article.ID
+			comment.Content = "comment_" + strconv.Itoa(i)
+			comment.UserID = user.ID
+			if err := d.Connection.Create(&comment).Error; err != nil {
+				fmt.Println(err)
+				return
+			}
 		}
 	}
 	fmt.Println("Create Data")

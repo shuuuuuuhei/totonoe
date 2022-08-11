@@ -14,7 +14,7 @@ type ProfilePageProps = {
 export const ProfilePage = () => {
     const [profile, setProfile] = useState<Profile|null>();
     const [articles, setArticles] = useState<[Article]>();
-    const {getAccessTokenSilently, user} = useAuth0();
+    const {getAccessTokenSilently} = useAuth0();
     const [cookies, setCookie,removeCookie] = useCookies();
 
     //ユーザIDをURIパラメータから取得
@@ -27,7 +27,7 @@ export const ProfilePage = () => {
                 scope: 'read:posts',
             });
             
-            if (!accessToken || !user) {
+            if (!accessToken) {
                 throw Error("アクセストークンがありません。");
             }
             const uri = "http://localhost:4000/users/"+userID+"/articles/";
@@ -38,6 +38,7 @@ export const ProfilePage = () => {
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
                     "Content-Type": "application/json",
+                    "User-ID": cookies.userID,
                 },
             };
             await fetch(uri, requestOption)
@@ -47,11 +48,12 @@ export const ProfilePage = () => {
                     console.log(response);
                     err.message = "記事が見つかりませんでした。" + response.status;
                     throw err;
-                };
+                }
                 return response.json();
             })
             .then((resData) => {
                 setArticles(resData)
+                console.log(resData)
             })
             .catch(err => {
                 console.log(err)
@@ -65,7 +67,7 @@ export const ProfilePage = () => {
                 scope: 'read:posts',
             });
 
-            if (!accessToken || !user) {
+            if (!accessToken) {
                 throw Error("アクセストークンがありません。");
             }
 
@@ -81,21 +83,18 @@ export const ProfilePage = () => {
                     user_id: userID,
                 })
             };
-            console.log(requestOption)
             await fetch(uri, requestOption)
-            .then((response) => {
-                if (!response.ok) {
-                    const err = new Error;
-                    console.log(response);
-                    err.message = "プロフィールが見つかりませんでした。" + response.status;
-                    throw err;
-                };
-                return response.json();
-            })
-            .then((resData) => {
-                setProfile(resData);
-                console.log(profile)
-            })
+                .then((response) => {
+                    if (!response.ok) {
+                        const err = new Error;
+                        err.message = "プロフィールが見つかりませんでした。" + response.status;
+                        throw err;
+                    }
+                    return response.json();
+                })
+                .then((resData) => {
+                    setProfile(resData);
+                })
             .catch(err => {
                 console.log(err)
                 return(
@@ -105,7 +104,7 @@ export const ProfilePage = () => {
         }
         fetchProfile();
         fetchArticle();
-    }, [user]);
+    }, []);
 
     if(!profile) {
         return(

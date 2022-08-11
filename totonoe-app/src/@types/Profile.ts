@@ -1,10 +1,10 @@
 export type Profile = {
-    ID: string
-    UserID: string
-    NickName: string
+    id: string
+    user_id: string
+    nick_name: string
     following_count: number
     followed_count: number
-    IsMe: boolean
-    IsFollowing: boolean
-    Introduction: string
+    is_me: boolean
+    is_following: boolean
+    introduction: string
 }

@@ -13,7 +13,7 @@ type ArticleProps = {
 export const DetailArticle: React.VFC<ArticleProps> = (props) => {
 
     const [article, setArticle] = useState<Article|undefined>(props.article);
-    const {getAccessTokenSilently, user} = useAuth0();
+    const {getAccessTokenSilently} = useAuth0();
     const [cookies, setCookie, removeCookie] = useCookies();
 
     const handleLike = async() => {
@@ -24,10 +24,11 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
         });
         const articleID = article?.id;
 
-        if (!accessToken || !user) {
+        if (!accessToken) {
             throw Error("アクセストークンがありません。");
         }
 
+        
         // 未いいねの場合
         if(!article?.is_liked) {
             const fetchLike = async() => {
@@ -49,13 +50,12 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
                         err.message = "いいねに失敗しました" + response.status;
                         throw err;
                     }
-                    return response.json();
+                    return;
                 })
-                .then((resData) => {
+                .then(() => {
                     setArticle((prevState) => (
                         prevState ? { ...prevState, like_count: prevState.like_count + 1, is_liked: true } : undefined
                     ))
-                    console.log(resData)
                 })
                 .catch(err => {
                     console.log(err)
@@ -83,13 +83,12 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
                     err.message = "いいね解除に失敗しました" + response.status;
                     throw err;
                 }
-                return response.json();
+                return;
             })
-            .then((resData) => {
+            .then(() => {
                 setArticle((prevState) => (
                     prevState ? { ...prevState, like_count: prevState.like_count - 1, is_liked: false} : undefined
                 ))
-                console.log(resData)
             })
             .catch(err => {
                 console.log(err)
@@ -103,7 +102,7 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
             <div className="article-wrap">
                 <div className="article-header row justify-content-center">
                     <div className="col-10 article-title">
-                        <h3><Link to={'saunas/'+article?.sauna_id+'/articles/'+article?.id}>{article?.title}</Link></h3>
+                        <h3><Link to={'/saunas/'+article?.sauna_id+'/articles/'+article?.id}>{article?.title}</Link></h3>
                     </div>
                     <div className="col-2 article-top-right">
                         <div className="row justify-content-center">

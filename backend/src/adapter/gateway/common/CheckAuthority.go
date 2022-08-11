@@ -24,3 +24,8 @@ func CheckUserAuthorize(userID string, conn *gorm.DB) error {
 
 	return nil
 }
+
+// ログインユーザかどうかのチェック
+func IsMe(userID string, logginedID string) bool {
+	return userID == logginedID
+}

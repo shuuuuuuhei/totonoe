@@ -6,16 +6,20 @@ import {CgDetailsMore} from 'react-icons/cg'
 import { Profile } from '../@types/Profile';
 import { Navigate } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
+import { useCookies } from 'react-cookie';
+import { UndefinedConvertToZero } from '../common/Convert';
 
 type profileProps = {
     profile: Profile|undefined
     setProfile: React.Dispatch<React.SetStateAction<Profile | null | undefined>>
 }
 export const ProfileComponent: React.VFC<profileProps> = ({profile, setProfile}) => {
-    const {getAccessTokenSilently, user} = useAuth0();
+    const {getAccessTokenSilently} = useAuth0();
+    const [cookies, setCookie, removeCookie] = useCookies();
 
+    console.log(profile)
     const handleFollow = async() => {
-        if(!user) {
+        if(!cookies.userID) {
             return
         }
         try {
@@ -30,15 +34,16 @@ export const ProfileComponent: React.VFC<profileProps> = ({profile, setProfile})
                     Authorization: `Bearer ${accessToken}`,
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({'user_id': user.sub?.split('|').at(1), "following_id": profile?.UserID})
+                body: JSON.stringify({'user_id': cookies.userID, "following_id": profile?.user_id})
             }
             fetch(uri, requestOption)
-            .then((response) => response.json())
-            .then(data => {
-                setProfile((prevState) => (
-                    prevState ? { ...prevState, IsFollowing: true, followed_count: prevState.followed_count + 1,} : null
-                ))
-            })
+                .then((response) => response.json())
+                .then(data => {
+                    console.log("prev:", profile?.followed_count)
+                    setProfile((prevState) => (
+                        prevState ? { ...prevState, is_following: true, followed_count: UndefinedConvertToZero(prevState.followed_count) + 1,} : null
+                    ))
+                })
         }
         catch(err) {
             console.log("エラー",err)
@@ -46,7 +51,7 @@ export const ProfileComponent: React.VFC<profileProps> = ({profile, setProfile})
     }
 
     const handleUnfollow = async() => {
-        if(!user) {
+        if(!cookies.userID) {
             return
         }
 
@@ -62,14 +67,14 @@ export const ProfileComponent: React.VFC<profileProps> = ({profile, setProfile})
                     Authorization: `Bearer ${accessToken}`,
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({'user_id': user.sub?.split('|').at(1), "following_id": profile?.UserID})
+                body: JSON.stringify({'user_id': cookies.userID, "following_id": profile?.user_id})
             }
             fetch(uri, requestOption)
-            .then((response) => response.json())
-            .then(data => {
-                setProfile((prevState) => (
-                    prevState && prevState.followed_count ? { ...prevState, IsFollowing: false, followed_count: prevState.followed_count - 1,} : null
-                ))
+                .then((response) => response.json())
+                .then(data => {
+                    setProfile((prevState) => (
+                        prevState && prevState.followed_count ? { ...prevState, is_following: false, followed_count: prevState.followed_count - 1,} : null
+                    ))
             })
         }
         catch(err) {
@@ -89,17 +94,17 @@ export const ProfileComponent: React.VFC<profileProps> = ({profile, setProfile})
                         <div className="col-2 user-name">
                             <div className="name">
                                 name:
-                                {profile?.NickName}
+                                {profile?.nick_name}
                             </div>
                             <div className="email">
                                 @yamada
                             </div>
                         </div>
                         <div className="col-4 follow-wrap float-right">
-                                {profile?.IsMe
+                                {profile?.is_me
                                     ? ""
-                                    : 
-                                    profile?.IsFollowing ?
+                                    :
+                                    profile?.is_following ?
                                         <div className="follow-btn">
                                             <Button onClick={handleUnfollow}>フォロー中</Button>
                                             <CgDetailsMore />
@@ -112,14 +117,14 @@ export const ProfileComponent: React.VFC<profileProps> = ({profile, setProfile})
                                         
                                 }
                             <div className="follow-info row">
-                                <p className="col-6">フォロワー{profile?.followed_count}人</p>
-                                <p className="col-6">フォロー{profile?.following_count}人</p>
+                                <p className="col-6">フォロワー{profile?.followed_count ? profile?.followed_count : 0}人</p>
+                                <p className="col-6">フォロー{profile?.following_count ? profile?.following_count : 0}人</p>
                             </div>
                         </div>
                     </div>
                     <div className="row justify-content-center">
                         <div className="user-introduce">
-                            {profile?.Introduction}
+                            {profile?.introduction}
                         </div>
                     </div>
                 </div>
