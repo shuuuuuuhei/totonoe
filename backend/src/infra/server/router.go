@@ -33,7 +33,7 @@ func Init(db *database.DB) *Routing {
 		Gin:  gin.Default(),
 		Port: ":4000",
 	}
-
+	r.setRouting()
 	return r
 }
 
@@ -61,6 +61,7 @@ func (r *Routing) setRouting() {
 		InputFactory:      interactor.NewCommentInputport,
 		OutputFactory:     presenter.NewCommentOutputPort,
 		RepositoryFactory: gateway.NewCommentRepository,
+		Conn:              r.DB.Connection,
 	}
 
 	r.Gin.Use(corsMiddleware())
@@ -124,7 +125,7 @@ func corsMiddleware() gin.HandlerFunc {
 			"User-ID",
 		},
 		// cookieなどの情報を必要とするかどうか
-		AllowCredentials: falseS,
+		AllowCredentials: false,
 		// preflightリクエストの結果をキャッシュする時間
 		MaxAge: 24 * time.Hour,
 	}))
