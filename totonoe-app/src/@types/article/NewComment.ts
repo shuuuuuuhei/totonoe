@@ -1,4 +1,4 @@
 export type NewComment = {
     content: string
-    article_id: string | undefined
+    article_id: number | undefined
 }
