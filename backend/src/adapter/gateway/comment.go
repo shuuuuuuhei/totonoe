@@ -26,7 +26,7 @@ type CommentParams struct {
 	ArticleID string `json:"article_id,omitempty"`
 }
 
-// NewCommentRepository NewCommentRepository
+// &NewCommentRepository NewCommentRepository
 func NewCommentRepository(c *gorm.DB) port.CommentRepository {
 	return &Comment{
 		conn: c,
@@ -45,7 +45,12 @@ func (c Comment) GetAllCommentsByArticleID(ctx *gin.Context) (*[]ValueObject.Com
 
 	comments := []ValueObject.CommentVO{}
 
-	if err := conn.Where("article_id=?", articleID).Find(&comments).Error; err != nil {
+	if err := conn.Debug().
+		Table("comment").
+		Select(`comment.*, "user".name AS "user_name"`).
+		Joins(`left join "user" on "user".id = comment.user_id`).
+		Where("article_id=?", articleID).
+		Scan(&comments).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Println("コメントが見つかりませんでした。)")
 			return nil, nil
@@ -69,14 +74,14 @@ func (c Comment) GetCommentsByArticleID(ctx *gin.Context) (*[]ValueObject.Commen
 	return nil, nil
 }
 
-func (c Comment) CreateComment(ctx *gin.Context) error {
+func (c Comment) CreateComment(ctx *gin.Context) (*ValueObject.CommentVO, error) {
 	conn := c.conn
 
 	params := CommentParams{}
 	json.NewDecoder(ctx.Request.Body).Decode(&params)
-
+	params.ArticleID = ctx.Param("articleID")
 	if err := common.CheckArticleByID(params.ArticleID, conn); err != nil {
-		return err
+		return nil, err
 	}
 
 	comment := Domain.Comment{
@@ -97,10 +102,24 @@ func (c Comment) CreateComment(ctx *gin.Context) error {
 	})
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	var newComment ValueObject.CommentVO
+	if err := conn.Debug().
+		Table("comment").
+		Select(`comment.*, "user".name AS "user_name"`).
+		Joins(`left join "user" on "user".id = comment.user_id`).
+		Where("comment.id=?", comment.ID).
+		Scan(&newComment).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Println("コメントが見つかりませんでした。)")
+			return nil, err
+		}
+		return nil, err
+	}
+
+	return &newComment, nil
 }
 
 func (c Comment) DeleteComment(ctx *gin.Context) error {

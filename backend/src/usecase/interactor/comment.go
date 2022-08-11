@@ -19,12 +19,12 @@ func NewCommentInputport(o port.CommentOutputPort, r port.CommentRepository) por
 }
 
 func (c Comment) CreateComment(ctx *gin.Context) {
-	err := c.Repository.CreateComment(ctx)
+	comment, err := c.Repository.CreateComment(ctx)
 
 	if err != nil {
 		c.Outputport.RenderErr(err)
 	}
-	c.Outputport.RenderOK()
+	c.Outputport.RenderComment(comment)
 }
 
 func (c Comment) GetAllCommentByArticleID(ctx *gin.Context) {
