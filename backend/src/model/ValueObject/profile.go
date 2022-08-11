@@ -15,4 +15,5 @@ type ProfileVO struct {
 	FollowingCount int8      `json:"following_count,omitempty"`
 	FollowedCount  int8      `json:"followed_count,omitempty"`
 	IsFollowing    bool      `json:"is_following,omitempty"`
+	IsMe           bool      `json:"is_me,omitempty"`
 }
