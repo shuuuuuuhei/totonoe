@@ -10,7 +10,7 @@ import { Comment } from '../@types/article/Comment'
 
 export const ArticlePage = () => {
     const [article, setArticle] = useState<Article>();
-    const [comments, setComments] = useState<[Comment]>();
+    const [comments, setComments] = useState<Comment[]>();
     const params = useParams();
     const {getAccessTokenSilently} = useAuth0();
     const [cookies, setCookie,removeCookie] = useCookies();
@@ -46,6 +46,7 @@ export const ArticlePage = () => {
                 return response.json();
             })
             .then((resData) => {
+                console.log(resData)
                 setArticle(resData)
             })
             .catch(err => {
@@ -95,7 +96,7 @@ export const ArticlePage = () => {
         <Fragment>
             <DetailArticle article={article}/>
             <hr/>
-            <Comments comments={comments}/>
+            <Comments comments={comments} setComments={setComments} articleID={article.id}/>
         </Fragment>
     )
 }
