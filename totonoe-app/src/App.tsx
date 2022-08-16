@@ -9,6 +9,7 @@ import { ArticlePostPage } from './pages/ArticlePostPage';
 import { ArticlePage } from './pages/ArticlePage';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useCookies } from 'react-cookie';
+import { SearchResultPage } from './pages/SearchResultPage';
 
 function App() {
   const {user} = useAuth0();
@@ -32,6 +33,7 @@ function App() {
           <Route path="/profile/:userID" element={<ProfilePage/>}></Route>
           <Route path="/articles/new" element={<ArticlePostPage />}></Route>
           <Route path="/saunas/:saunaID/articles/:articleID" element={<ArticlePage />}></Route>
+          <Route path="/search" element={<SearchResultPage />}></Route>
         </Routes>
       </div>
     </BrowserRouter>
