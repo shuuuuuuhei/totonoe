@@ -20,6 +20,8 @@ export const SearchResultPage = () => {
         { key: "Green", value: "green" }
     ];
 
+    const [saunas, setSaunaState] = useState<Sauna[]>();
+
     useEffect(() => {
         const fetchSaunas = async() => {
             const uri = "http://localhost:4040/saunas";
@@ -40,14 +42,23 @@ export const SearchResultPage = () => {
                     return response.json();
                 })
                 .then((resData) => {
-                    console.log(resData);
+                    setSaunaState(resData);
+                    console.log(resData)
                 })
             .catch(err => {
                 console.log(err)
             });
         }
         fetchSaunas();
-    })
+    }, [])
+
+    if(!saunas) {
+        return(
+            <Fragment>
+                <p>ロード中...</p>
+            </Fragment>
+        )
+    }
 
     return(
         <Fragment>
@@ -79,7 +90,7 @@ export const SearchResultPage = () => {
                             </div>
                         </div>
                         <div className="search-contents">
-                            <SaunaList />
+                            <SaunaList saunas={saunas}/>
                         </div>
                     </div>
                 </div>
