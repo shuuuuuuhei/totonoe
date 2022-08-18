@@ -1,10 +1,10 @@
-import React, { Component, Fragment, useState } from 'react'
+import React, { Component, Fragment, useState, useEffect } from 'react'
 import { SaunaDetail } from '../components/SaunaDetail';
 import { Valuation } from '../components/Valuation';
 
 export const SaunaPage = () => {
 
-    const [sauna, setSaunsaState] = useState<Sauna>();
+    const [facility, setFacilityState] = useState<Facility>();
     const [activeMode, setActiveMode] = useState("nav-1");
 
     const handleClick= (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -17,11 +17,42 @@ export const SaunaPage = () => {
         document.getElementById(id)?.classList.add("active")
         setActiveMode(id)
     }
-    console.log(activeMode)
+
+    useEffect(() => {
+        const fetchSauna = async() => {
+            const uri = "http://localhost:4040/facility";
+            const requestOption: RequestInit = {
+                method: "GET",
+                mode: "cors",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            };
+            await fetch(uri, requestOption)
+                .then((response) => {
+                    if (!response.ok) {
+                        const err = new Error;
+                        err.message = "サウナ施設取得に失敗しました" + response.status;
+                        throw err;
+                    }
+                    return response.json();
+                })
+                .then((resData) => {
+                    setFacilityState(resData);
+                    console.log(facility)
+                })
+            .catch(err => {
+                console.log(err)
+            });
+        }
+        fetchSauna();
+    }, []);
+
+    if(!facility) <Fragment>return("ロード中...")</Fragment>
 
     return(
         <Fragment>
-            <div className="container py-5">
+            <div className="container py-5 px-5">
                 <div className="row align-items-center sauna-name py-4">
                     <h1 className="text-center">
                         タイムズ スパ・レスタ 
@@ -32,15 +63,15 @@ export const SaunaPage = () => {
                     <li className="nav-item"><button id='nav-2' className="nav-link" onClick={handleClick}>投稿</button></li>
                     <li className="nav-item"><button id='nav-3' className="nav-link" onClick={handleClick}>評価</button></li>
                 </ul>
-            </div>
-            <div className="sauna-contents">
-                {
-                    (() => {
-                        if(activeMode == 'nav-1') return( <SaunaDetail sauna={sauna}/> )
-                        if(activeMode == 'nav-2') return( <>投稿</> )
-                        if(activeMode == 'nav-3') return( < Valuation/> )
-                    })()
-                }
+                <div className="sauna-contents p-5">
+                    {
+                        (() => {
+                            if(activeMode == 'nav-1') return( <SaunaDetail facility={facility}/> )
+                            if(activeMode == 'nav-2') return( <>投稿</> )
+                            if(activeMode == 'nav-3') return( < Valuation/> )
+                        })()
+                    }
+                </div>
             </div>
         </Fragment>
     )

@@ -4,7 +4,7 @@ import { DropdownButton } from 'react-bootstrap';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { HiOutlinePencilAlt } from 'react-icons/hi';
 import { BsHeart } from 'react-icons/bs';
-import { SaunaList } from '../components/SaunaList';
+import { FacilityList } from '../components/SaunaList';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useCookies } from 'react-cookie';
 
@@ -20,7 +20,7 @@ export const SearchResultPage = () => {
         { key: "Green", value: "green" }
     ];
 
-    const [saunas, setSaunaState] = useState<Sauna[]>();
+    const [facilities, setFacilitiesState] = useState<Facility[]>();
 
     useEffect(() => {
         const fetchSaunas = async() => {
@@ -42,7 +42,7 @@ export const SearchResultPage = () => {
                     return response.json();
                 })
                 .then((resData) => {
-                    setSaunaState(resData);
+                    setFacilitiesState(resData);
                     console.log(resData)
                 })
             .catch(err => {
@@ -52,7 +52,7 @@ export const SearchResultPage = () => {
         fetchSaunas();
     }, [])
 
-    if(!saunas) {
+    if(!facilities) {
         return(
             <Fragment>
                 <p>ロード中...</p>
@@ -90,7 +90,7 @@ export const SearchResultPage = () => {
                             </div>
                         </div>
                         <div className="search-contents">
-                            <SaunaList saunas={saunas}/>
+                            <FacilityList facilities={facilities}/>
                         </div>
                     </div>
                 </div>
