@@ -77,7 +77,7 @@ export const SaunaDetail = (props: SaunaDetailProps) => {
                                     <div className="sauna-basic-info">
                                         <h4>サウナ{index+1}</h4>
                                         <p>{sauna.sauna_type}</p>
-                                        <p>温度　{sauna.temperature}</p>
+                                        <p>温度　{sauna.temperature}度</p>
                                         <p>収容人数 {sauna.capacity}人</p>
                                     </div>
                                     <div className="sauna-options text-center">
@@ -113,8 +113,19 @@ export const SaunaDetail = (props: SaunaDetailProps) => {
                             )
                         })}
                     </div>
-                    <div className="col-6 waterBaths">
-                        水風呂情報を加える
+                    <div className="col-6 waterbaths">
+                        {props.facility.waterbaths.map((waterbath, index) => {
+                            return(
+                                <div className="water-bath container text-center py-5">
+                                    <div className="waterbath-basic-info">
+                                        <h4>水風呂{index+1}</h4>
+                                        <p>温度　{waterbath.temperature}度</p>
+                                        <p>収容人数 {waterbath.capacity}人</p>
+                                    </div>
+                                    <hr/>
+                                </div>
+                            )
+                        })}
                     </div>
                 </div>
                 {/* 
@@ -150,6 +161,10 @@ export const SaunaDetail = (props: SaunaDetailProps) => {
                                 {ConvertKBToMaruORHyphen(props.facility.heatwave_kb)}
                             </div>
                             <div className="col-3 py-2 text-center">
+                                <p className="m-0">外気浴</p>
+                                {ConvertKBToMaruORHyphen(props.facility.airbath_kb)}
+                            </div>
+                            <div className="col-3 py-2 text-center">
                                 <p className="m-0">休憩スペース</p>
                                 {ConvertKBToMaruORHyphen(props.facility.breakspace_kb)}
                             </div>
@@ -163,11 +178,17 @@ export const SaunaDetail = (props: SaunaDetailProps) => {
                 <hr/>
                 <div className="row facility-amenity">
                     <div className="col-3">
-                        <p>アメニティ</p>
+                        <h5>アメニティ</h5>
                     </div>
                     <div className="col-9">
-                        <div className="row">
-                            
+                        <div className="row facility-amenities">
+                            {props.facility.amenities.map((amenity, index) => {
+                                return(
+                                    <div className="amenity">
+                                        <p>・{amenity.amenity_type}</p>
+                                    </div>
+                                )
+                            })}
                         </div>
                     </div>
                 </div>
