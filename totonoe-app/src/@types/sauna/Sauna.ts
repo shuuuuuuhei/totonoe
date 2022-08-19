@@ -1,5 +1,11 @@
 type Sauna = {
-    ID: string
-    Name: string
-    Address: string
+    id: string,
+    facility_id: string,
+    sauna_type: string,
+    temperature: number,
+    capacity: number,
+    humidity: string,
+    rouryu_kb: string,
+    bgm_kb: string,
+    tv_kb: string,
 }
