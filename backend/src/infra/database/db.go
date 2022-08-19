@@ -65,9 +65,9 @@ func createNewLogger() logger.Interface {
 
 // DBMigrate DBマイグレーションを行う
 func (d *DB) DBMigrate() {
-	err := d.Connection.Migrator().DropTable(Domain.User{}, Domain.Profile{}, Domain.Article{}, Domain.Sauna{}, Domain.Comment{}, Domain.ArticleLike{}, Domain.UserRelationShip{})
+	err := d.Connection.Migrator().DropTable(Domain.User{}, Domain.Profile{}, Domain.Article{}, Domain.Facility{}, Domain.Comment{}, Domain.ArticleLike{}, Domain.UserRelationShip{})
 	fmt.Println("delete: ", err)
-	err = d.Connection.AutoMigrate(Domain.Sauna{})
+	err = d.Connection.AutoMigrate(Domain.Facility{})
 	fmt.Println("migrate: ", err)
 	err = d.Connection.AutoMigrate(Domain.User{})
 	fmt.Println("migrate: ", err)
@@ -78,6 +78,12 @@ func (d *DB) DBMigrate() {
 	err = d.Connection.AutoMigrate(Domain.Comment{})
 	fmt.Println("migrate: ", err)
 	err = d.Connection.AutoMigrate(Domain.ArticleLike{})
+	fmt.Println("migrate: ", err)
+	err = d.Connection.AutoMigrate(Domain.Prefecture{})
+	fmt.Println("migrate: ", err)
+	err = d.Connection.AutoMigrate(Domain.City{})
+	fmt.Println("migrate: ", err)
+	err = d.Connection.AutoMigrate(Domain.Address{})
 	fmt.Println("migrate: ", err)
 }
 
@@ -102,7 +108,7 @@ func (d *DB) CreateData() {
 		return
 	}
 
-	sauna := Domain.Sauna{Name: "test"}
+	sauna := Domain.Facility{Name: "test"}
 
 	if err := d.Connection.Create(&sauna).Error; err != nil {
 		fmt.Println(err)
@@ -136,7 +142,7 @@ func (d *DB) CreateData() {
 		article := Domain.Article{}
 		article.Title = "test_" + strconv.Itoa(i)
 		article.Content = "content_" + strconv.Itoa(i)
-		article.SaunaID = sauna.ID
+		article.FacilityID = sauna.ID
 		article.UserID = user.ID
 		if err := d.Connection.Create(&article).Error; err != nil {
 			fmt.Println(err)
@@ -164,7 +170,7 @@ func (d *DB) CreateData() {
 		article := Domain.Article{}
 		article.Title = "test2_" + strconv.Itoa(i)
 		article.Content = "content2_" + strconv.Itoa(i)
-		article.SaunaID = sauna.ID
+		article.FacilityID = sauna.ID
 		article.UserID = tmpUser.ID
 		if err := d.Connection.Create(&article).Error; err != nil {
 			fmt.Println(err)

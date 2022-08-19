@@ -64,12 +64,22 @@ func (r *Routing) setRouting() {
 		Conn:              r.DB.Connection,
 	}
 
+	prefectureController := controller.Prefecture{
+		InputFactory:      interactor.NewPrefectureInputPort,
+		OutputFactory:     presenter.NewPrefectureOutputPort,
+		RepositoryFactory: gateway.NewPrefectureRepository,
+		Conn:              r.DB.Connection,
+	}
+
 	r.Gin.Use(corsMiddleware())
 
 	store := cookie.NewStore([]byte("secret"))
 	r.Gin.Use(sessions.Sessions("auth-session", store))
 
 	r.Gin.GET("/articles", articleController.GetArticlesOrderByDate)
+
+	// 都道府県取得
+	r.Gin.GET("/prefecture", prefectureController.GetAllPrefecture)
 
 	/**
 	@description All Auth Route
@@ -96,6 +106,7 @@ func (r *Routing) setRouting() {
 	r.Gin.GET("/articles/:articleID/comments/:commentID", commentController.GetCommentsByArticleID)
 	r.Gin.POST("/articles/:articleID/comments/new", commentController.CreateComment)
 	r.Gin.DELETE("/articles/:articleID/comment/new", commentController.DeleteComment)
+
 }
 
 // corsMiddleware CORSの設定

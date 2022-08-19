@@ -118,7 +118,7 @@ func (a *ArticleRepository) CreateArticle(c *gin.Context) error {
 
 	article := params.Article
 	article.UserID = params.UserID
-	article.SaunaID = params.SaunaID
+	article.FacilityID = params.SaunaID
 
 	err := conn.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(&article).Error; err != nil {

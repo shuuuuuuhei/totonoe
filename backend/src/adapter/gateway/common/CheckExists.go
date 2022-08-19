@@ -29,7 +29,7 @@ func CheckUserByID(userID string, conn *gorm.DB) error {
 
 // CheckSaunaByID サウナ存在チェック
 func CheckSaunaByID(saunaID uint32, conn *gorm.DB) error {
-	sauna := Domain.Sauna{}
+	sauna := Domain.Facility{}
 
 	if err := conn.Where("id = ?", saunaID).First(&sauna).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
