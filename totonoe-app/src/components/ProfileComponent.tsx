@@ -17,7 +17,6 @@ export const ProfileComponent: React.VFC<profileProps> = ({profile, setProfile})
     const {getAccessTokenSilently} = useAuth0();
     const [cookies, setCookie, removeCookie] = useCookies();
 
-    console.log(profile)
     const handleFollow = async() => {
         if(!cookies.userID) {
             return
