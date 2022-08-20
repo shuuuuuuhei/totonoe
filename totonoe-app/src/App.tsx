@@ -10,6 +10,7 @@ import { ArticlePage } from './pages/ArticlePage';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useCookies } from 'react-cookie';
 import { SearchResultPage } from './pages/SearchResultPage';
+import { SaunaPage } from './pages/SaunaPage';
 
 function App() {
   const {user} = useAuth0();
@@ -34,6 +35,7 @@ function App() {
           <Route path="/articles/new" element={<ArticlePostPage />}></Route>
           <Route path="/saunas/:saunaID/articles/:articleID" element={<ArticlePage />}></Route>
           <Route path="/search" element={<SearchResultPage />}></Route>
+          <Route path="/saunas/:saunaID" element={<SaunaPage />}></Route>
         </Routes>
       </div>
     </BrowserRouter>
