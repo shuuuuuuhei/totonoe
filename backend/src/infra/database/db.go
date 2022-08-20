@@ -65,7 +65,7 @@ func createNewLogger() logger.Interface {
 
 // DBMigrate DBマイグレーションを行う
 func (d *DB) DBMigrate() {
-	err := d.Connection.Migrator().DropTable(Domain.User{}, Domain.Profile{}, Domain.Article{}, Domain.Facility{}, Domain.Comment{}, Domain.ArticleLike{}, Domain.UserRelationShip{})
+	err := d.Connection.Migrator().DropTable(Domain.User{}, Domain.Profile{}, Domain.Article{}, Domain.Facility{}, Domain.Comment{}, Domain.ArticleLike{}, Domain.UserRelationShip{},Domain.Address{})
 	fmt.Println("delete: ", err)
 	err = d.Connection.AutoMigrate(Domain.Facility{})
 	fmt.Println("migrate: ", err)
@@ -79,11 +79,11 @@ func (d *DB) DBMigrate() {
 	fmt.Println("migrate: ", err)
 	err = d.Connection.AutoMigrate(Domain.ArticleLike{})
 	fmt.Println("migrate: ", err)
-	err = d.Connection.AutoMigrate(Domain.Prefecture{})
+	err = d.Connection.AutoMigrate(Domain.Address{})
 	fmt.Println("migrate: ", err)
 	err = d.Connection.AutoMigrate(Domain.City{})
 	fmt.Println("migrate: ", err)
-	err = d.Connection.AutoMigrate(Domain.Address{})
+	err = d.Connection.AutoMigrate(Domain.Prefecture{})
 	fmt.Println("migrate: ", err)
 }
 
