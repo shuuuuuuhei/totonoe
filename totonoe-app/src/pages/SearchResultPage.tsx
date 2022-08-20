@@ -7,6 +7,7 @@ import { BsHeart } from 'react-icons/bs';
 import { FacilityList } from '../components/SaunaList';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useCookies } from 'react-cookie';
+import { SearchOption } from '../components/SearchOption';
 
 export const SearchResultPage = () => {
     const [selected, setSelected] = useState({
@@ -62,13 +63,14 @@ export const SearchResultPage = () => {
 
     return(
         <Fragment>
+                <div className="container text-center">
                 <div className="row">
-                    <div className="search-option col-3">
-                        Column
+                    <div className="search-option col-3 py-5">
+                        <SearchOption />
                     </div>
-                    <div className="result-list col-8 pt-5">
+                    <div className="result-list col-9 pt-5">
                         <div className="list-header row">
-                            <div className="list-header-left col-8">
+                            <div className="list-header-left col-8 text-start">
                                 <h3>サウナ一覧</h3>
                                 <p>200件(1~20)</p>
                             </div>
@@ -89,9 +91,10 @@ export const SearchResultPage = () => {
                                 </DropdownButton>
                             </div>
                         </div>
-                        <div className="search-contents">
+                        <div className="search-contents text-start">
                             <FacilityList facilities={facilities}/>
                         </div>
+                    </div>
                     </div>
                 </div>
         </Fragment>
