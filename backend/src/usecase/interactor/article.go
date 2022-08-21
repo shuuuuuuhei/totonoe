@@ -98,3 +98,13 @@ func (a *Article) UnLikedArticle(ctx *gin.Context) {
 	}
 	a.OutputPort.RenderOK(ctx)
 }
+
+// GetArticleByFacilityID 成功：Articles、失敗:エラーを返す
+func (a *Article) GetArticleByFacilityID(ctx *gin.Context) {
+	articles, err := a.ArticleRepo.GetArticleByFacilityID(ctx)
+	if err != nil {
+		a.OutputPort.RenderError(err)
+		return
+	}
+	a.OutputPort.RenderArticles(articles)
+}

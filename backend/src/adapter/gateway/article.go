@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+
 	"main.go/model/Domain"
 	"main.go/model/ValueObject"
 
@@ -72,7 +73,7 @@ func (a *ArticleRepository) GetArticlesByUserID(c *gin.Context) (*[]ValueObject.
 	articles := []ValueObject.ArticleVO{}
 
 	userID := c.Param("userID")
-	
+
 	if err := common.CheckUserByID(userID, conn); err != nil {
 		return nil, err
 	}
@@ -249,6 +250,38 @@ func (a *ArticleRepository) UpdateArticleByID(c *gin.Context) error {
 	}
 
 	return nil
+}
+
+// GetArticleByFacilityID FacilityIDからArticleを取得
+func (a *ArticleRepository) GetArticleByFacilityID(ctx *gin.Context) (*[]ValueObject.ArticleVO, error) {
+	conn := a.conn
+
+	facilityID := ctx.Param("facilityID")
+
+	loginUserID := ctx.Request.Header.Get("User-ID")
+
+	if err := common.CheckUserByID(loginUserID, conn); err != nil {
+		return nil, err
+	}
+
+	articles := []ValueObject.ArticleVO{}
+
+	if err := conn.Debug().Table("article").
+		Select(`article.*,"user".name AS user_name, facility.name AS facility, count(likes_count.id) AS like_count,  case when liked.id is null  then false else true end AS is_liked, count(comment.id) AS comment_count`).
+		Joins(`left join  "user" on "user".id = article.user_id`).
+		Joins("left join facility on facility.id = article.facility_id").
+		Joins("left join article_like likes_count on likes_count.article_id = article.id").
+		Joins("left join article_like liked on liked.article_id = article.id AND liked.user_id=?", loginUserID).
+		Joins("left join comment on comment.article_id = article.id").
+		Where("article.facility_id = ?", facilityID).
+		Group(`article.id, "user".name, facility.name, liked.id`).
+		Scan(&articles).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Println("記事が見つかりませんでした。)")
+			return nil, nil
+		}
+	}
+	return &articles, nil
 }
 
 // DeleteArticleByID コンテキストを受け取り、IDからArticleを削除する

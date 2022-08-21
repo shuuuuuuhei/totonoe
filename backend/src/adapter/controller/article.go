@@ -45,6 +45,11 @@ func (a *Article) GetArticlesByUserID(c *gin.Context) {
 	inputPort.GetArticlesByUserID(c)
 }
 
+func (a *Article) GetArticleByFacilityID(c *gin.Context) {
+	inputPort := a.newInputport(c)
+	inputPort.GetArticleByFacilityID(c)
+}
+
 func (a *Article) GetArticlesOrderByDate(c *gin.Context) {
 	inputPort := a.newInputport(c)
 	inputPort.GetArticlesOrderByDate(c)
