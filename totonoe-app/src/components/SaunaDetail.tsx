@@ -13,6 +13,7 @@ export const SaunaDetail = (props: SaunaDetailProps) => {
             </Fragment>
         )
     }
+    console.log(props.facility)
     return(
         <Fragment>
             <div className="container facility-info">
@@ -57,7 +58,7 @@ export const SaunaDetail = (props: SaunaDetailProps) => {
                             </tr>
                             <tr>
                                 <td>料金</td>
-                                <td>{props.facility.access}</td>
+                                <td>¥{props.facility.price}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -71,66 +72,80 @@ export const SaunaDetail = (props: SaunaDetailProps) => {
                 <label htmlFor=""><h3>○サウナ＆水風呂</h3></label>
                 <div className="row">
                     <div className="col-6 saunas">
-                        {props.facility.saunas.map((sauna, index) => {
-                            return(
-                                <div className="sauna-contents container text-center py-5">
-                                    <div className="sauna-basic-info">
-                                        <h4>サウナ{index+1}</h4>
-                                        <p>{sauna.sauna_type}</p>
-                                        <p>温度　{sauna.temperature}度</p>
-                                        <p>収容人数 {sauna.capacity}人</p>
-                                    </div>
-                                    <div className="sauna-options text-center">
-                                        <div className="row py-2">
-                                            <div className="col-4">
-                                                <p>ロウリュウ</p>
-                                                {ConvertKBToMaruORHyphen(sauna.rouryu_kb)}
+                        {!props.facility.saunas ? <p>サウナ情報なし</p>
+                            :
+                            props.facility.saunas.map((sauna, index) => {
+                                return(
+                                    <div className="sauna-contents container text-center py-5">
+                                        <div className="sauna-basic-info">
+                                            <h4>サウナ{index+1}</h4>
+                                            <p>{sauna.sauna_type}</p>
+                                            <p>温度　{sauna.temperature}度</p>
+                                            <p>収容人数 {sauna.capacity}人</p>
+                                        </div>
+                                        <div className="sauna-options text-center">
+                                            <div className="row py-2">
+                                                <div className="col-4">
+                                                    <p>ロウリュウ</p>
+                                                    {ConvertKBToMaruORHyphen(sauna.rouryu_kb)}
+                                                </div>
+                                                <div className="col-4">
+                                                    <p>サウナマット</p>
+                                                    {ConvertKBToMaruORHyphen(sauna.sauna_mat_kb)}
+                                                </div>
+                                                <div className="col-4">
+                                                    <p>TV</p>
+                                                    {ConvertKBToMaruORHyphen(sauna.tv_kb)}
+                                                </div>
                                             </div>
-                                            <div className="col-4">
-                                                <p>サウナマット</p>
-                                            </div>
-                                            <div className="col-4">
-                                                <p>TV</p>
-                                                {ConvertKBToMaruORHyphen(sauna.tv_kb)}
+                                            <div className="row">
+                                                <div className="col-4">
+                                                    <p>BGM</p>
+                                                    {ConvertKBToMaruORHyphen(sauna.bgm_kb)}
+                                                </div>
+                                                <div className="col-4">
+                                                    <p>サウナマット</p>
+                                                    {ConvertKBToMaruORHyphen(sauna.sauna_mat_kb)}
+    
+                                                </div>
+                                                <div className="col-4">
+                                                    <p>TV</p>
+                                                    {ConvertKBToMaruORHyphen(sauna.tv_kb)}
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="row">
-                                            <div className="col-4">
-                                                <p>BGM</p>
-                                                {ConvertKBToMaruORHyphen(sauna.bgm_kb)}
-                                            </div>
-                                            <div className="col-4">
-                                                <p>サウナマット</p>
-                                            </div>
-                                            <div className="col-4">
-                                                <p>TV</p>
-                                                {ConvertKBToMaruORHyphen(sauna.tv_kb)}
-                                            </div>
-                                        </div>
+                                        <hr/>
                                     </div>
-                                    <hr/>
-                                </div>
-                            )
-                        })}
+                                )
+                            })
+                        }
                     </div>
                     <div className="col-6 waterbaths">
-                        {props.facility.waterbaths.map((waterbath, index) => {
-                            return(
-                                <div className="water-bath container text-center py-5">
-                                    <div className="waterbath-basic-info">
-                                        <h4>水風呂{index+1}</h4>
-                                        <p>温度　{waterbath.temperature}度</p>
-                                        <p>収容人数 {waterbath.capacity}人</p>
+                        {!props.facility.waterbaths ? <p>水風呂情報なし</p> 
+                            :
+                            props.facility.waterbaths?.map((waterbath, index) => {
+                                return(
+                                    <div className="water-bath container text-center py-5">
+                                        <div className="waterbath-basic-info">
+                                            <h4>水風呂{index+1}</h4>
+                                            <p>温度　{waterbath.temperature}度</p>
+                                            <p>収容人数 {waterbath.capacity}人</p>
+                                        </div>
+                                        <hr/>
                                     </div>
-                                    <hr/>
-                                </div>
-                            )
-                        })}
+                                )
+                            })
+                        }
                     </div>
                 </div>
                 {/* 
                     ---------
                     サウナ&水風呂情報終了
+                    ---------
+                */}
+                {/* 
+                    ---------
+                    施設設備情報開始
                     ---------
                 */}
                 <label htmlFor=""><h3>○設備</h3></label>
@@ -175,6 +190,16 @@ export const SaunaDetail = (props: SaunaDetailProps) => {
                         </div>
                     </div>
                 </div>
+                {/* 
+                    ---------
+                    施設設備情報終了
+                    ---------
+                */}
+                {/* 
+                    ---------
+                    アメニティ情報開始
+                    ---------
+                */}
                 <hr/>
                 <div className="row facility-amenity">
                     <div className="col-3">
@@ -182,16 +207,24 @@ export const SaunaDetail = (props: SaunaDetailProps) => {
                     </div>
                     <div className="col-9">
                         <div className="row facility-amenities">
-                            {props.facility.amenities.map((amenity, index) => {
-                                return(
-                                    <div className="amenity">
-                                        <p>・{amenity.amenity_type}</p>
-                                    </div>
-                                )
-                            })}
+                            {!props.facility.waterbaths ? <p>アメニティ情報なし</p> 
+                            : 
+                                props.facility.amenities?.map((amenity, index) => {
+                                    return(
+                                        <div className="amenity">
+                                            <p>・{amenity.amenity_type}</p>
+                                        </div>
+                                    )
+                                })
+                            }
                         </div>
                     </div>
                 </div>
+                {/* 
+                    ---------
+                    アメニティ情報終了
+                    ---------
+                */}
                 <hr/>
             </div>
 
