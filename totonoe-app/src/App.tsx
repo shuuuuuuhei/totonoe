@@ -35,7 +35,7 @@ function App() {
           <Route path="/articles/new" element={<ArticlePostPage />}></Route>
           <Route path="/saunas/:saunaID/articles/:articleID" element={<ArticlePage />}></Route>
           <Route path="/search" element={<SearchResultPage />}></Route>
-          <Route path="/saunas/:saunaID" element={<SaunaPage />}></Route>
+          <Route path="/saunas/:facilityID" element={<SaunaPage />}></Route>
         </Routes>
       </div>
     </BrowserRouter>
