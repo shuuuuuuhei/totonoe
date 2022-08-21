@@ -1,9 +1,10 @@
 package server
 
 import (
+	"time"
+
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
-	"time"
 
 	adapter "github.com/gwatts/gin-adapter"
 
@@ -71,6 +72,13 @@ func (r *Routing) setRouting() {
 		Conn:              r.DB.Connection,
 	}
 
+	facilityController := controller.Facility{
+		InputFactory:  interactor.NewFacilityInputPort,
+		OutputFactory: presenter.NewFacilityOutputPort,
+		FacilityRepo:  gateway.NewFacilityRepository,
+		Conn:          r.DB.Connection,
+	}
+
 	r.Gin.Use(corsMiddleware())
 
 	store := cookie.NewStore([]byte("secret"))
@@ -80,6 +88,9 @@ func (r *Routing) setRouting() {
 
 	// 都道府県取得
 	r.Gin.GET("/prefecture", prefectureController.GetAllPrefecture)
+
+	// 施設取得
+	r.Gin.GET("/facility/:facilityID", facilityController.GetFacilityByID)
 
 	/**
 	@description All Auth Route
