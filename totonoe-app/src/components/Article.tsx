@@ -102,7 +102,7 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
             <div className="article-wrap">
                 <div className="article-header row justify-content-center">
                     <div className="col-10 article-title">
-                        <h3><Link to={'/saunas/'+article?.sauna_id+'/articles/'+article?.id}>{article?.title}</Link></h3>
+                        <h3><Link to={'/saunas/'+article?.facility_id+'/articles/'+article?.id}>{article?.title}</Link></h3>
                     </div>
                     <div className="col-2 article-top-right">
                         <div className="row justify-content-center">
@@ -128,10 +128,10 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
                         </div>
                         <div className="col-8 sauna text-center">
                             <div className="sauna-name">
-                            <h3>{article?.sauna_name}</h3>
+                            <h3>{article?.facility_name}</h3>
                             </div>
                             <div className="sauna-place">
-                                {article?.sauna_name}
+                                {article?.facility_name}
                             </div>
                         </div>
                     </div>
