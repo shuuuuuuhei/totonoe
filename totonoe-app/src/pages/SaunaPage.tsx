@@ -1,11 +1,13 @@
 import React, { Component, Fragment, useState, useEffect } from 'react'
 import { SaunaDetail } from '../components/SaunaDetail';
 import { Valuation } from '../components/Valuation';
+import { useParams } from 'react-router-dom';
 
 export const SaunaPage = () => {
 
     const [facility, setFacilityState] = useState<Facility>();
     const [activeMode, setActiveMode] = useState("nav-1");
+    const {facilityID} = useParams();
 
     const handleClick= (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 
@@ -18,9 +20,11 @@ export const SaunaPage = () => {
         setActiveMode(id)
     }
 
+    console.log(facilityID)
+
     useEffect(() => {
         const fetchSauna = async() => {
-            const uri = "http://localhost:4040/facility";
+            const uri = "http://localhost:4000/facility/"+facilityID;
             const requestOption: RequestInit = {
                 method: "GET",
                 mode: "cors",
