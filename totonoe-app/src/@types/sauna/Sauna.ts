@@ -8,4 +8,5 @@ type Sauna = {
     rouryu_kb: string,
     bgm_kb: string,
     tv_kb: string,
+    sauna_mat_kb: string,
 }
