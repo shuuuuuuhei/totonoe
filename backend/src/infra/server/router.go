@@ -79,6 +79,13 @@ func (r *Routing) setRouting() {
 		Conn:          r.DB.Connection,
 	}
 
+	cityController := controller.City{
+		InputFactory:  interactor.NewCityInputPort,
+		OutputFactory: presenter.NewCityOutputPort,
+		RepoFactory: gateway.NewCityRepository,
+		Conn:       r.DB.Connection,
+	}
+
 	r.Gin.Use(corsMiddleware())
 
 	store := cookie.NewStore([]byte("secret"))
@@ -88,6 +95,9 @@ func (r *Routing) setRouting() {
 
 	// 都道府県取得
 	r.Gin.GET("/prefecture", prefectureController.GetAllPrefecture)
+
+	// 市町村取得
+	r.Gin.GET("/prefecture/:prefectureID/cities", cityController.GetCitiesByPrefectureID)
 
 	// 施設取得
 	r.Gin.GET("/facility/:facilityID", facilityController.GetFacilityByID)
