@@ -13,17 +13,19 @@ export const SelectAddress = () => {
     
     const [prefectureIndex, setPrefectureIndex] = useState(0);
     const [cityList, setCityList] = useState<City[]>();
+    const [cityIndex, setCityIndex] = useState(0);
     
     const prefectureList = ["北海道","青森県","岩手県","宮城県","秋田県","山形県","福島県","茨城県","栃木県","群馬県","埼玉県","千葉県","東京都","神奈川県","新潟県","富山県","石川県","福井県","山梨県","長野県","岐阜県","静岡県","愛知県","三重県","滋賀県","京都府","大阪府","兵庫県","奈良県","和歌山県","鳥取県","島根県","岡山県","広島県","山口県","徳島県","香川県","愛媛県","高知県","福岡県","佐賀県","長崎県","熊本県","大分県","宮崎県","鹿児島県","沖縄県"];
 
     const handlePrefecture = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        const index = event.currentTarget.id;
-        setPrefectureIndex(parseInt(index))
-        console.log(parseInt(index)+1)
+        const index = parseInt(event.currentTarget.id);
+        setPrefectureIndex(index);
+        setCityIndex(0);
+        const prefectureID = index + 1;
         const fetchCityInfo = async() => {
             try {
-                const uri = "http://localhost:4000/prefecture/"+parseInt(index)+1+"/cities";
-                
+                const uri = "http://localhost:4000/prefecture/"+prefectureID+"/cities";
+                console.log(uri)
                 const requestOption: RequestInit = {
                 method: "GET",
                     headers: {
@@ -46,6 +48,11 @@ export const SelectAddress = () => {
             }
         }
         fetchCityInfo();
+    }
+
+    const handleCity = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        const index = parseInt(event.currentTarget.id);
+        setCityIndex(index)
     }
 
     return(
@@ -73,16 +80,20 @@ export const SelectAddress = () => {
                 <label htmlFor="">市町村</label>
                 <div className="col-12">
                     <DropdownButton
-                                as={ButtonGroup}
-                                id="dropdown-menu-align-responsive-1"
-                                title="市町村を選択"
-                                onChange={handlePrefecture}
+                        as={ButtonGroup}
+                        id="dropdown-menu-align-responsive-1"
+                        title={!cityList ? <>都道府県を選択</> : cityList[cityIndex].name }
+                        onChange={handlePrefecture}
                     >
+                        <div className="row">
                             {cityList?.map((city, index) => {
                                 return(
-                                    <Dropdown.Item as="button" id={index.toString()}>{city.name}</Dropdown.Item>
+                                    <div className="col-3 px-3">
+                                        <Dropdown.Item as="button" id={index.toString()} onClick={handleCity}>{city.name}</Dropdown.Item>
+                                    </div>
                                 )
                             })}
+                        </div>
                     </DropdownButton>
                 </div>
             </div>
