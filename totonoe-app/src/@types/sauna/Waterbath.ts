@@ -1,4 +1,4 @@
-type Waterbath = {
+type WaterBath = {
     id: string,
     facility_id: string,
     temperature: number,
