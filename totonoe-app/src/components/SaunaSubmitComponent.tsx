@@ -5,8 +5,8 @@ import { Input } from './form-components/Input'
 type SaunaSubmitComponentProps = {
     sauna: NewSauna,
     index: number,
+    handleSetSaunas: (updateIndex: number, name: string, value: string|number) => void
     handleDeleteSauna: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void) | undefined
-    setSaunas: React.Dispatch<React.SetStateAction<NewSauna[]>>
 }
 
 export const SaunaSubmitComponent = (props: SaunaSubmitComponentProps) => {
@@ -16,16 +16,22 @@ export const SaunaSubmitComponent = (props: SaunaSubmitComponentProps) => {
 
     const handleChange: React.ChangeEventHandler<HTMLSelectElement> = (event) => {
         const name = event.target.name.split(":")[1];
-        const value = event.target.value;
+        const value: string|number = event.target.value;
 
-        setSauna({
-            ...sauna,
-            [name]: value,
-        });
+        // number型の更新の場合
+        if(typeof sauna[name as keyof NewSauna] === 'number') {
+            const numValue = parseInt(value);
+            setSauna((prevState) => (
+                {...prevState, [name]: numValue,}
+            ));
+            props.handleSetSaunas(props.index, name, numValue);
+            return
+        }
 
-        props.setSaunas((prevState) => 
-            prevState.map((prevSaunaState, index) => (index === props.index ? sauna : prevSaunaState))
-        );
+        setSauna((prevState) => (
+            {...prevState, [name]: value,}
+        ));
+        props.handleSetSaunas(props.index, name, value);
     }
 
     const saunaTypeList = [
@@ -56,9 +62,7 @@ export const SaunaSubmitComponent = (props: SaunaSubmitComponentProps) => {
 
         // サウナタイプの更新を行う
         setSauna((prevState) => ({...prevState, sauna_type: saunaTypeIndex,}))
-        props.setSaunas((prevState) => 
-            prevState.map((prevSaunaState, index) => (index === props.index ? sauna : prevSaunaState))
-        );
+        props.handleSetSaunas(props.index, "sauna_type", saunaTypeIndex);
     }
 
     const handleSaunaOption = (e: React.FormEvent<HTMLInputElement>) => {
@@ -68,17 +72,16 @@ export const SaunaSubmitComponent = (props: SaunaSubmitComponentProps) => {
         if(e.currentTarget.checked) {
             setSauna((prevState) => ({
                 ...prevState,
-                [saunaOptionID]: "1",
             }))
+            props.handleSetSaunas(props.index, saunaOptionID, "1");
         } else {
             setSauna((prevState) => ({
                 ...prevState,
                 [saunaOptionID]: "0",
             }))
+            props.handleSetSaunas(props.index, saunaOptionID, "0");
         }
-        props.setSaunas((prevState) => 
-            prevState.map((prevSaunaState, index) => (index === props.index ? sauna : prevSaunaState))
-        );
+        
     }
 
     return(
@@ -104,7 +107,7 @@ export const SaunaSubmitComponent = (props: SaunaSubmitComponentProps) => {
                                 <option className="d-none" value="">サウナタイプを選択</option>
                                 {saunaTypeList.map((saunaType, index) => {
                                     return(
-                                        <option value={index.toString()}>{saunaType}</option>
+                                        <option value={index.toString()} key={index}>{saunaType}</option>
                                     )
                                 })}
                             </Form.Select>
@@ -141,7 +144,7 @@ export const SaunaSubmitComponent = (props: SaunaSubmitComponentProps) => {
                                 <label htmlFor="">サウナオプション</label>
                                 {saunaOptions.map((option, index) => {
                                     return(
-                                        <div className="terms-option py-1 px-2">
+                                        <div className="terms-option py-1 px-2" key={index}>
                                             <input type="checkbox" className="form-check-input pl-2" value={option.name} id={props.index+":"+option.id} onClick={handleSaunaOption} />
                                             <label htmlFor={props.index+":"+option.id} className="px-3 border-bottom">
                                                 {option.name}

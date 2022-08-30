@@ -1,12 +1,12 @@
-import React, { Component, Fragment, useState } from 'react'
-import { Accordion, Button, DropdownButton } from 'react-bootstrap'
+import React, { Fragment, useState } from 'react'
+import { Accordion, Button } from 'react-bootstrap'
 import { Input } from './form-components/Input'
 
 type waterBathSubmitComponentProps = {
     waterBath: WaterBath,
     index: number,
+    handleSetWaterBath: (updateIndex: number, name: string, value: string | number) => void
     handleDeleteWaterBath: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void) | undefined
-    setWaterBaths: React.Dispatch<React.SetStateAction<WaterBath[]>>
 }
 export const WaterBathSubmitComponent = (props: waterBathSubmitComponentProps) => {
 
@@ -20,10 +20,20 @@ export const WaterBathSubmitComponent = (props: waterBathSubmitComponentProps) =
             ...waterBath,
             [name]: value,
         });
+        // number型の更新の場合
+        if(typeof waterBath[name as keyof WaterBath] === 'number') {
+            const numValue = parseInt(value);
+            setWaterBath((prevState) => (
+                {...prevState, [name]: numValue,}
+            ));
+            props.handleSetWaterBath(props.index, name, numValue);
+            return
+        }
 
-        props.setWaterBaths((prevState) => 
-            prevState.map((prevSaunaState, index) => (index === props.index ? waterBath : prevSaunaState))
-        );
+        setWaterBath((prevState) => (
+            {...prevState, [name]: value,}
+        ));
+        props.handleSetWaterBath(props.index, name, value);
     }
 
     return(
