@@ -1,3 +1,4 @@
 type Amenity = {
-    amenity_type: string,
+    id: string,
+    name: string;
 }
