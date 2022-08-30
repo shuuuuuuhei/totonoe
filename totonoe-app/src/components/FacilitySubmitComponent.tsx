@@ -1,4 +1,4 @@
-import React, { Component, Fragment, useState } from 'react'
+import React, { Component, Fragment, useState, useEffect } from 'react'
 import { Input } from './form-components/Input'
 import { InputScope } from './form-components/InputScope'
 import { DropdownButton, Dropdown, ButtonGroup, Button, Form } from 'react-bootstrap'
@@ -7,43 +7,14 @@ import { SelectAddress } from './form-components/SelectAdress'
 import { TermsCheckBox } from './form-components/TermsCheckBox'
 import { SaunaSubmitComponent } from './SaunaSubmitComponent'
 import { WaterBathSubmitComponent } from './WaterBathSubmitComponent'
+import { useCookies } from 'react-cookie'
+import { useAuth0 } from '@auth0/auth0-react'
 
 export const FacilitySubmitComponent = () => {
 
-    const [facility, setFacilityState] = useState<NewFacility>({
-        id: "",
-        name: "",
-        price: 0,
-        prefecture_id: 0,
-        city_id: 0,
-        street: "",
-        eigyo_start: "",
-        eigyo_end: "",
-        access: "",
-        tel: "",
-        restaurant_kb: "",
-        lodging_kb: "",
-        workingspace_kb: "",
-        books_kb: "",
-        heatwave_kb: "",
-        airbath_kb: "",
-        breakspace_kb: "",
-        waterserver_kb: "",
-        saunas: [],
-        waterbaths: [],
-        amenities: [],
-    });
+    const {getAccessTokenSilently} = useAuth0();
+    const [cookies, setCookie,removeCookie] = useCookies();
 
-    // SelectAddressコンポーネントで変更があれば更新を行う
-    const [address, setAddress] = useState({
-        prefectureID: 0,
-        cityID: 0,
-        street: "",
-    });
-
-    const [terms, setTerms] = useState<{id: string;
-        name: string;}[]>();
-    
     const [saunas, setSaunas] = useState<NewSauna[]>([
         {
             id: "",
@@ -65,17 +36,96 @@ export const FacilitySubmitComponent = () => {
         capacity: 0,
     }]);
 
+    const [facility, setFacilityState] = useState<NewFacility>({
+        id: "",
+        name: "",
+        price: 0,
+        address: {
+            prefecture_id: 0,
+            city_id: 0,
+            street: "",
+        },
+        eigyo_start: "",
+        eigyo_end: "",
+        access: "",
+        tel: "",
+        restaurant_flg: "",
+        lodging_flg: "",
+        workingspace_flg: "",
+        books_flg: "",
+        heatwave_flg: "",
+        airbath_flg: "",
+        breakspace_flg: "",
+        waterserver_flg: "",
+        saunas: saunas,
+        waterbaths: waterBaths,
+        amenities: [],
+    });
+
+    // SelectAddressコンポーネントで変更があれば更新を行う
+    const [address, setAddress] = useState({
+        prefecture_id: 0,
+        city_id: 0,
+        street: "",
+    });
+
+    const [terms, setTerms] = useState<{id: string;name: string;}[]>();
+
+    // 登録前にfacilityの更新を行うと最新のfacilityを登録できないので、useEffect内で該当の要素に変更があればfacilityの更新を行うようにする
+    useEffect(() => {
+
+        setFacilityState((prevState) => ({
+            ...prevState,
+            address: address,
+            saunas: saunas,
+            waterbaths: waterBaths,
+        }));
+
+        terms?.map((term, index) => {
+            setFacilityState((prevState) => ({
+                ...prevState,
+                [term.id]: "1",
+            }))
+        })
+
+    }, [address, saunas, waterBaths, terms])
+
+    console.log(facility)
     const handleChange: React.ChangeEventHandler<HTMLSelectElement> = (event) => {
         const name = event.target.name;
         const value = event.target.value;
 
-        setFacilityState({
-            ...facility, 
-            [name]: value,
-        });
+        // number型の更新の場合
+        if(typeof facility[name as keyof NewFacility] === 'number') {
+            const numValue = parseInt(value);
+            setFacilityState((prevState) => (
+                {...prevState, [name]: numValue,}
+            ));
+            return
+        }
+
+        setFacilityState((prevState) => (
+            {...prevState, [name]: value,}
+        ));
     };
 
-    console.log(saunas)
+    const handleSetSaunas = (updateIndex: number, name: string, value: string|number) => {
+        console.log(name,value);
+        // sauna個別コンポーネントから saunaState を受け取ってsaunasの更新を行うこうと、saunaStateを更新していない(レンダリングしていない)状態で更新するので、saunasの更新が正しく行われない。
+        // 更新する項目と値を受け取って更新を行う。
+        setSaunas((prevState) => (
+            prevState.map((prevSaunaState, index) => (index === updateIndex ? {...prevSaunaState, [name]: value} : prevSaunaState))
+        ));
+    };
+
+    const handleSetWaterBath = (updateIndex: number, name: string, value: string|number) => {
+        console.log(name,value);
+        // waterBath個別コンポーネントから waterBathState を受け取ってwaterBathsの更新を行うこうと、waterBathStateを更新していない(レンダリングしていない)状態で更新するので、waterBathsの更新が正しく行われない。
+        // 更新する項目と値を受け取って更新を行う。
+        setWaterBaths((prevState) => (
+            prevState.map((prevWaterBathState, index) => (index === updateIndex ? {...prevWaterBathState, [name]: value} : prevWaterBathState))
+        ));
+    };
 
     const handleAddSauna = () => {
         setSaunas((prevState) => ([
@@ -110,38 +160,62 @@ export const FacilitySubmitComponent = () => {
 
     const handleDeleteSauna = ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         
-        // 要素をしていするindexを受け取る
+        // 要素を指定するindexを受け取る
         const deleteIndex = parseInt(event.currentTarget.id);
-        console.log(deleteIndex)
 
         const newSaunas = saunas.filter((sauna, index) => {
-            console.log(index, sauna)
             return index !== deleteIndex
         })
-
-        setSaunas(newSaunas);
-
-        console.log(saunas);
+        setSaunas((prevSaunas) => newSaunas);
     })
 
     const handleDeleteWaterBath = ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        
-        // 要素をしていするindexを受け取る
+
+        // 要素を指定するindexを受け取る
         const deleteIndex = parseInt(event.currentTarget.id);
-        console.log(deleteIndex)
 
         const newWaterBaths = waterBaths.filter((sauna, index) => {
-            console.log(index, waterBaths)
             return index !== deleteIndex
         })
-
-        setWaterBaths(newWaterBaths);
+        setWaterBaths((prevWaterBaths) => newWaterBaths);
     })
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        console.log("aaa")
+        const fetchPostFacility = async() => {
+            try {
+                const uri = "http://localhost:4000/facilities/new";
+                const accessToken = await getAccessTokenSilently({
+                    audience: 'https://totonoe-app.com',
+                    scope: 'read:posts',
+                })
+                const requestOption: RequestInit = {
+                method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({facility, 'user_id': cookies.userID,})
+                }
+                fetch(uri, requestOption)
+                    .then((response) => {
+                        if(!response.ok) {
+                            throw(new Error("サウナ施設の登録に失敗しました。"+response.status))
+                        }
+                        return response.json();
+                    })
+                    .then((data) => {
+                        console.log("登録成功", data)
+                    })
+            } catch (err)
+            { 
+                console.log(err) 
+            }
+        }
+        fetchPostFacility();
     }
+
+    console.log(address)
 
     return(
         <Fragment>
@@ -181,7 +255,7 @@ export const FacilitySubmitComponent = () => {
                                 <Input 
                                         type="time"
                                         className="input-sm"
-                                        name="facility_end"
+                                        name="eigyo_end"
                                         value={facility.eigyo_end}
                                         onChange={handleChange}
                                         placehodlder=""
@@ -213,7 +287,7 @@ export const FacilitySubmitComponent = () => {
                                 </div>
                                 {saunas.map((sauna, index) => {
                                     return(
-                                        <SaunaSubmitComponent sauna={sauna} index={index} handleDeleteSauna={handleDeleteSauna} setSaunas={setSaunas}/>
+                                        <SaunaSubmitComponent sauna={sauna} index={index} handleDeleteSauna={handleDeleteSauna} handleSetSaunas={handleSetSaunas} key={index}/>
                                     )
                                 })}
                             </div>
@@ -229,7 +303,7 @@ export const FacilitySubmitComponent = () => {
                                 </div>
                                 {waterBaths.map((waterBath, index) => {
                                     return(
-                                        <WaterBathSubmitComponent waterBath={waterBath} index={index} handleDeleteWaterBath={handleDeleteWaterBath} setWaterBaths={setWaterBaths}/>
+                                        <WaterBathSubmitComponent waterBath={waterBath} index={index} handleDeleteWaterBath={handleDeleteWaterBath} handleSetWaterBath={handleSetWaterBath} key={index}/>
                                     )
                                 })}
                             </div>
