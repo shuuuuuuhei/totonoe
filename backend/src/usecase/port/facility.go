@@ -8,6 +8,7 @@ import (
 type FacilityInputPort interface {
 	GetFacilityByID(*gin.Context)
 	GetFacilitiesBySaunaOption(*gin.Context)
+	CreateFacility(*gin.Context)
 }
 
 type FacilityOutputPort interface {
@@ -20,4 +21,5 @@ type FacilityOutputPort interface {
 type FacilityRepository interface {
 	GetFacilityByID(*gin.Context) (*ValueObject.FacilityVO, error)
 	GetFacilitiesBySaunaOption(*gin.Context) ([]*ValueObject.FacilityVO, error)
+	CreateFacility(*gin.Context) (*ValueObject.FacilityVO, error)
 }
