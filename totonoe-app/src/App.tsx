@@ -11,6 +11,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { useCookies } from 'react-cookie';
 import { SearchResultPage } from './pages/SearchResultPage';
 import { SaunaPage } from './pages/SaunaPage';
+import { SaunaSubmitPage } from './pages/SaunaSubmitPage';
 
 function App() {
   const {user} = useAuth0();
@@ -36,6 +37,7 @@ function App() {
           <Route path="/saunas/:saunaID/articles/:articleID" element={<ArticlePage />}></Route>
           <Route path="/search" element={<SearchResultPage />}></Route>
           <Route path="/saunas/:facilityID" element={<SaunaPage />}></Route>
+          <Route path="/saunas/new/" element={<SaunaSubmitPage />}></Route>
         </Routes>
       </div>
     </BrowserRouter>
