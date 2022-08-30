@@ -6,14 +6,14 @@ import { Input } from './Input';
 
 type selectAddressProps = {
     address: {
-        prefectureID: number,
-        cityID: number,
+        prefecture_id: number,
+        city_id: number,
         street: string,
 
     }
     setAddress: React.Dispatch<React.SetStateAction<{
-        prefectureID: number;
-        cityID: number;
+        prefecture_id: number;
+        city_id: number;
         street: string;
     }>>
 }
@@ -62,7 +62,7 @@ export const SelectAddress = (props: selectAddressProps) => {
                         // prefectureID(引数)の更新を行う
                         props.setAddress((prevState) => ({
                             ...prevState,
-                            prefectureID: prefectureID,
+                            prefecture_id: prefectureID,
                         }));
                     })
             }
@@ -85,7 +85,7 @@ export const SelectAddress = (props: selectAddressProps) => {
         // 市町村ID（引数)の更新を行う
         props.setAddress((prevState) => ({
             ...prevState,
-            cityID: cityList[index].id,
+            city_id: cityList[index].id,
         }));
     }
 
@@ -108,7 +108,7 @@ export const SelectAddress = (props: selectAddressProps) => {
                         <option className="d-none" value="">都道府県を選択</option>
                         {prefectureList.map((prefecture, index) => {
                             return(
-                                <option value={index.toString()}>{prefecture}</option>
+                                <option value={index.toString()} key={index}>{prefecture}</option>
                             )
                         })}
                     </Form.Select>
@@ -119,7 +119,7 @@ export const SelectAddress = (props: selectAddressProps) => {
                         <option className="d-none" value="">市町村を選択</option>
                         {cityList?.map((city, index) => {
                             return(
-                                <option value={index.toString()}>{city.name}</option>
+                                <option value={index.toString()} key={index}>{city.name}</option>
                             )
                         })}
                 </Form.Select>
