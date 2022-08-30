@@ -157,35 +157,35 @@ export const SaunaDetail = (props: SaunaDetailProps) => {
                         <div className="row">
                             <div className="col-3 py-2 text-center">
                                 <p className="m-0">宿泊</p>
-                                {ConvertKBToMaruORHyphen(props.facility.lodging_kb)}
+                                {ConvertKBToMaruORHyphen(props.facility.lodging_flg)}
                             </div>
                             <div className="col-3 py-2 text-center">
                                 <p className="m-0">コワーキングスペース</p>
-                                {ConvertKBToMaruORHyphen(props.facility.workingspace_kb)}
+                                {ConvertKBToMaruORHyphen(props.facility.workingspace_flg)}
                             </div>
                             <div className="col-3 py-2 text-center">
                                 <p className="m-0">飯処</p>
-                                {ConvertKBToMaruORHyphen(props.facility.restaurant_kb)}
+                                {ConvertKBToMaruORHyphen(props.facility.restaurant_flg)}
                             </div>
                             <div className="col-3 py-2 text-center">
                                 <p className="m-0">漫画</p>
-                                {ConvertKBToMaruORHyphen(props.facility.books_kb)}
+                                {ConvertKBToMaruORHyphen(props.facility.books_flg)}
                             </div>
                             <div className="col-3 py-2 text-center">
                                 <p className="m-0">アウフグース</p>
-                                {ConvertKBToMaruORHyphen(props.facility.heatwave_kb)}
+                                {ConvertKBToMaruORHyphen(props.facility.heatwave_flg)}
                             </div>
                             <div className="col-3 py-2 text-center">
                                 <p className="m-0">外気浴</p>
-                                {ConvertKBToMaruORHyphen(props.facility.airbath_kb)}
+                                {ConvertKBToMaruORHyphen(props.facility.airbath_flg)}
                             </div>
                             <div className="col-3 py-2 text-center">
                                 <p className="m-0">休憩スペース</p>
-                                {ConvertKBToMaruORHyphen(props.facility.breakspace_kb)}
+                                {ConvertKBToMaruORHyphen(props.facility.breakspace_flg)}
                             </div>
                             <div className="col-3 py-2 text-center">
                                 <p className="m-0">給水機</p>
-                                {ConvertKBToMaruORHyphen(props.facility.waterserver_kb)}
+                                {ConvertKBToMaruORHyphen(props.facility.waterserver_flg)}
                             </div>
                         </div>
                     </div>
@@ -212,7 +212,7 @@ export const SaunaDetail = (props: SaunaDetailProps) => {
                                 props.facility.amenities?.map((amenity, index) => {
                                     return(
                                         <div className="amenity">
-                                            <p>・{amenity.amenity_type}</p>
+                                            <p>・{amenity.name}</p>
                                         </div>
                                     )
                                 })
