@@ -80,7 +80,6 @@ const handleChangeTerms = (e: React.FormEvent<HTMLInputElement>) => {
         }
     })
     props.setTerms(newTerms);
-
 }
     return(
         <Fragment>
@@ -88,7 +87,7 @@ const handleChangeTerms = (e: React.FormEvent<HTMLInputElement>) => {
             <div className="terms-options text-start row">
                 {termsList.map((terms, index) => {
                     return(
-                        <div className="terms-option py-1 px-2 col-3">
+                        <div className="terms-option py-1 px-2 col-3" key={index}>
                             <input type="checkbox" className="form-check-input pl-2" value={terms.name} id={terms.id} onClick={handleChangeTerms}/>
                             <label htmlFor={terms.id} className="px-3 border-bottom">
                                 {terms.name}
