@@ -1,5 +1,5 @@
 import React, { Component, Fragment, useState, useEffect } from 'react'
-import { DropdownButton, Dropdown, ButtonGroup, Button, Form, Col } from 'react-bootstrap'
+import { DropdownButton, Dropdown, ButtonGroup, Button, Form, Col, Alert } from 'react-bootstrap'
 import '../style/QuantityInput.css'
 import { SaunaSubmitComponent } from './SaunaSubmitComponent'
 import { WaterBathSubmitComponent } from './WaterBathSubmitComponent'
@@ -201,7 +201,6 @@ export const FacilitySubmitComponent = () => {
                 street: "",
             },
             price: "",
-            saunas: undefined,
         }
 
         if(!facility.name || facility.name === '') newErrors.name = '施設名を入力してください'
@@ -210,15 +209,17 @@ export const FacilitySubmitComponent = () => {
         if(!facility.address.street_name || facility.address.street_name === '') newErrors.address.street = '町名番地を入力してください'
         if(!facility.price || facility.price <=0 ) newErrors.price = '1円以上を入力してください'
 
+        // サウナのバリデーションは保留
         const hasErrorSaunas = facility.saunas.filter((sauna) => !sauna.sauna_type || sauna.temperature <= 0 || sauna.capacity <= 0)
-        hasErrorSaunas.forEach((sauna, index) => {
-            newErrors.saunas?.push({
-                sauna_type: "",
-                temperature: "",
-                capacity: "",
-            })
-        })
+
         return newErrors;
+    }
+
+    const returnTop = () => {
+        window.scrollTo({
+            top: 10,
+            behavior: "auto",
+        })
     }
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -227,6 +228,8 @@ export const FacilitySubmitComponent = () => {
         const formErrors = validateForm();
         if(Object.keys(formErrors).length > 0) {
             setErrors(formErrors);
+            setValidated(true)
+            returnTop();
             return
         }
 
@@ -264,12 +267,21 @@ export const FacilitySubmitComponent = () => {
         fetchPostFacility();
     }
 
+    const GetErrors = () => {
+        if(errors) {
+            return <>・入力に不備があります</>
+        }
+    }
+
     return(
         <Fragment>
             <div className="container p-5">
                 <div className="row py-5">
                     <Form onSubmit={handleSubmit}>
                         <h2 className="text-center py-3">サウナ施設を登録する</h2>
+                        <Alert variant="danger" show={validated}>
+                            {GetErrors()}
+                        </Alert>
                         <Form.Group controlId="validationCustom01">
                             <Form.Label htmlFor="">施設名</Form.Label>
                             <Form.Control 
