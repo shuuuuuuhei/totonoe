@@ -62,6 +62,7 @@ export const WaterBathSubmitComponent = (props: waterBathSubmitComponentProps) =
                                             placehodlder=""
                                             errorDiv=""
                                             errorMsg=""
+                                            required={true}
                                     />
                                 </div>
                                 <div className="capacity col-6">
@@ -75,6 +76,7 @@ export const WaterBathSubmitComponent = (props: waterBathSubmitComponentProps) =
                                             placehodlder=""
                                             errorDiv=""
                                             errorMsg=""
+                                            required={true}
                                     />
                                 </div>
                             </div>

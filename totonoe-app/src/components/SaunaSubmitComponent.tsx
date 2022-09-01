@@ -1,6 +1,7 @@
 import React, { Component, Fragment, useState, ChangeEvent } from 'react'
 import { Button, DropdownButton, Dropdown, ButtonGroup, Accordion, Form} from 'react-bootstrap'
 import { Input } from './form-components/Input'
+const MinCapacity = 1;
 
 type SaunaSubmitComponentProps = {
     sauna: NewSauna,
@@ -9,12 +10,16 @@ type SaunaSubmitComponentProps = {
     handleDeleteSauna: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void) | undefined
 }
 
+// next task
+// 保存ボタン押下後、ページを上にする
+// 保存完了 or Errorメッセージ表示
+
 export const SaunaSubmitComponent = (props: SaunaSubmitComponentProps) => {
 
     const [sauna, setSauna] = useState<NewSauna>(props.sauna);
     console.log(sauna)
 
-    const handleChange: React.ChangeEventHandler<HTMLSelectElement> = (event) => {
+    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         const name = event.target.name.split(":")[1];
         const value: string|number = event.target.value;
 
@@ -40,19 +45,19 @@ export const SaunaSubmitComponent = (props: SaunaSubmitComponentProps) => {
 
     const saunaOptions = [
         {
-            id: 'rouryu_kb',
+            id: 'rouryu_flg',
             name: "ロウリュウ",
         },
         {
-            id: 'sauna_mat_kb',
+            id: 'sauna_mat_flg',
             name: "サウナマット",
         },
         {
-            id: 'tv_kb',
+            id: 'tv_flg',
             name: "TV",
         },
         {
-            id: 'bgm_kb',
+            id: 'bgm_flg',
             name: "BGM",
         },
     ]
@@ -101,58 +106,57 @@ export const SaunaSubmitComponent = (props: SaunaSubmitComponentProps) => {
                     </Accordion.Header>
                     <Accordion.Body>
                         <div className="container text-start py-3">
-                            <label htmlFor="">サウナタイプ</label>
-                            <div className="sauna-type py-3">
-                            <Form.Select aria-label="Default select example" onChange={handleSaunaType}>
-                                <option className="d-none" value="">サウナタイプを選択</option>
-                                {saunaTypeList.map((saunaType, index) => {
-                                    return(
-                                        <option value={index.toString()} key={index}>{saunaType}</option>
-                                    )
-                                })}
-                            </Form.Select>
-                            </div>
+                            <Form.Group className="sauna-type py-3">
+                                <Form.Label>サウナタイプ</Form.Label>
+                                <Form.Select aria-label="Default select example" onChange={handleSaunaType}>
+                                    <option className="d-none" value="">サウナタイプを選択</option>
+                                    {saunaTypeList.map((saunaType, index) => {
+                                        return(
+                                            <option value={index.toString()} key={index}>{saunaType}</option>
+                                        )
+                                    })}
+                                </Form.Select>
+                                <Form.Control.Feedback type='invalid'></Form.Control.Feedback>
+                            </Form.Group>
                             <div className="row">
-                                <div className="temperature col-6">
-                                    <label htmlFor="">温度</label>
-                                    <Input 
+                                <Form.Group className="temperature col-6">
+                                    <Form.Label>温度</Form.Label>
+                                    <Form.Control 
                                             type="number"
                                             className="input-sm"
                                             name={props.index+":temperature"}
                                             value={sauna.temperature.toString()}
                                             onChange={handleChange}
-                                            placehodlder=""
-                                            errorDiv=""
-                                            errorMsg=""
                                     />
-                                </div>
-                                <div className="capacity col-6">
-                                    <label htmlFor="">収容人数</label>
-                                    <Input 
+                                    <Form.Control.Feedback type='invalid'></Form.Control.Feedback>
+                                </Form.Group>
+                                <Form.Group className="capacity col-6">
+                                    <Form.Label>収容人数</Form.Label>
+                                    <Form.Control 
                                             type="number"
                                             className="input-sm"
                                             name={props.index+":capacity"}
                                             value={sauna.capacity.toString()}
                                             onChange={handleChange}
-                                            placehodlder=""
-                                            errorDiv=""
-                                            errorMsg=""
+                                            required={true}
+                                            min={MinCapacity}
                                     />
-                                </div>
+                                    <Form.Control.Feedback type='invalid'></Form.Control.Feedback>
+                                </Form.Group>
                             </div>
-                            <div className="sauna-option">
-                                <label htmlFor="">サウナオプション</label>
+                            <Form.Group className="sauna-option">
+                                <Form.Label>サウナオプション</Form.Label>
                                 {saunaOptions.map((option, index) => {
                                     return(
                                         <div className="terms-option py-1 px-2" key={index}>
                                             <input type="checkbox" className="form-check-input pl-2" value={option.name} id={props.index+":"+option.id} onClick={handleSaunaOption} />
-                                            <label htmlFor={props.index+":"+option.id} className="px-3 border-bottom">
+                                            <Form.Label htmlFor={props.index+":"+option.id} className="px-3 border-bottom"/>
                                                 {option.name}
-                                            </label>
                                         </div>
                                     )
                                 })}
-                            </div>
+                                <Form.Control.Feedback type='invalid'></Form.Control.Feedback>
+                            </Form.Group>
                         </div>
                     </Accordion.Body>
                 </Accordion.Item>

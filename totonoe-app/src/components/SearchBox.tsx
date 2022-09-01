@@ -23,6 +23,7 @@ export const SearchBox = () => {
                             placehodlder="エリア・駅・【例：銀座、池袋】"
                             errorDiv=""
                             errorMsg=""
+                            required={true}
                             />
                     </div>
                     <div className="col-md-5">
@@ -35,6 +36,7 @@ export const SearchBox = () => {
                             placehodlder=""
                             errorDiv=""
                             errorMsg=""
+                            required={true}
                         />
                     </div>
                     <div className="col-md-2">
