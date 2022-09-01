@@ -15,31 +15,31 @@ type termsCheckBoxProps = {
 export const TermsCheckBox = (props: termsCheckBoxProps) => {
     const termsList = [
         {
-            id: 'lodging_kb',
+            id: 'lodging_flg',
             name: "宿泊",
         },
         {
-            id: 'restaurant_kb',
+            id: 'restaurant_flg',
             name: "飯処",
         },
         {
-            id: 'workingspace_kb',
+            id: 'working_space_flg',
             name: "コワーキングスペース",
         },
         {
-            id: 'airbath_kb',
+            id: 'air_bath_flg',
             name: "外気浴",
         },
         {
-            id: 'books_kb',
+            id: 'books_flg',
             name: "読書",
         },
         {
-            id: 'waterserver_kb',
+            id: 'water_server_flg',
             name: "給水機",
         },
         {
-            id: 'heatwave_kb',
+            id: 'heat_wave_flg',
             name: "熱波師",
         },
     ];
