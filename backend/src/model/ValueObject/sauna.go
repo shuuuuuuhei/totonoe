@@ -7,8 +7,8 @@ type Sauna struct {
 	SaunaType    string `json:"sauna_type,omitempty"`
 	Temperature  uint   `json:"temperature,omitempty"`
 	Capacity     uint   `json:"capacity,omitempty"`
-	RouryuKB     string `json:"rouryu_kb,omitempty"`
-	SaunaMatKB   string `json:"sauna_mat_kb,omitempty"`
-	TvKB         string `json:"tv_kb,omitempty"`
-	BgmKB        string `json:"bgm_kb,omitempty"`
+	RouryuFlg     string `json:"rouryu_flg,omitempty"`
+	SaunaMatFlg   string `json:"sauna_mat_flg,omitempty"`
+	TvFlg         string `json:"tv_flg,omitempty"`
+	BgmFlg        string `json:"bgm_flg,omitempty"`
 }
