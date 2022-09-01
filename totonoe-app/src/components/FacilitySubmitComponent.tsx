@@ -1,31 +1,31 @@
 import React, { Component, Fragment, useState, useEffect } from 'react'
-import { Input } from './form-components/Input'
-import { InputScope } from './form-components/InputScope'
-import { DropdownButton, Dropdown, ButtonGroup, Button, Form } from 'react-bootstrap'
+import { DropdownButton, Dropdown, ButtonGroup, Button, Form, Col } from 'react-bootstrap'
 import '../style/QuantityInput.css'
-import { SelectAddress } from './form-components/SelectAdress'
-import { TermsCheckBox } from './form-components/TermsCheckBox'
 import { SaunaSubmitComponent } from './SaunaSubmitComponent'
 import { WaterBathSubmitComponent } from './WaterBathSubmitComponent'
 import { useCookies } from 'react-cookie'
 import { useAuth0 } from '@auth0/auth0-react'
-
+import { SelectAddress } from './form-components/SelectAdress'
+import { TermsCheckBox } from './form-components/TermsCheckBox'
+import { IsRequiredCheckForm } from '../@types/Form'
+const MinPrice = 1;
 export const FacilitySubmitComponent = () => {
-
     const {getAccessTokenSilently} = useAuth0();
     const [cookies, setCookie,removeCookie] = useCookies();
+    const [validated, setValidated] = useState(false);
+    const [errors, setErrors] = useState<IsRequiredCheckForm>();
 
     const [saunas, setSaunas] = useState<NewSauna[]>([
         {
             id: "",
             facility_id: "",
             sauna_type: 0,
-            temperature: 0,
-            capacity: 0,
-            rouryu_kb: "",
-            bgm_kb: "",
-            tv_kb: "",
-            sauna_mat_kb: "",
+            temperature: 0 ,
+            capacity: 1,
+            rouryu_flg: "",
+            bgm_flg: "",
+            tv_flg: "",
+            sauna_mat_flg: "",
         }
     ]);
 
@@ -43,7 +43,7 @@ export const FacilitySubmitComponent = () => {
         address: {
             prefecture_id: 0,
             city_id: 0,
-            street: "",
+            street_name: "",
         },
         eigyo_start: "",
         eigyo_end: "",
@@ -51,14 +51,14 @@ export const FacilitySubmitComponent = () => {
         tel: "",
         restaurant_flg: "",
         lodging_flg: "",
-        workingspace_flg: "",
+        working_space_flg: "",
         books_flg: "",
-        heatwave_flg: "",
-        airbath_flg: "",
-        breakspace_flg: "",
-        waterserver_flg: "",
+        heat_wave_flg: "",
+        air_bath_flg: "",
+        break_space_flg: "",
+        water_server_flg: "",
         saunas: saunas,
-        waterbaths: waterBaths,
+        water_baths: waterBaths,
         amenities: [],
     });
 
@@ -66,7 +66,7 @@ export const FacilitySubmitComponent = () => {
     const [address, setAddress] = useState({
         prefecture_id: 0,
         city_id: 0,
-        street: "",
+        street_name: "",
     });
 
     const [terms, setTerms] = useState<{id: string;name: string;}[]>();
@@ -78,7 +78,7 @@ export const FacilitySubmitComponent = () => {
             ...prevState,
             address: address,
             saunas: saunas,
-            waterbaths: waterBaths,
+            water_baths: waterBaths,
         }));
 
         terms?.map((term, index) => {
@@ -90,10 +90,13 @@ export const FacilitySubmitComponent = () => {
 
     }, [address, saunas, waterBaths, terms])
 
-    console.log(facility)
-    const handleChange: React.ChangeEventHandler<HTMLSelectElement> = (event) => {
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const name = event.target.name;
         const value = event.target.value;
+
+        if(errors) {
+            if(errors[name as keyof IsRequiredCheckForm]) setErrors({...errors, [name]: null})
+        }
 
         // number型の更新の場合
         if(typeof facility[name as keyof NewFacility] === 'number') {
@@ -138,10 +141,10 @@ export const FacilitySubmitComponent = () => {
                 capacity: 0,
                 humidity_start: 0,
                 humidity_end: 0,
-                rouryu_kb: "",
-                bgm_kb: "",
-                tv_kb: "",
-                sauna_mat_kb: "",
+                rouryu_flg: "",
+                bgm_flg: "",
+                tv_flg: "",
+                sauna_mat_flg: "",
             },
         ]))
     }
@@ -180,8 +183,54 @@ export const FacilitySubmitComponent = () => {
         setWaterBaths((prevWaterBaths) => newWaterBaths);
     })
 
+    // address component用のerror更新
+    const handleSetAddressErrorNull = (name: string) => {
+        if(errors) {
+            setErrors({...errors, address: {...errors?.address, [name]: null}});
+        }
+    }
+
+    // 保存前入力チェック
+    const validateForm = () => {
+
+        const newErrors: IsRequiredCheckForm = {
+            name: "",
+            address: {
+                prefecture: "",
+                city: "",
+                street: "",
+            },
+            price: "",
+            saunas: undefined,
+        }
+
+        if(!facility.name || facility.name === '') newErrors.name = '施設名を入力してください'
+        if(!facility.address.prefecture_id) newErrors.address.prefecture = '都道府県を選択してください'
+        if(!facility.address.city_id ) newErrors.address.city = '市町村を選択してください'
+        if(!facility.address.street_name || facility.address.street_name === '') newErrors.address.street = '町名番地を入力してください'
+        if(!facility.price || facility.price <=0 ) newErrors.price = '1円以上を入力してください'
+
+        const hasErrorSaunas = facility.saunas.filter((sauna) => !sauna.sauna_type || sauna.temperature <= 0 || sauna.capacity <= 0)
+        hasErrorSaunas.forEach((sauna, index) => {
+            newErrors.saunas?.push({
+                sauna_type: "",
+                temperature: "",
+                capacity: "",
+            })
+        })
+        return newErrors;
+    }
+
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+
+        const formErrors = validateForm();
+        if(Object.keys(formErrors).length > 0) {
+            setErrors(formErrors);
+            return
+        }
+
+        console.log("prev",facility)
         const fetchPostFacility = async() => {
             try {
                 const uri = "http://localhost:4000/facilities/new";
@@ -195,7 +244,7 @@ export const FacilitySubmitComponent = () => {
                         Authorization: `Bearer ${accessToken}`,
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({facility, 'user_id': cookies.userID,})
+                    body: JSON.stringify({'facility':facility, 'user_id': cookies.userID,})
                 }
                 fetch(uri, requestOption)
                     .then((response) => {
@@ -215,70 +264,77 @@ export const FacilitySubmitComponent = () => {
         fetchPostFacility();
     }
 
-    console.log(address)
-
     return(
         <Fragment>
             <div className="container p-5">
                 <div className="row py-5">
                     <Form onSubmit={handleSubmit}>
                         <h2 className="text-center py-3">サウナ施設を登録する</h2>
-                        <label htmlFor="">施設名</label>
-                        <Input 
-                                type="text"
-                                className="input-sm"
-                                name="name"
-                                value={facility.name}
-                                onChange={handleChange}
-                                placehodlder="〇〇温泉"
-                                errorDiv=""
-                                errorMsg=""
-                        />
-                        <label htmlFor="">住所</label>
-                        <SelectAddress address={address} setAddress={setAddress}/>
-                        <label htmlFor="">営業時間</label>
+                        <Form.Group controlId="validationCustom01">
+                            <Form.Label htmlFor="">施設名</Form.Label>
+                            <Form.Control 
+                                    type="text"
+                                    className="input-sm"
+                                    name="name"
+                                    value={facility.name}
+                                    onChange={handleChange}
+                                    placeholder="〇〇温泉"
+                                    isInvalid={!!errors?.name}
+                            />
+                            <Form.Control.Feedback type='invalid'>{errors?.name}</Form.Control.Feedback>
+                        </Form.Group>
+                        <Form.Label htmlFor="">住所</Form.Label>
+                        <SelectAddress address={address} setAddress={setAddress} error={errors?.address} handleSetAddressErrorNull={handleSetAddressErrorNull}/>
+                        <Form.Label htmlFor="">営業時間</Form.Label>
                         <div className="eigyo-time row">
                             <div className="col-5">
-                                <Input 
-                                        type="time"
-                                        className="input-sm"
-                                        name="eigyo_start"
-                                        value={facility.eigyo_start}
-                                        onChange={handleChange}
-                                        placehodlder=""
-                                        errorDiv=""
-                                        errorMsg=""
-                                />
+                                <Form.Group>
+                                    <Form.Control
+                                            type="time"
+                                            className="input-sm"
+                                            name="eigyo_start"
+                                            value={facility.eigyo_start}
+                                            onChange={handleChange}
+                                            placeholder=""
+                                            required={false}
+                                    />
+                                </Form.Group>
                             </div>
                             <p className="col-1 text-center">~</p>
                             <div className="col-5">
-                                <Input 
-                                        type="time"
-                                        className="input-sm"
-                                        name="eigyo_end"
-                                        value={facility.eigyo_end}
-                                        onChange={handleChange}
-                                        placehodlder=""
-                                        errorDiv=""
-                                        errorMsg=""
-                                />
+                                <Form.Group>
+                                    <Form.Control 
+                                            type="time"
+                                            className="input-sm"
+                                            name="eigyo_end"
+                                            value={facility.eigyo_end}
+                                            onChange={handleChange}
+                                            placeholder=""
+                                            required={false}
+                                    />
+                                </Form.Group>
                             </div>
                         </div>
-                        <label htmlFor="">値段</label>
-                        <Input 
-                                type="number"
-                                className="input-sm"
-                                name="price"
-                                value={facility.price.toString()}
-                                onChange={handleChange}
-                                placehodlder="値段"
-                                errorDiv=""
-                                errorMsg=""
-                        />
+                        <Form.Group>
+                            <Form.Label htmlFor="">値段</Form.Label>
+                            <Form.Control 
+                                    type="number"
+                                    className="input-sm"
+                                    name="price"
+                                    value={facility.price.toString()}
+                                    onChange={handleChange}
+                                    placeholder="値段"
+                                    isInvalid={!!errors?.price}
+                                    min={MinPrice}
+                            />
+                            <Form.Control.Feedback type='invalid'>
+                                {errors?.price}
+                            </Form.Control.Feedback>
+                        </Form.Group>
                         <div className="row py-4">
                             <div className="col-6">
                                 <div className="row">
-                                    <label htmlFor="" className="col-6">サウナ</label>
+                                    <Form.Label htmlFor="" className="col-6">サウナ</Form.Label>
                                     <div className="col-6 text-end">
                                         <Button onClick={handleAddSauna}>
                                             サウナを追加
@@ -294,7 +350,7 @@ export const FacilitySubmitComponent = () => {
                             
                             <div className="col-6">
                                 <div className="row">
-                                    <label htmlFor="" className="col-6">水風呂</label>
+                                    <Form.Label htmlFor="" className="col-6">水風呂</Form.Label>
                                     <div className="col-6 text-end">
                                         <Button onClick={handleAddWaterBath}>
                                             水風呂を追加
