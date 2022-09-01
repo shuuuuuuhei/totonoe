@@ -18,7 +18,17 @@ func (f Facility) GetFacilityByID(c *gin.Context) {
 	inputport.GetFacilityByID(c)
 }
 
-func (f Facility) newInputPort(c *gin.Context) port.FacilityInputPort{
+func (f Facility) CreateFacility(c *gin.Context) {
+	inputport := f.newInputPort(c)
+	inputport.CreateFacility(c)
+}
+
+func (f Facility) GetFacilities(c *gin.Context) {
+	inputport := f.newInputPort(c)
+	inputport.CreateFacility(c)
+}
+
+func (f Facility) newInputPort(c *gin.Context) port.FacilityInputPort {
 	output := f.OutputFactory(c)
 	repository := f.FacilityRepo(f.Conn)
 	inputport := f.InputFactory(output, repository)

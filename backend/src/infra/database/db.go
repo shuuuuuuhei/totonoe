@@ -66,7 +66,7 @@ func createNewLogger() logger.Interface {
 
 // DBMigrate DBマイグレーションを行う
 func (d *DB) DBMigrate() {
-	err := d.Connection.Migrator().DropTable(Domain.User{}, Domain.Profile{}, Domain.Article{}, Domain.Facility{}, Domain.Comment{}, Domain.ArticleLike{}, Domain.UserRelationShip{}, Domain.Sauna{}, Domain.Address{})
+	err := d.Connection.Migrator().DropTable(Domain.User{}, Domain.Profile{}, Domain.Article{}, Domain.Facility{}, Domain.Comment{}, Domain.ArticleLike{}, Domain.UserRelationShip{}, Domain.Sauna{}, Domain.WaterBath{}, Domain.Address{})
 	fmt.Println("delete: ", err)
 	err = d.Connection.AutoMigrate(Domain.Facility{})
 	fmt.Println("migrate: ", err)
@@ -87,6 +87,8 @@ func (d *DB) DBMigrate() {
 	err = d.Connection.AutoMigrate(Domain.Prefecture{})
 	fmt.Println("migrate: ", err)
 	err = d.Connection.AutoMigrate(Domain.Sauna{})
+	fmt.Println("migrate: ", err)
+	err = d.Connection.AutoMigrate(Domain.WaterBath{})
 	fmt.Println("migrate: ", err)
 
 }
@@ -112,16 +114,16 @@ func (d *DB) CreateData() {
 	}
 
 	facility := Domain.Facility{
-		Name:           "test",
-		Tel:            "0000-1234-67890",
-		Price:          1000,
-		LoggingKb:      "1",
-		RestaurantKb:   "0",
-		WorkingSpaceKb: "1",
-		BooksKb:        "1",
-		HeatWaveKb:     "1",
-		AirBathKb:      "1",
-		BreakSpaceKb:   "0",
+		Name:            "test",
+		Tel:             "0000-1234-67890",
+		Price:           1000,
+		LodgingFlg:      "1",
+		RestaurantFlg:   "0",
+		WorkingSpaceFlg: "1",
+		BooksFlg:        "1",
+		HeatWaveFlg:     "1",
+		AirBathFlg:      "1",
+		BreakSpaceFlg:   "0",
 	}
 	if err := d.Connection.Create(&facility).Error; err != nil {
 		fmt.Println(err)
@@ -130,16 +132,24 @@ func (d *DB) CreateData() {
 
 	for i := 0; i < 3; i++ {
 		sauna := Domain.Sauna{}
+		waterBath := Domain.WaterBath{}
 		sauna.FacilityID = facility.ID
 		sauna.Capacity = uint(i) * 10
-		sauna.Temperature = uint(i) * 40
-		sauna.SaunaType = "4"
-		sauna.BgmKB = "0"
-		sauna.RouryuKB = "1"
-		sauna.SaunaMatKB = "1"
-		sauna.TvKB = "1"
+		sauna.Temperature = i * 40
+		sauna.SaunaType = 4
+		waterBath.FacilityID = facility.ID
+		waterBath.Capacity = uint(i) * 5
+		waterBath.Temperature = i * 3
+		sauna.BgmFlg = "0"
+		sauna.RouryuFlg = "1"
+		sauna.SaunaMatFlg = "1"
+		sauna.TvFlg = "1"
 
 		if err := d.Connection.Create(&sauna).Error; err != nil {
+			fmt.Println(err)
+			return
+		}
+		if err := d.Connection.Create(&waterBath).Error; err != nil {
 			fmt.Println(err)
 			return
 		}

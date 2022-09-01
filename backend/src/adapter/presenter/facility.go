@@ -18,7 +18,7 @@ func NewFacilityOutputPort(c *gin.Context) port.FacilityOutputPort {
 
 // RenderOK implements port.FacilityOutputPort
 func (f Facility) RenderOK() {
-	panic("unimplemented")
+	f.c.JSON(200, nil)
 }
 
 func (f Facility) RenderError(_ error) {
@@ -26,7 +26,7 @@ func (f Facility) RenderError(_ error) {
 }
 
 // RenderFacilities implements port.FacilityOutputPort
-func (f Facility) RenderFacilities([]*ValueObject.FacilityVO) {
+func (f Facility) RenderFacilities(*[]ValueObject.FacilityVO) {
 	panic("unimplemented")
 }
 

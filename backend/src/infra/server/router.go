@@ -110,6 +110,11 @@ func (r *Routing) setRouting() {
 	*/
 	r.Gin.Use(corsMiddleware(), adapter.Wrap(jwtMiddleware.CheckJWT))
 
+	// サウナ施設
+	r.Gin.GET("/facilities", facilityController.GetFacilities)
+	r.Gin.POST("/facilities/new", facilityController.CreateFacility)
+	
+
 	// 記事
 	r.Gin.GET("/users/:userID/articles/", articleController.GetArticlesByUserID)
 	r.Gin.GET("/articles/:articleID", articleController.GetArticleByID)
