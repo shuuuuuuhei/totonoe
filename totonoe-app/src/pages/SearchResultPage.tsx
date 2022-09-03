@@ -25,7 +25,7 @@ export const SearchResultPage = () => {
 
     useEffect(() => {
         const fetchSaunas = async() => {
-            const uri = "http://localhost:4040/saunas";
+            const uri = "http://localhost:4000/facilities";
             const requestOption: RequestInit = {
                 method: "GET",
                 mode: "cors",
