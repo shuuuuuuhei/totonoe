@@ -26,6 +26,7 @@ export const SearchOption = () => {
                         placehodlder="エリア・駅・【例：銀座、池袋】"
                         errorDiv=""
                         errorMsg=""
+                        required={true}
                         />
                 </div>
                 <div className="temperature-option row">

@@ -26,6 +26,7 @@ export const InputScope = (props: InputScopeProps) => {
                     placehodlder={props.placehodlder}
                     errorDiv={props.errorDiv}
                     errorMsg={props.errorMsg}
+                    required={true}
                 />
             </div>
             <div className="col-2 text-center">
@@ -43,6 +44,7 @@ export const InputScope = (props: InputScopeProps) => {
                     placehodlder={props.placehodlder}
                     errorDiv={props.errorDiv}
                     errorMsg={props.errorMsg}
+                    required={true}
                 />
             </div>
         </Fragment>

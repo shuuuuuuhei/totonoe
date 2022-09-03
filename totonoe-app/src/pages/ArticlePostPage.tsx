@@ -92,6 +92,7 @@ export const ArticlePostPage = () => {
                         onChange={handleChange}
                         errorDiv=""
                         errorMsg=""
+                        required={true}
                         />
                         <label className="form-label">
                             内容

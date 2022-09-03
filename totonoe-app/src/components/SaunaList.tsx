@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react'
 import { HiOutlinePencilAlt } from 'react-icons/hi'
 import { BsHeart } from 'react-icons/bs'
 import { Link } from 'react-router-dom'
-import { StrConvertStrTime } from '../common/Convert'
+import { StrConvertStrTime, UndefinedConvertToEmpty } from '../common/Convert'
 
 type FacilityListProps = {
     facilities: Facility[]
@@ -24,7 +24,7 @@ export const FacilityList = (props: FacilityListProps) => {
                             <p className="facility-address">{facility.address}</p>
                             <div className="row">
                                 <p className="col-2">入浴料：{facility.price}円</p>
-                                <p className="col-2">営業：{StrConvertStrTime(facility.eigyo_start)}~{StrConvertStrTime(facility.eigyo_end)}</p>
+                                <p className="col-2">営業：{StrConvertStrTime(facility.eigyo_start,facility.eigyo_end)}</p>
                             </div>
                         </div>
                     </div>

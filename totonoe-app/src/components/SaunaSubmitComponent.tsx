@@ -10,10 +10,6 @@ type SaunaSubmitComponentProps = {
     handleDeleteSauna: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void) | undefined
 }
 
-// next task
-// 保存ボタン押下後、ページを上にする
-// 保存完了 or Errorメッセージ表示
-
 export const SaunaSubmitComponent = (props: SaunaSubmitComponentProps) => {
 
     const [sauna, setSauna] = useState<NewSauna>(props.sauna);

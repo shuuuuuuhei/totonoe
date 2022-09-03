@@ -9,10 +9,11 @@ type inputProps = {
     errorDiv: string,
     errorMsg: string,
     className: string,
+    required: boolean|undefined,
 }
 
 export const Input = (props: inputProps) => {
-    const { type, name, value, onChange, placehodlder, errorDiv, errorMsg, className } = props
+    const { type, name, value, onChange, placehodlder, errorDiv, errorMsg, className, required } = props
     return(
         <div className="mb-3">
             <input
@@ -23,6 +24,7 @@ export const Input = (props: inputProps) => {
                 defaultValue={value}
                 onChange={onChange}
                 placeholder={placehodlder}
+                required={required}
             />
         </div>
     )
