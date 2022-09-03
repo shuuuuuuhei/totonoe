@@ -3,10 +3,11 @@ package database
 import (
 	"fmt"
 	"log"
-	"main.go/model/Domain"
 	"os"
 	"strconv"
 	"time"
+
+	"main.go/model/Domain"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -65,9 +66,9 @@ func createNewLogger() logger.Interface {
 
 // DBMigrate DBマイグレーションを行う
 func (d *DB) DBMigrate() {
-	err := d.Connection.Migrator().DropTable(Domain.User{}, Domain.Profile{}, Domain.Article{}, Domain.Sauna{}, Domain.Comment{}, Domain.ArticleLike{}, Domain.UserRelationShip{})
+	err := d.Connection.Migrator().DropTable(Domain.User{}, Domain.Profile{}, Domain.Article{}, Domain.Facility{}, Domain.Comment{}, Domain.ArticleLike{}, Domain.UserRelationShip{}, Domain.Sauna{}, Domain.WaterBath{}, Domain.Address{})
 	fmt.Println("delete: ", err)
-	err = d.Connection.AutoMigrate(Domain.Sauna{})
+	err = d.Connection.AutoMigrate(Domain.Facility{})
 	fmt.Println("migrate: ", err)
 	err = d.Connection.AutoMigrate(Domain.User{})
 	fmt.Println("migrate: ", err)
@@ -79,6 +80,17 @@ func (d *DB) DBMigrate() {
 	fmt.Println("migrate: ", err)
 	err = d.Connection.AutoMigrate(Domain.ArticleLike{})
 	fmt.Println("migrate: ", err)
+	err = d.Connection.AutoMigrate(Domain.Address{})
+	fmt.Println("migrate: ", err)
+	err = d.Connection.AutoMigrate(Domain.City{})
+	fmt.Println("migrate: ", err)
+	err = d.Connection.AutoMigrate(Domain.Prefecture{})
+	fmt.Println("migrate: ", err)
+	err = d.Connection.AutoMigrate(Domain.Sauna{})
+	fmt.Println("migrate: ", err)
+	err = d.Connection.AutoMigrate(Domain.WaterBath{})
+	fmt.Println("migrate: ", err)
+
 }
 
 // CreateData サンプルデータ作成
@@ -99,12 +111,57 @@ func (d *DB) CreateData() {
 	profile.UserID = user.ID
 	if err := d.Connection.Create(&profile).Error; err != nil {
 		fmt.Println(err)
+	}
+
+	facility := Domain.Facility{
+		Name:            "test",
+		Tel:             "0000-1234-67890",
+		Price:           1000,
+		LodgingFlg:      "1",
+		RestaurantFlg:   "0",
+		WorkingSpaceFlg: "1",
+		BooksFlg:        "1",
+		HeatWaveFlg:     "1",
+		AirBathFlg:      "1",
+		BreakSpaceFlg:   "0",
+	}
+	if err := d.Connection.Create(&facility).Error; err != nil {
+		fmt.Println(err)
 		return
 	}
 
-	sauna := Domain.Sauna{Name: "test"}
+	for i := 0; i < 3; i++ {
+		sauna := Domain.Sauna{}
+		waterBath := Domain.WaterBath{}
+		sauna.FacilityID = facility.ID
+		sauna.Capacity = uint(i) * 10
+		sauna.Temperature = i * 40
+		sauna.SaunaType = 4
+		waterBath.FacilityID = facility.ID
+		waterBath.Capacity = uint(i) * 5
+		waterBath.Temperature = i * 3
+		sauna.BgmFlg = "0"
+		sauna.RouryuFlg = "1"
+		sauna.SaunaMatFlg = "1"
+		sauna.TvFlg = "1"
 
-	if err := d.Connection.Create(&sauna).Error; err != nil {
+		if err := d.Connection.Create(&sauna).Error; err != nil {
+			fmt.Println(err)
+			return
+		}
+		if err := d.Connection.Create(&waterBath).Error; err != nil {
+			fmt.Println(err)
+			return
+		}
+	}
+
+	address := Domain.Address{
+		FacilityID:   1,
+		CityID:       1100,
+		PrefectureID: 1,
+		StreetName:   "3-50-11",
+	}
+	if err := d.Connection.Create(&address).Error; err != nil {
 		fmt.Println(err)
 		return
 	}
@@ -136,7 +193,7 @@ func (d *DB) CreateData() {
 		article := Domain.Article{}
 		article.Title = "test_" + strconv.Itoa(i)
 		article.Content = "content_" + strconv.Itoa(i)
-		article.SaunaID = sauna.ID
+		article.FacilityID = facility.ID
 		article.UserID = user.ID
 		if err := d.Connection.Create(&article).Error; err != nil {
 			fmt.Println(err)
@@ -164,7 +221,7 @@ func (d *DB) CreateData() {
 		article := Domain.Article{}
 		article.Title = "test2_" + strconv.Itoa(i)
 		article.Content = "content2_" + strconv.Itoa(i)
-		article.SaunaID = sauna.ID
+		article.FacilityID = facility.ID
 		article.UserID = tmpUser.ID
 		if err := d.Connection.Create(&article).Error; err != nil {
 			fmt.Println(err)

@@ -15,6 +15,7 @@ type ArticleInputPort interface {
 	GetArticlesOrderByDate(ctx *gin.Context)
 	LikeArticle(ctx *gin.Context)
 	UnLikedArticle(ctx *gin.Context)
+	GetArticleByFacilityID(ctx *gin.Context)
 }
 
 // ArticleOutputPort 出力インタフェース
@@ -35,4 +36,5 @@ type ArticleRepository interface {
 	GetArticlesOrderByDate(ctx *gin.Context) (*[]ValueObject.ArticleVO, error)
 	LikeArticle(ctx *gin.Context) error
 	UnLikedArticle(ctx *gin.Context) error
+	GetArticleByFacilityID(ctx *gin.Context) (*[]ValueObject.ArticleVO, error)
 }

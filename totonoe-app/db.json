@@ -1,0 +1,134 @@
+{
+  "saunas": [
+    {
+      "id": "1",
+      "name": "タイムズ スパ・レスタ",
+      "address": "東京都江戸川区",
+      "price": 1000,
+      "eigyo_start": "0800",
+      "eigyo_end": "2300"
+    },
+    {
+      "id": "2",
+      "name": "タイムズ スパ・レスタ",
+      "address": "東京都江戸川区",
+      "price": 900,
+      "eigyo_start": "0800",
+      "eigyo_end": "2300"
+    },
+    {
+      "id": "3",
+      "name": "タイムズ スパ・レスタ",
+      "address": "東京都江戸川区",
+      "price": 1500,
+      "eigyo_start": "0800",
+      "eigyo_end": "2300"
+    },
+    {
+      "id": "4",
+      "name": "タイムズ スパ・レスタ",
+      "address": "東京都江戸川区",
+      "price": 2000,
+      "eigyo_start": "0800",
+      "eigyo_end": "2300"
+    },
+    {
+      "id": "5",
+      "name": "タイムズ スパ・レスタ",
+      "address": "東京都江戸川区",
+      "price": 2500,
+      "eigyo_start": "0800",
+      "eigyo_end": "2300"
+    }
+  ],
+
+  "facility": 
+  {
+    "id": "1",
+    "name": "大江戸温泉",
+    "address_id": "1",
+    "eigyo_start": "0800",
+    "eigyo_end": "2300",
+    "price": "1000",
+    "logging_kb": "1",
+    "restaurant_kb": "1",
+    "working_space_kb": "1",
+    "books_kb": "1",
+    "heat_wave_kb": "1",
+    "air_bath_kb": "1",
+    "breaks_space_kb": "1",
+    "saunas": [
+      {
+          "id": "1",
+          "facility_id": "1",
+          "sauna_type": "フィンランドサウナ",
+          "temperature": 100,
+          "capacity": 20,
+          "humidity": "50",
+          "rouryu_kb": "1",
+          "bgm_kb": "1",
+          "tv_kb": "0"
+      },
+      {
+          "id": "2",
+          "facility_id": "1",
+          "sauna_type": "薪サウナ",
+          "temperature": 110,
+          "capacity": 20,
+          "humidity": "80",
+          "rouryu_kb": "1",
+          "bgm_kb": "0",
+          "tv_kb": "1"
+      },
+      {
+          "id": "3",
+          "facility_id": "1",
+          "sauna_type": "スチームサウナ",
+          "temperature": 120,
+          "capacity": 20,
+          "humidity": "90",
+          "rouryu_kb": "0",
+          "bgm_kb": "1",
+          "tv_kb": "1"
+      }
+    ],
+
+    "waterbaths": [
+      {
+        "id": "1",
+        "facility_id": "1",
+        "temperature": 10,
+        "capacity": 20
+      },
+      {
+        "id": "2",
+        "facility_id": "1",
+        "temperature": 15,
+        "capacity": 20
+      },
+      {
+        "id": "3",
+        "facility_id": "1",
+        "temperature": 5,
+        "capacity": 20
+      }
+    ],
+    "amenities": [
+      {
+        "amenity_type": "ドライヤー"
+      },
+      {
+        "amenity_type": "化粧品"
+      }
+    ],
+    "valuation": {
+      "id": "1",
+      "facility_id": "1",
+      "overall_score":  4.5,
+      "cost_score": 3.8,
+      "atmosphere_score": 3.9,
+      "totonoi_score": 4.6,
+      "score_count": 40
+    }
+  }
+}

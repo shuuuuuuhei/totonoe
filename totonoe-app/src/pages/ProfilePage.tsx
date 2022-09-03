@@ -7,10 +7,6 @@ import { ArticleList } from '../components/ArticleList'
 import { ProfileComponent } from '../components/ProfileComponent'
 import { useCookies } from "react-cookie";
 
-type ProfilePageProps = {
-    userID: string
-}
-
 export const ProfilePage = () => {
     const [profile, setProfile] = useState<Profile|null>();
     const [articles, setArticles] = useState<[Article]>();
@@ -19,6 +15,7 @@ export const ProfilePage = () => {
 
     //ユーザIDをURIパラメータから取得
     const {userID} = useParams();
+
     useEffect(() => {
         const fetchArticle = async() => {
             

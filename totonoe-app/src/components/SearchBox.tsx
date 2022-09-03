@@ -2,6 +2,7 @@ import React, { Fragment, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { Input } from './form-components/Input';
 import "../style/Search-Box.css"
+import { Link } from 'react-router-dom';
 
 export const SearchBox = () => {
     
@@ -22,6 +23,7 @@ export const SearchBox = () => {
                             placehodlder="エリア・駅・【例：銀座、池袋】"
                             errorDiv=""
                             errorMsg=""
+                            required={true}
                             />
                     </div>
                     <div className="col-md-5">
@@ -34,10 +36,11 @@ export const SearchBox = () => {
                             placehodlder=""
                             errorDiv=""
                             errorMsg=""
+                            required={true}
                         />
                     </div>
                     <div className="col-md-2">
-                        <Button className="btn-warning btn-blockb　w-auto">検索</Button>
+                        <Link to="/search"><Button className="btn-warning btn-blockb　w-auto">検索</Button></Link>
                     </div>
                 </div>
             </form>

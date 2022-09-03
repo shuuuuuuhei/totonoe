@@ -1,14 +1,14 @@
 package ValueObject
 
-import (
-	"time"
-)
-
 // Sauna サウナモデル
 type Sauna struct {
-	ID        uint32    `json:"id,omitempty"`
-	Name      string    `json:"name,omitempty"`
-	AddressID string    `json:"address_id,omitempty"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	ID           uint32 `json:"id,omitempty"`
+	FacilityVOID uint32 `json:"facility_id,omitempty"`
+	SaunaType    string `json:"sauna_type,omitempty"`
+	Temperature  uint   `json:"temperature,omitempty"`
+	Capacity     uint   `json:"capacity,omitempty"`
+	RouryuFlg     string `json:"rouryu_flg,omitempty"`
+	SaunaMatFlg   string `json:"sauna_mat_flg,omitempty"`
+	TvFlg         string `json:"tv_flg,omitempty"`
+	BgmFlg        string `json:"bgm_flg,omitempty"`
 }

@@ -12,7 +12,7 @@ export const ArticleList: React.VFC<ArticlesProps> = ({articles}) => {
     return (
         <Fragment>
             <div className="article-list container">
-                {articles?.map((article) => {
+                {articles?.map((article, key) => {
                     return(
                         <DetailArticle article={article}/>
                     )

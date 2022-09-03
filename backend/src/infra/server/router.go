@@ -1,9 +1,10 @@
 package server
 
 import (
+	"time"
+
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
-	"time"
 
 	adapter "github.com/gwatts/gin-adapter"
 
@@ -64,6 +65,27 @@ func (r *Routing) setRouting() {
 		Conn:              r.DB.Connection,
 	}
 
+	prefectureController := controller.Prefecture{
+		InputFactory:      interactor.NewPrefectureInputPort,
+		OutputFactory:     presenter.NewPrefectureOutputPort,
+		RepositoryFactory: gateway.NewPrefectureRepository,
+		Conn:              r.DB.Connection,
+	}
+
+	facilityController := controller.Facility{
+		InputFactory:  interactor.NewFacilityInputPort,
+		OutputFactory: presenter.NewFacilityOutputPort,
+		FacilityRepo:  gateway.NewFacilityRepository,
+		Conn:          r.DB.Connection,
+	}
+
+	cityController := controller.City{
+		InputFactory:  interactor.NewCityInputPort,
+		OutputFactory: presenter.NewCityOutputPort,
+		RepoFactory: gateway.NewCityRepository,
+		Conn:       r.DB.Connection,
+	}
+
 	r.Gin.Use(corsMiddleware())
 
 	store := cookie.NewStore([]byte("secret"))
@@ -71,10 +93,27 @@ func (r *Routing) setRouting() {
 
 	r.Gin.GET("/articles", articleController.GetArticlesOrderByDate)
 
+	// 都道府県取得
+	r.Gin.GET("/prefecture", prefectureController.GetAllPrefecture)
+
+	// 市町村取得
+	r.Gin.GET("/prefecture/:prefectureID/cities", cityController.GetCitiesByPrefectureID)
+
+	// 施設取得
+	r.Gin.GET("/facility/:facilityID", facilityController.GetFacilityByID)
+
+	// 記事取得
+	r.Gin.GET("/facilities/:facilityID/articles", articleController.GetArticleByFacilityID)
+
 	/**
 	@description All Auth Route
 	*/
 	r.Gin.Use(corsMiddleware(), adapter.Wrap(jwtMiddleware.CheckJWT))
+
+	// サウナ施設
+	r.Gin.GET("/facilities", facilityController.GetFacilities)
+	r.Gin.POST("/facilities/new", facilityController.CreateFacility)
+	
 
 	// 記事
 	r.Gin.GET("/users/:userID/articles/", articleController.GetArticlesByUserID)
@@ -96,6 +135,7 @@ func (r *Routing) setRouting() {
 	r.Gin.GET("/articles/:articleID/comments/:commentID", commentController.GetCommentsByArticleID)
 	r.Gin.POST("/articles/:articleID/comments/new", commentController.CreateComment)
 	r.Gin.DELETE("/articles/:articleID/comment/new", commentController.DeleteComment)
+
 }
 
 // corsMiddleware CORSの設定
