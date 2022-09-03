@@ -4,10 +4,10 @@ type Sauna = {
     sauna_type: number,
     temperature: number,
     capacity: number,
-    rouryu_kb: string,
-    bgm_kb: string,
-    tv_kb: string,
-    sauna_mat_kb: string,
+    rouryu_flg: string,
+    bgm_flg: string,
+    tv_flg: string,
+    sauna_mat_flg: string,
 }
 
 type NewSauna = {
@@ -16,8 +16,8 @@ type NewSauna = {
     sauna_type: number,
     temperature: number,
     capacity: number,
-    rouryu_kb: string,
-    bgm_kb: string,
-    tv_kb: string,
-    sauna_mat_kb: string,
+    rouryu_flg: string,
+    bgm_flg: string,
+    tv_flg: string,
+    sauna_mat_flg: string,
 }
