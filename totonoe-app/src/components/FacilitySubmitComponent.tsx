@@ -9,6 +9,7 @@ import { SelectAddress } from './form-components/SelectAdress'
 import { TermsCheckBox } from './form-components/TermsCheckBox'
 import { IsRequiredCheckForm } from '../@types/Form'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 const MinPrice = 1;
 export const FacilitySubmitComponent = () => {
     const navigate = useNavigate();
@@ -188,7 +189,7 @@ export const FacilitySubmitComponent = () => {
     // address component用のerror更新
     const handleSetAddressErrorNull = (name: string) => {
         if(errors) {
-            setErrors({...errors, address: {...errors?.address, [name]: null}});
+            setErrors({...errors, [name]: null});
         }
     }
 
@@ -197,18 +198,16 @@ export const FacilitySubmitComponent = () => {
 
         const newErrors: IsRequiredCheckForm = {
             name: "",
-            address: {
-                prefecture: "",
-                city: "",
-                street: "",
-            },
+            prefecture: "",
+            city: "",
+            street: "",
             price: "",
         }
 
         if(!facility.name || facility.name === '') newErrors.name = '施設名を入力してください'
-        if(!facility.address.prefecture_id) newErrors.address.prefecture = '都道府県を選択してください'
-        if(!facility.address.city_id ) newErrors.address.city = '市町村を選択してください'
-        if(!facility.address.street_name || facility.address.street_name === '') newErrors.address.street = '町名番地を入力してください'
+        if(!facility.address.prefecture_id) newErrors.prefecture = '都道府県を選択してください'
+        if(!facility.address.city_id ) newErrors.city = '市町村を選択してください'
+        if(!facility.address.street_name || facility.address.street_name === '') newErrors.street = '町名番地を入力してください'
         if(!facility.price || facility.price <=0 ) newErrors.price = '1円以上を入力してください'
 
         // サウナのバリデーションは保留
@@ -230,17 +229,16 @@ export const FacilitySubmitComponent = () => {
         event.preventDefault();
         
         const formErrors = validateForm();
-        
+
+        console.log(formErrors)
         // エラーメッセージがあれば処理中断
-        if(!Object.values(formErrors).includes('')) {
+        if(Object.values(formErrors).some((formError) => formError !== "")) {
             setErrors(formErrors);
-            console.log(errors)
             setValidated(true)
             returnPositionFromTop();
             return
         }
 
-        console.log("prev",facility)
         const fetchPostFacility = async() => {
             try {
                 const uri = "http://localhost:4000/facilities/new";
@@ -265,7 +263,8 @@ export const FacilitySubmitComponent = () => {
                     })
                     .then((data) => {
                         console.log("登録成功", data)
-                        navigate('/')
+                        toast.success('新規登録が成功しました！');
+                        navigate('/');
                     })
             } catch (err)
             { 
@@ -304,7 +303,7 @@ export const FacilitySubmitComponent = () => {
                             <Form.Control.Feedback type='invalid'>{errors?.name}</Form.Control.Feedback>
                         </Form.Group>
                         <Form.Label htmlFor="">住所</Form.Label>
-                        <SelectAddress address={address} setAddress={setAddress} error={errors?.address} handleSetAddressErrorNull={handleSetAddressErrorNull}/>
+                        <SelectAddress address={address} setAddress={setAddress} error={{prefecture: errors?.prefecture, city: errors?.city, street: errors?.street}}handleSetAddressErrorNull={handleSetAddressErrorNull}/>
                         <Form.Label htmlFor="">営業時間</Form.Label>
                         <div className="eigyo-time row">
                             <div className="col-5">

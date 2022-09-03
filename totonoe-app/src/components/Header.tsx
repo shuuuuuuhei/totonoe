@@ -8,6 +8,8 @@ import { Link } from 'react-router-dom';
 import { IconContext } from 'react-icons';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useCookies } from 'react-cookie';
+import { ToastContainer, Zoom, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export const Header = () => {
     const { loginWithRedirect, isAuthenticated, logout } = useAuth0();
@@ -23,8 +25,29 @@ export const Header = () => {
         logout({returnTo: window.location.origin});
     }
 
+    const contextClass = {
+        success: 'bg-blue-600',
+        error: 'bg-red-600',
+        info: 'bg-gray-700',
+        warning: 'bg-orange-400',
+        default: 'bg-black text-white ',
+        dark: 'bg-white text-gray-600',
+    };
+
     return (
         <Fragment>
+            <ToastContainer
+            position="bottom-left"
+            autoClose={5000}
+            hideProgressBar
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            />
+            
             <div className="header row">
                 <div className="header-top d-flex justify-content-between">
                     <div className="header-top-left">
