@@ -8,8 +8,10 @@ import { useAuth0 } from '@auth0/auth0-react'
 import { SelectAddress } from './form-components/SelectAdress'
 import { TermsCheckBox } from './form-components/TermsCheckBox'
 import { IsRequiredCheckForm } from '../@types/Form'
+import { useNavigate } from 'react-router-dom'
 const MinPrice = 1;
 export const FacilitySubmitComponent = () => {
+    const navigate = useNavigate();
     const {getAccessTokenSilently} = useAuth0();
     const [cookies, setCookie,removeCookie] = useCookies();
     const [validated, setValidated] = useState(false);
@@ -215,21 +217,26 @@ export const FacilitySubmitComponent = () => {
         return newErrors;
     }
 
-    const returnTop = () => {
+    // errorListの位置までスクロールする
+    const returnPositionFromTop = () => {
+        const positionFromTop = document.getElementById('errors-list')?.offsetTop;
         window.scrollTo({
-            top: 10,
+            top: positionFromTop,
             behavior: "auto",
         })
     }
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-
+        
         const formErrors = validateForm();
-        if(Object.keys(formErrors).length > 0) {
+        
+        // エラーメッセージがあれば処理中断
+        if(!Object.values(formErrors).includes('')) {
             setErrors(formErrors);
+            console.log(errors)
             setValidated(true)
-            returnTop();
+            returnPositionFromTop();
             return
         }
 
@@ -258,6 +265,7 @@ export const FacilitySubmitComponent = () => {
                     })
                     .then((data) => {
                         console.log("登録成功", data)
+                        navigate('/')
                     })
             } catch (err)
             { 
@@ -279,7 +287,7 @@ export const FacilitySubmitComponent = () => {
                 <div className="row py-5">
                     <Form onSubmit={handleSubmit}>
                         <h2 className="text-center py-3">サウナ施設を登録する</h2>
-                        <Alert variant="danger" show={validated}>
+                        <Alert variant="danger" show={validated} id="errors-list">
                             {GetErrors()}
                         </Alert>
                         <Form.Group controlId="validationCustom01">
