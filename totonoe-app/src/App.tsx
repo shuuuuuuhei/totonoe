@@ -12,6 +12,7 @@ import { useCookies } from 'react-cookie';
 import { SearchResultPage } from './pages/SearchResultPage';
 import { SaunaPage } from './pages/SaunaPage';
 import { SaunaSubmitPage } from './pages/SaunaSubmitPage';
+import { SearchMapPage } from './pages/SearchMapPage';
 
 function App() {
   const {user} = useAuth0();
@@ -38,6 +39,7 @@ function App() {
           <Route path="/search" element={<SearchResultPage />}></Route>
           <Route path="/saunas/:facilityID" element={<SaunaPage />}></Route>
           <Route path="/saunas/new/" element={<SaunaSubmitPage />}></Route>
+          <Route path="/map" element={<SearchMapPage />}></Route>
         </Routes>
       </div>
     </BrowserRouter>
