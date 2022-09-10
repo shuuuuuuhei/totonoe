@@ -10,14 +10,16 @@ import { TermsCheckBox } from './form-components/TermsCheckBox'
 import { IsRequiredCheckForm } from '../@types/Form'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { isUint16Array } from 'util/types'
 const MinPrice = 1;
 export const FacilitySubmitComponent = () => {
     const navigate = useNavigate();
-    const {getAccessTokenSilently} = useAuth0();
+    const {getAccessTokenSilently, isAuthenticated, loginWithRedirect} = useAuth0();
     const [cookies, setCookie,removeCookie] = useCookies();
     const [validated, setValidated] = useState(false);
     const [errors, setErrors] = useState<IsRequiredCheckForm>();
 
+    // サウナState
     const [saunas, setSaunas] = useState<NewSauna[]>([
         {
             id: "",
@@ -32,6 +34,7 @@ export const FacilitySubmitComponent = () => {
         }
     ]);
 
+    // 水風呂State
     const [waterBaths, setWaterBaths] = useState<WaterBath[]>([{
         id: "",
         facility_id: "",
@@ -39,6 +42,7 @@ export const FacilitySubmitComponent = () => {
         capacity: 0,
     }]);
 
+    // 施設State
     const [facility, setFacilityState] = useState<NewFacility>({
         id: "",
         name: "",
@@ -73,6 +77,11 @@ export const FacilitySubmitComponent = () => {
     });
 
     const [terms, setTerms] = useState<{id: string;name: string;}[]>();
+
+    // ログイン認証前であればログイン画面に遷移
+    if(!isAuthenticated) {
+        loginWithRedirect();
+    }
 
     // 登録前にfacilityの更新を行うと最新のfacilityを登録できないので、useEffect内で該当の要素に変更があればfacilityの更新を行うようにする
     useEffect(() => {
@@ -229,7 +238,6 @@ export const FacilitySubmitComponent = () => {
         event.preventDefault();
         
         const formErrors = validateForm();
-
         console.log(formErrors)
         // エラーメッセージがあれば処理中断
         if(Object.values(formErrors).some((formError) => formError !== "")) {
@@ -268,7 +276,7 @@ export const FacilitySubmitComponent = () => {
                     })
             } catch (err)
             { 
-                console.log(err) 
+                console.log(err)
             }
         }
         fetchPostFacility();
@@ -280,6 +288,7 @@ export const FacilitySubmitComponent = () => {
         }
     }
 
+    console.log(isAuthenticated)
     return(
         <Fragment>
             <div className="container p-5">
