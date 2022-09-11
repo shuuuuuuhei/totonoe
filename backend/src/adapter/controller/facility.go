@@ -28,6 +28,11 @@ func (f Facility) GetFacilities(c *gin.Context) {
 	inputport.CreateFacility(c)
 }
 
+func (f Facility) GetFacilitiesByMapInfo(c *gin.Context) {
+	inputport := f.newInputPort(c)
+	inputport.GetFacilitiesByMapInfomation(c)
+}
+
 func (f Facility) newInputPort(c *gin.Context) port.FacilityInputPort {
 	output := f.OutputFactory(c)
 	repository := f.FacilityRepo(f.Conn)

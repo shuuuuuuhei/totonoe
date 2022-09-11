@@ -21,13 +21,13 @@ func (f Facility) RenderOK() {
 	f.c.JSON(200, nil)
 }
 
-func (f Facility) RenderError(_ error) {
-	panic("not implemented") // TODO: Implement
+func (f Facility) RenderError(err error) {
+	f.c.JSON(500, err)
 }
 
 // RenderFacilities implements port.FacilityOutputPort
-func (f Facility) RenderFacilities(*[]ValueObject.FacilityVO) {
-	panic("unimplemented")
+func (f Facility) RenderFacilities(facilities *[]ValueObject.FacilityVO) {
+	f.c.JSON(200, facilities)
 }
 
 // RenderFacility implements port.FacilityOutputPort

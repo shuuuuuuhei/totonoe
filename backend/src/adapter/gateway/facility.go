@@ -2,8 +2,12 @@ package gateway
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
+	"log"
 
 	"github.com/gin-gonic/gin"
+	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 	"main.go/model/Domain"
 	"main.go/model/ValueObject"
@@ -17,6 +21,46 @@ type Facility struct {
 type facilityParams struct {
 	UserID   string          `json:"user_id"`
 	Facility Domain.Facility `json:"facility"`
+}
+
+type mapInfo struct {
+	LatLngLiteral struct {
+		Lat decimal.Decimal `json:"lat"`
+		Lng decimal.Decimal `json:"lng"`
+	} `json:"latlng_literal"`
+	Name string `json:"name"`
+}
+
+type mapInfoListParams struct {
+	MapInfoList []mapInfo `json:"map_info_list,omitempty"`
+}
+
+// GetFacilitiesByMapInfomation マップ情報から登録されている施設の基本情報を返す
+func (f *Facility) GetFacilitiesByMapInfomation(c *gin.Context) (*[]ValueObject.FacilityVO, error) {
+	conn := f.conn
+
+	params := mapInfoListParams{}
+	json.NewDecoder(c.Request.Body).Decode(&params)
+
+	facilities := []ValueObject.FacilityVO{}
+	for i := 0; i < len(params.MapInfoList); i++ {
+		facility := ValueObject.FacilityVO{}
+		if err := conn.Debug().Table("facility").
+			Select("facility.id, facility.name, address.latitude, address.longitude").
+			Joins("left join address on address.facility_id = facility.id").
+			Where("address.Latitude=? and address.Longitude=?", params.MapInfoList[i].LatLngLiteral.Lat, params.MapInfoList[i].LatLngLiteral.Lng).First(&facility).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				// 施設情報が登録されていなければマップ情報のみ代入を行い、リストに追加する。次ループ処理を行う。
+				fmt.Println("施設情報が見つかりませんでした。 user_id =", params.MapInfoList[i].Name)
+				facilities = append(facilities, ValueObject.FacilityVO{Name: params.MapInfoList[i].Name, Latitude: params.MapInfoList[i].LatLngLiteral.Lat, Longitude: params.MapInfoList[i].LatLngLiteral.Lng})
+				continue
+			}
+			log.Println(err)
+			return nil, errors.New("Internal Server Error. 施設情報取得に失敗しました。")
+		}
+		facilities = append(facilities, facility)
+	}
+	return &facilities, nil
 }
 
 // GetFacilities implements port.FacilityRepository

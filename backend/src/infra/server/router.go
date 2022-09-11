@@ -105,6 +105,9 @@ func (r *Routing) setRouting() {
 	// 記事取得
 	r.Gin.GET("/facilities/:facilityID/articles", articleController.GetArticleByFacilityID)
 
+	// サウナ施設情報取得
+	r.Gin.POST("/facilities/map_infomation", facilityController.GetFacilitiesByMapInfo)
+
 	/**
 	@description All Auth Route
 	*/
