@@ -2,7 +2,6 @@ package interactor
 
 import (
 	"github.com/gin-gonic/gin"
-	"main.go/model/ValueObject"
 	"main.go/usecase/port"
 )
 
@@ -11,9 +10,19 @@ type Facility struct {
 	FacilityRepo port.FacilityRepository
 }
 
-// GetFacilities implements port.FacilityInputPort
-func (*Facility) GetFacilities(*gin.Context) (*[]ValueObject.FacilityVO, error) {
-	panic("unimplemented")
+// GetFacilitiesByMapInfomation マップ情報を受け取り、該当する施設情報を返す
+func (f *Facility) GetFacilitiesByMapInfomation(c *gin.Context) {
+	facilities, err := f.FacilityRepo.GetFacilitiesByMapInfomation(c)
+	if err != nil {
+		f.OutputPort.RenderError(err)
+		return
+	}
+	f.OutputPort.RenderFacilities(facilities)
+}
+
+// GetFacilities マップ情報から登録されている施設の基本情報を返す
+func (f *Facility) GetFacilities(c *gin.Context) {
+	
 }
 
 // CreateFacility

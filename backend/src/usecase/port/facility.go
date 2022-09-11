@@ -9,7 +9,8 @@ type FacilityInputPort interface {
 	GetFacilityByID(*gin.Context)
 	GetFacilitiesBySaunaOption(*gin.Context)
 	CreateFacility(*gin.Context)
-	GetFacilities(*gin.Context) (*[]ValueObject.FacilityVO, error)
+	GetFacilities(*gin.Context)
+	GetFacilitiesByMapInfomation(*gin.Context)
 }
 
 type FacilityOutputPort interface {
@@ -24,4 +25,5 @@ type FacilityRepository interface {
 	GetFacilitiesBySaunaOption(*gin.Context) (*[]ValueObject.FacilityVO, error)
 	CreateFacility(*gin.Context) error
 	GetFacilities(*gin.Context) (*[]ValueObject.FacilityVO, error)
+	GetFacilitiesByMapInfomation(*gin.Context) (*[]ValueObject.FacilityVO, error)	
 }

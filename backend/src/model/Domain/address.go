@@ -1,9 +1,13 @@
 package Domain
 
+import "github.com/shopspring/decimal"
+
 type Address struct {
-	ID           uint32 `gorm:"primaryKey" json:"id,omitempty"`
-	FacilityID   uint32 `gorm:"primaryKey" json:"facility_id,omitempty"`
-	CityID       uint32 `gorm:"primaryKey" json:"city_id,omitempty"`
-	PrefectureID uint32 `gorm:"primaryKey" json:"prefecture_id,omitempty"`
-	StreetName   string `gorm:"not null" json:"street_name,omitempty"`
+	ID           uint32          `gorm:"primaryKey" json:"id,omitempty"`
+	FacilityID   uint32          `gorm:"primaryKey" json:"facility_id,omitempty"`
+	CityID       uint32          `gorm:"primaryKey" json:"city_id,omitempty"`
+	PrefectureID uint32          `gorm:"primaryKey" json:"prefecture_id,omitempty"`
+	StreetName   string          `gorm:"not null" json:"street_name,omitempty"`
+	Latitude     decimal.Decimal `gorm:"type:decimal not null"`
+	Longitude    decimal.Decimal `gorm:"type:decimal not null"`
 }
