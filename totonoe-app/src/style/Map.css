@@ -1,0 +1,6 @@
+.search-facility {
+    transition:  0.5s;
+}
+.search-facility:hover {
+    background-color: #FFCC66;
+}
