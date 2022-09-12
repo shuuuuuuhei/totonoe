@@ -1,4 +1,4 @@
-import React, { Component, Fragment, useState } from 'react'
+import React, { Component, Fragment, useState, useEffect } from 'react'
 import { GoogleMap, LoadScript, StandaloneSearchBox, Marker, InfoWindow } from "@react-google-maps/api";
 
 import "../style/Map.css"
@@ -23,12 +23,20 @@ export const MapComponent = () => {
 
     const [ libraries ] = useState<Libraries>(['places'])
     
-    const [map, setMap] = useState<GoogleMap|null>();
     const [query, setQuery] = useState<google.maps.places.SearchBox>();
+    const [currentLocation, setCurrentLocation] = useState<google.maps.LatLngLiteral>(defaultLocation.latlng_literal);
     const [locations, setLocation] = useState<Position[]>([defaultLocation]);
     
     const onLoad = (ref: google.maps.places.SearchBox) => setQuery(ref);
     const [facilities, setFacilities] = useState<FacilityMapInfo[]>();
+
+    useEffect(() => {
+        navigator.geolocation.getCurrentPosition((position) => {
+            setCurrentLocation({lat: position.coords.latitude, lng: position.coords.longitude});
+        });
+        
+    }, [currentLocation])
+
     const onPlacesChanged = () => {
         // 検索Boxから候補地を取得
         const places = query?.getPlaces();
@@ -107,7 +115,7 @@ export const MapComponent = () => {
                             <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAP_API} libraries={libraries} >
                                 <GoogleMap
                                     mapContainerStyle={containerStyle}
-                                    center={locations[0].latlng_literal}
+                                    center={currentLocation}
                                     zoom={10}
                                     options={{
                                         streetViewControl: false,
