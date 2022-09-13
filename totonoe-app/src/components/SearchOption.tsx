@@ -16,19 +16,6 @@ export const SearchOption = () => {
         <Fragment>
             <div className="option-box border px-3 py-2 text-start">
                 <label htmlFor="" className="py-3">■条件を絞る</label>
-                <div className="area-option text-start">
-                    <Input 
-                        type="text"
-                        className="input-sm"
-                        name=""
-                        value=""
-                        onChange={handleChange}
-                        placehodlder="エリア・駅・【例：銀座、池袋】"
-                        errorDiv=""
-                        errorMsg=""
-                        required={true}
-                        />
-                </div>
                 <div className="temperature-option row">
                     <InputScope
                         className="input-sm"
