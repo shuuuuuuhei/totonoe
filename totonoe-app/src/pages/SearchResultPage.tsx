@@ -1,13 +1,15 @@
-import React, { Component, Fragment, useState, useEffect } from 'react'
+import React, { Component, Fragment, useState, useEffect, useRef } from 'react'
 import Dropdown from "react-bootstrap/Dropdown";
 import { DropdownButton } from 'react-bootstrap';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
+import { ModalHover } from 'react-modal-hover'
 import { HiOutlinePencilAlt } from 'react-icons/hi';
 import { BsHeart } from 'react-icons/bs';
 import { FacilityList } from '../components/SaunaList';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useCookies } from 'react-cookie';
 import { SearchOption } from '../components/SearchOption';
+import { Link } from 'react-router-dom';
 
 export const SearchResultPage = () => {
     const [selected, setSelected] = useState({
@@ -22,6 +24,7 @@ export const SearchResultPage = () => {
     ];
 
     const [facilities, setFacilitiesState] = useState<Facility[]>();
+    const [show, setShow] = useState(false);
 
     useEffect(() => {
         const fetchSaunas = async() => {
@@ -37,7 +40,7 @@ export const SearchResultPage = () => {
                 .then((response) => {
                     if (!response.ok) {
                         const err = new Error;
-                        err.message = "サウナ一覧取得に失敗しました" + response.status;
+                        err.message = "サウナ施設一覧取得に失敗しました" + response.status;
                         throw err;
                     }
                     return response.json();
@@ -60,15 +63,24 @@ export const SearchResultPage = () => {
             </Fragment>
         )
     }
+    
 
     return(
         <Fragment>
                 <div className="container text-center">
                 <div className="row">
                     <div className="search-option col-3 py-5">
+                        <div className="row text-start border p-3 mb-3">
+                            <label htmlFor="" className="py-3">■エリアを絞る</label>
+                            <div className="area" onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>
+                                <p className="border-bottom" style={{cursor: 'pointer'}}>全国</p>
+                                {show && <p style={{ color: 'red', fontWeight: 'bold' }}>Tooltipに表示させたい内容をここに記述します。</p>}
+                            </div>
+                            <button><Link to='/map'>GoogleMapで探す</Link></button>
+                        </div>
                         <SearchOption />
                     </div>
-                    <div className="result-list col-9 pt-5">
+                    <div className="result-list col-9 pt-5 px-5">
                         <div className="list-header row">
                             <div className="list-header-left col-8 text-start">
                                 <h3>サウナ一覧</h3>
