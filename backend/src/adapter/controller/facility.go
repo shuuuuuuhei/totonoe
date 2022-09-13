@@ -25,7 +25,7 @@ func (f Facility) CreateFacility(c *gin.Context) {
 
 func (f Facility) GetFacilities(c *gin.Context) {
 	inputport := f.newInputPort(c)
-	inputport.CreateFacility(c)
+	inputport.GetFacilities(c)
 }
 
 func (f Facility) GetFacilitiesByMapInfo(c *gin.Context) {
