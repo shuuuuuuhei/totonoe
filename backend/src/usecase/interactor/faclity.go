@@ -20,9 +20,14 @@ func (f *Facility) GetFacilitiesByMapInfomation(c *gin.Context) {
 	f.OutputPort.RenderFacilities(facilities)
 }
 
-// GetFacilities マップ情報から登録されている施設の基本情報を返す
+// GetFacilities
 func (f *Facility) GetFacilities(c *gin.Context) {
-	
+	facilities, err := f.FacilityRepo.GetFacilities(c)
+	if err != nil {
+		f.OutputPort.RenderError(err)
+		return
+	}
+	f.OutputPort.RenderFacilities(facilities)
 }
 
 // CreateFacility
