@@ -34,8 +34,61 @@ export const MapComponent = () => {
         navigator.geolocation.getCurrentPosition((position) => {
             setCurrentLocation({lat: position.coords.latitude, lng: position.coords.longitude});
         });
+
+        // const fetchPlaces = async() => {
+        //     const requestOption: RequestInit = {
+        //         method: "GET",
+        //         headers: {},
+        //     };
+
+        //     const uri = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=AIzaSyDvVAw_XqiKs1Poi1GNo0dl6zrg0ES8YeE&location=35.6987769,139.76471&radius=300&language=ja&keyword=公園OR広場OR駅';
+        //     await fetch(uri, requestOption)
+        //         .then((response) =>{
+        //             if (!response.ok) {
+        //                 const err = new Error;
+        //                 err.message = "施設情報の取得に失敗しました" + response.status;
+        //                 throw err;
+        //             }
+        //             return response.json();
+        //         })
+        //         .then((data) => console.log(data))
+            
+        //     .catch(err => {
+        //         console.log(err)
+        //     });
+        // }
+        // fetchPlaces();
+
+        
         
     }, [currentLocation])
+    
+    const fetchMap = () => {
+        const fetchPlaces = async() => {
+            const requestOption: RequestInit = {
+                method: "GET",
+                headers: {},
+            };
+
+            const uri = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=AIzaSyDvVAw_XqiKs1Poi1GNo0dl6zrg0ES8YeE&location=35.6987769,139.76471&radius=300&language=ja&keyword=公園OR広場OR駅';
+            await fetch(uri, requestOption)
+                .then((response) =>{
+                    if (!response.ok) {
+                        const err = new Error;
+                        err.message = "施設情報の取得に失敗しました" + response.status;
+                        throw err;
+                    }
+                    return response.json();
+                })
+                .then((data) => console.log(data))
+            
+            .catch(err => {
+                console.log(err)
+            });
+        }
+        fetchPlaces();
+    }
+
 
     const onPlacesChanged = () => {
         // 検索Boxから候補地を取得
@@ -60,7 +113,7 @@ export const MapComponent = () => {
 
         const fetchGetFacilitiesByMapInfo = async() => {
             const uri = "http://localhost:4000/facilities/map_infomation";
-
+            
             const requestOption: RequestInit = {
                 method: "POST",
                 mode: "cors",
@@ -95,6 +148,7 @@ export const MapComponent = () => {
 
     return(
         <Fragment>
+            <button onClick={fetchMap}>click here!</button>
             <div className="container text-center">
                 <div className="row border-bottom">
                     {facilities?.length}件表示
