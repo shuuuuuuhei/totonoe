@@ -106,6 +106,7 @@ func (r *Routing) setRouting() {
 	r.Gin.GET("/facilities/:facilityID/articles", articleController.GetArticleByFacilityID)
 
 	// サウナ施設情報取得
+	r.Gin.GET("/facilities", facilityController.GetFacilities)
 	r.Gin.POST("/facilities/map_infomation", facilityController.GetFacilitiesByMapInfo)
 
 	/**
@@ -114,7 +115,6 @@ func (r *Routing) setRouting() {
 	r.Gin.Use(corsMiddleware(), adapter.Wrap(jwtMiddleware.CheckJWT))
 
 	// サウナ施設
-	r.Gin.GET("/facilities", facilityController.GetFacilities)
 	r.Gin.POST("/facilities/new", facilityController.CreateFacility)
 	
 
