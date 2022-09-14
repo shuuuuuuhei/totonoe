@@ -41,7 +41,7 @@ export const MapComponent = () => {
         //         headers: {},
         //     };
 
-        //     const uri = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=AIzaSyDvVAw_XqiKs1Poi1GNo0dl6zrg0ES8YeE&location=35.6987769,139.76471&radius=300&language=ja&keyword=公園OR広場OR駅';
+        //     const uri = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=API&location=35.6987769,139.76471&radius=300&language=ja&keyword=公園OR広場OR駅';
         //     await fetch(uri, requestOption)
         //         .then((response) =>{
         //             if (!response.ok) {
@@ -70,7 +70,7 @@ export const MapComponent = () => {
                 headers: {},
             };
 
-            const uri = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=AIzaSyDvVAw_XqiKs1Poi1GNo0dl6zrg0ES8YeE&location=35.6987769,139.76471&radius=300&language=ja&keyword=公園OR広場OR駅';
+            const uri = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=API=35.6987769,139.76471&radius=300&language=ja&keyword=公園OR広場OR駅';
             await fetch(uri, requestOption)
                 .then((response) =>{
                     if (!response.ok) {
