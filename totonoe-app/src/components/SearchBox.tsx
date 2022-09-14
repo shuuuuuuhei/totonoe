@@ -1,49 +1,55 @@
 import React, { Fragment, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
-import { Input } from './form-components/Input';
 import "../style/Search-Box.css"
 import { Link } from 'react-router-dom';
 
 export const SearchBox = () => {
     
-    const handleChange = () => {
-        
+    const [area, setArea] = useState("");
+    const [keyWord, setKeyWord] = useState("");
+
+    const handleArea = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setArea(event.target.value)
     }
+
+    const handleKeyWord = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setKeyWord(event.target.value);
+    }
+    
     return (
         <Fragment>
-            <form className="container">
-                <div className="search-box row justify-content-center">
-                    <div className="col-md-5">
-                        <Input 
+            <Form className="container">
+                <div className="search-box row">
+                    <div className="col-4 p-0">
+                        <Form.Control 
                             type="text"
                             className="input-sm"
                             name=""
-                            value=""
-                            onChange={handleChange}
-                            placehodlder="エリア・駅・【例：銀座、池袋】"
-                            errorDiv=""
-                            errorMsg=""
-                            required={true}
-                            />
-                    </div>
-                    <div className="col-md-5">
-                        <Input 
-                            type="text"
-                            className="input-sm"
-                            name=""
-                            value=""
-                            onChange={handleChange}
-                            placehodlder=""
-                            errorDiv=""
-                            errorMsg=""
-                            required={true}
+                            value={area}
+                            onChange={handleArea}
+                            placeholder="エリア・駅・【例：銀座、池袋】"
                         />
                     </div>
-                    <div className="col-md-2">
-                        <Link to="/search"><Button className="btn-warning btn-blockb　w-auto">検索</Button></Link>
+                    <div className="col-4 p-0">
+                        <Form.Control 
+                            type="text"
+                            className="input-sm"
+                            name=""
+                            value={keyWord}
+                            onChange={handleKeyWord}
+                            placeholder="施設名・キーワード"
+                        />
+                    </div>
+                    <div className="col-1 p-0">
+                        <Button>
+                            特徴を指定
+                        </Button>
+                    </div>
+                    <div className="col-2 text">
+                        <Link to={"/search?lang=jp&area="+area+"&keyword="+keyWord}><Button className="btn-warning btn-blockb　w-auto">検索</Button></Link>
                     </div>
                 </div>
-            </form>
+            </Form>
         </Fragment>
     )
 }
