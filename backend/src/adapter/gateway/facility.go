@@ -63,19 +63,29 @@ func (f *Facility) GetFacilitiesByMapInfomation(c *gin.Context) (*[]ValueObject.
 	return &facilities, nil
 }
 
-// GetFacilities implements port.FacilityRepository
+// GetFacilities サウナ施設条件検索を行う
 func (f *Facility) GetFacilities(c *gin.Context) (*[]ValueObject.FacilityVO, error) {
 	conn := f.conn
 
 	facilities := []ValueObject.FacilityVO{}
-	query := conn.Debug().Table("facility").
-		Select("facility.id,facility.name,prefecture.name || city.name || address.street_name AS address,facility.tel,facility.eigyo_start,facility.eigyo_end,facility.price,facility.lodging_flg,facility.restaurant_flg,facility.working_space_flg,facility.books_flg,facility.heat_wave_flg,facility.air_bath_flg,facility.break_space_flg, sauna.sauna_type, sauna.temperature, sauna.capacity, sauna.rouryu_flg, sauna.sauna_mat_flg, sauna.tv_flg, sauna.bgm_flg").
-		Joins("left join sauna on sauna.facility_id = facility.id").
-		Joins("left join address on address.facility_id = facility.id").
-		Joins("left join prefecture on prefecture.id = address.prefecture_id").
-		Joins("left join city on city.id = address.city_id")
+	requestPrams := c.Request.URL.Query()
+	fmt.Println(requestPrams)
 
-	query.Scan(&facilities)
+	query := conn.Where("")
+
+	if requestPrams.Get("area") != "" {
+		// エリア情報の指定があればエリアの条件を付与する
+		query = query.Where("f.address like ?", "%"+requestPrams.Get("area")+"%")
+	}
+
+	query.Debug().
+		Table("(?) as f", conn.Table("facility").
+			Select("facility.id,facility.name,prefecture.name || city.name || address.street_name AS address,facility.tel,facility.eigyo_start,facility.eigyo_end,facility.price,facility.lodging_flg,facility.restaurant_flg,facility.working_space_flg,facility.books_flg,facility.heat_wave_flg,facility.air_bath_flg,facility.break_space_flg, sauna.sauna_type, sauna.temperature, sauna.capacity, sauna.rouryu_flg, sauna.sauna_mat_flg, sauna.tv_flg, sauna.bgm_flg").
+			Joins("left join sauna on sauna.facility_id = facility.id").
+			Joins("left join address on address.facility_id = facility.id").
+			Joins("left join prefecture on prefecture.id = address.prefecture_id").
+			Joins("left join city on city.id = address.city_id")).
+			Scan(&facilities)
 
 	return &facilities, nil
 }

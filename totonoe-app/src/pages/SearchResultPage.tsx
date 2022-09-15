@@ -9,9 +9,11 @@ import { FacilityList } from '../components/SaunaList';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useCookies } from 'react-cookie';
 import { SearchOption } from '../components/SearchOption';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 export const SearchResultPage = () => {
+    const { search } = useLocation();
+    const queryParams = new URLSearchParams(search);
     const [selected, setSelected] = useState({
         key: "",
         value: "",
@@ -27,8 +29,10 @@ export const SearchResultPage = () => {
     const [show, setShow] = useState(false);
 
     useEffect(() => {
+        console.log(queryParams.get("area"));
+        console.log(queryParams.get("keyword"));
         const fetchSaunas = async() => {
-            const uri = "http://localhost:4000/facilities";
+            const uri = `http://localhost:4000/facilities?area=${queryParams.get("area")}&name=${queryParams.get("keyword")}`;
             const requestOption: RequestInit = {
                 method: "GET",
                 mode: "cors",
@@ -36,6 +40,7 @@ export const SearchResultPage = () => {
                     "Content-Type": "application/json",
                 },
             };
+            console.log(uri)
             await fetch(uri, requestOption)
                 .then((response) => {
                     if (!response.ok) {
