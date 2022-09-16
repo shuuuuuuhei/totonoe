@@ -30,9 +30,9 @@ export const SearchResultPage = () => {
 
     useEffect(() => {
         console.log(queryParams.get("area"));
-        console.log(queryParams.get("keyword"));
+        console.log(queryParams.get("name"));
         const fetchSaunas = async() => {
-            const uri = `http://localhost:4000/facilities?area=${queryParams.get("area")}&name=${queryParams.get("keyword")}`;
+            const uri = `http://localhost:4000/facilities?area=${queryParams.get("area")}&facilityName=${queryParams.get("name")}`;
             const requestOption: RequestInit = {
                 method: "GET",
                 mode: "cors",
