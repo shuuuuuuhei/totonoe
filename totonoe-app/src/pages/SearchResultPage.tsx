@@ -10,10 +10,14 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { useCookies } from 'react-cookie';
 import { SearchOption } from '../components/SearchOption';
 import { Link, useLocation } from 'react-router-dom';
+import { UndefinedOrNullConvertToEmpty } from '../common/Convert';
 
 export const SearchResultPage = () => {
     const { search } = useLocation();
     const queryParams = new URLSearchParams(search);
+    const areaParams = UndefinedOrNullConvertToEmpty(queryParams.get("area"));
+    const facilityName = UndefinedOrNullConvertToEmpty(queryParams.get("name"));
+
     const [selected, setSelected] = useState({
         key: "",
         value: "",
@@ -29,10 +33,8 @@ export const SearchResultPage = () => {
     const [show, setShow] = useState(false);
 
     useEffect(() => {
-        console.log(queryParams.get("area"));
-        console.log(queryParams.get("name"));
         const fetchSaunas = async() => {
-            const uri = `http://localhost:4000/facilities?area=${queryParams.get("area")}&facilityName=${queryParams.get("name")}`;
+            const uri = `http://localhost:4000/facilities?area=${areaParams}&facilityName=${facilityName}`;
             const requestOption: RequestInit = {
                 method: "GET",
                 mode: "cors",
@@ -78,7 +80,7 @@ export const SearchResultPage = () => {
                         <div className="row text-start border p-3 mb-3">
                             <label htmlFor="" className="py-3">■エリアを絞る</label>
                             <div className="area" onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>
-                                <p className="border-bottom" style={{cursor: 'pointer'}}>全国</p>
+                                <p className="border-bottom" style={{cursor: 'pointer'}}>{areaParams === '' ? "全国" : areaParams}</p>
                                 {show && <p style={{ color: 'red', fontWeight: 'bold' }}>Tooltipに表示させたい内容をここに記述します。</p>}
                             </div>
                             <button><Link to='/map'>GoogleMapで探す</Link></button>
@@ -86,32 +88,36 @@ export const SearchResultPage = () => {
                         <SearchOption />
                     </div>
                     <div className="result-list col-9 pt-5 px-5">
-                        <div className="list-header row">
-                            <div className="list-header-left col-8 text-start">
-                                <h3>サウナ一覧</h3>
-                                <p>200件(1~20)</p>
+                            <div className="list-header row">
+                                {facilities.length === 0 ? <p>サウナ施設が見つかりませんでした</p> :
+                                    <>
+                                        <div className="list-header-left col-8 text-start">
+                                            <h3>サウナ一覧</h3>
+                                            <p>{facilities.length}件(1~20)</p>
+                                        </div>
+                                        <div className="list-option col-4 text-end">
+                                            <DropdownButton
+                                                id="dropdown-basic-button"
+                                                variant="info"
+                                                className="floatRight"
+                                                title={selected?.key || list[0].key}
+                                            >
+                                                {list.map((item, index) => {
+                                                    return(
+                                                        <DropdownItem key={index} eventKey={item.key}>
+                                                            {item.value}
+                                                        </DropdownItem>
+                                                    )
+                                                })}
+                                            </DropdownButton>
+                                        </div>
+                                    </>
+                                }
                             </div>
-                            <div className="list-option col-4 text-end">
-                                <DropdownButton
-                                    id="dropdown-basic-button"
-                                    variant="info"
-                                    className="floatRight"
-                                    title={selected?.key || list[0].key}
-                                >
-                                    {list.map((item, index) => {
-                                        return(
-                                            <DropdownItem key={index} eventKey={item.key}>
-                                                {item.value}
-                                            </DropdownItem>
-                                        )
-                                    })}
-                                </DropdownButton>
+                            <div className="search-contents text-start">
+                                <FacilityList facilities={facilities}/>
                             </div>
                         </div>
-                        <div className="search-contents text-start">
-                            <FacilityList facilities={facilities}/>
-                        </div>
-                    </div>
                     </div>
                 </div>
         </Fragment>
