@@ -3,20 +3,30 @@ import { Input } from './form-components/Input'
 import { Button, Form } from 'react-bootstrap'
 import { InputScope } from './form-components/InputScope'
 import { Link } from 'react-router-dom'
+import { termsList } from '../utils/constants'
 
-const termsList = [
-    "宿泊", "飯処", "コワーキングスペース", "外気浴", "読書", "給水機", "熱波師",
-]
+type searchOptionProps = {
+    handleSearch: (searchOption: string) => void
+}
+type terms = {
+    id: string,
+    link: string,
+}
 
-export const SearchOption = () => {
+export const SearchOption = (props: searchOptionProps) => {
 
     const [temperature, setTemperature] = useState({start: "", end: ""});
-    const [price, setPrice] = useState({start: "", end: ""})
+    const [price, setPrice] = useState({start: "", end: ""});
+    const [termsListState, setTermsListState] = useState<terms[]|undefined>([]);
+    const [termsLinkState, setTermsLinkState] = useState("");
+
 
     const handleTemperatureChange = (event: React.ChangeEvent<HTMLInputElement>) => {    
         // 入力区分(開始or終了)を受け取る
         const inputKb = event.target.id;
-        setTemperature({...temperature, [inputKb]: event.target.value});
+        const inputPrice = event.target.value;
+
+       setTemperature({...temperature, [inputKb]: inputPrice});
     }
     
     const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,7 +34,56 @@ export const SearchOption = () => {
         const inputKb = event.target.id;
         setPrice({...temperature, [inputKb]: event.target.value});
     }
+
+    console.log(termsListState)
+
+    const handleChangeTerms = (e: React.FormEvent<HTMLInputElement>) => {
+        const id = e.currentTarget.id;
     
+        // チェックがある場合は、配列から要素を追加
+        if(e.currentTarget.checked) {
+    
+            setTermsListState((prevState) => (
+                // 配列が存在していない場合は、代入する
+                !prevState ? 
+                [
+                    {
+                        id: id,
+                        link: "",
+                    }
+                ]
+                :
+                // 配列が存在している場合は、配列に追加する
+                [
+                    ...prevState,
+                    {
+                        id: id,
+                        link: "",
+                    }
+                ]
+            ))
+            return
+        }
+    
+        // 配列から要素を削除
+        const newTerms = termsListState?.filter((term, index) => {
+            if(term.id != id) {
+                return term;
+            }
+        })
+        setTermsListState(newTerms);
+
+    }
+
+    const handleSearchButton = () => {
+        // termsリストでチェックがある項目のリンクを作成
+        const termsOption = termsListState?.map((terms) => { return "&"+terms.id+"=1"});
+
+        // 追加検索のuriに検索条件を付与して、検索関数に引数として渡す
+        const searchOption = "&price_start="+price.start+"&price_end="+price.end+"&temperature_start="+temperature.start+"&temperature_end="+termsOption?.join('');
+        props.handleSearch(searchOption);
+    }
+
     return(
         <Fragment>
             <div className="option-box border px-3 py-2 text-start">
@@ -55,9 +114,9 @@ export const SearchOption = () => {
                     {termsList.map((terms, index) => {
                         return(
                             <div className="terms-option py-1 px-2">
-                                <input type="checkbox" className="form-check-input pl-2" value="" id={"formCheckDefault"+index.toString()}/>
+                                <input type="checkbox" className="form-check-input pl-2" value="" id={terms.id} onClick={handleChangeTerms}/>
                                 <label htmlFor={"formCheckDefault"+index.toString()} className="px-3 border-bottom">
-                                    {terms}
+                                    {terms.name}
                                 </label>
                             </div>
                         )
@@ -65,7 +124,7 @@ export const SearchOption = () => {
                 </div>
                 <div className="row">
                     <div className="research-button py-2 col-6">
-                        <Link to="/search"><Button className="btn-warning btn-blockb　w-auto">検索</Button></Link>
+                        <Button className="btn-warning btn-blockb　w-auto" onClick={handleSearchButton}>検索</Button>
                     </div>
                     <div className="clear-button py-2 col-6">
                         <Button>クリア</Button>

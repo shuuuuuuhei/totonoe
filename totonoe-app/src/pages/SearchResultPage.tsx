@@ -17,6 +17,10 @@ export const SearchResultPage = () => {
     const queryParams = new URLSearchParams(search);
     const areaParams = UndefinedOrNullConvertToEmpty(queryParams.get("area"));
     const facilityName = UndefinedOrNullConvertToEmpty(queryParams.get("name"));
+    const priceStart = UndefinedOrNullConvertToEmpty(queryParams.get("price_start"));
+    const priceEnd = UndefinedOrNullConvertToEmpty(queryParams.get("price_end"));
+    const temperatureStart = UndefinedOrNullConvertToEmpty(queryParams.get("temperature_start"));
+    const temperatureEnd = UndefinedOrNullConvertToEmpty(queryParams.get("temperature_end"));
 
     const [selected, setSelected] = useState({
         key: "",
@@ -32,9 +36,41 @@ export const SearchResultPage = () => {
     const [facilities, setFacilitiesState] = useState<Facility[]>();
     const [show, setShow] = useState(false);
 
+    const handleSearch = (searchOption: string) => {
+        const uri = `http://localhost:4000/facilities?area=${areaParams}&facilityName=${facilityName}${searchOption}`;
+
+        const requestOption: RequestInit = {
+            method: "GET",
+            mode: "cors",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        };
+
+        const fetchSaunas = async() => {
+            await fetch(uri, requestOption)
+                .then((response) => {
+                    if (!response.ok) {
+                        const err = new Error;
+                        err.message = "サウナ施設一覧取得に失敗しました" + response.status;
+                        throw err;
+                    }
+                    return response.json();
+                })
+                .then((resData) => {
+                    setFacilitiesState(resData);
+                    console.log(resData)
+                })
+            .catch(err => {
+                console.log(err)
+            });
+        }
+        fetchSaunas();
+    }
+
     useEffect(() => {
         const fetchSaunas = async() => {
-            const uri = `http://localhost:4000/facilities?area=${areaParams}&facilityName=${facilityName}`;
+            const uri = `http://localhost:4000/facilities?area=${areaParams}&facilityName=${facilityName}&priceStart=${priceStart}&priceEnd=${priceEnd}&priceStart=${priceStart}&temperatureStart=${temperatureStart}&temperatureEnd=${temperatureEnd}`;
             const requestOption: RequestInit = {
                 method: "GET",
                 mode: "cors",
@@ -85,7 +121,7 @@ export const SearchResultPage = () => {
                             </div>
                             <button><Link to='/map'>GoogleMapで探す</Link></button>
                         </div>
-                        <SearchOption />
+                        <SearchOption handleSearch={handleSearch}/>
                     </div>
                     <div className="result-list col-9 pt-5 px-5">
                             <div className="list-header row">
