@@ -1,6 +1,7 @@
 import React, { Component, Fragment, useState, ChangeEvent } from 'react'
 import { Button, DropdownButton, Dropdown, ButtonGroup, Accordion, Form} from 'react-bootstrap'
 import { Input } from './form-components/Input'
+import { saunaTypeList, saunaOptions } from '../utils/constants';
 const MinCapacity = 1;
 
 type SaunaSubmitComponentProps = {
@@ -35,29 +36,7 @@ export const SaunaSubmitComponent = (props: SaunaSubmitComponentProps) => {
         props.handleSetSaunas(props.index, name, value);
     }
 
-    const saunaTypeList = [
-        "遠赤外線サウナ", "ミストサウナ", "スチームサウナ", "塩サウナ", "ケロサウナ", "ボナサウナ", "スモークサウナ", "テントサウナ", "アースサウナ", "アイスサウナ", "バレルサウナ"
-    ]
-
-    const saunaOptions = [
-        {
-            id: 'rouryu_flg',
-            name: "ロウリュウ",
-        },
-        {
-            id: 'sauna_mat_flg',
-            name: "サウナマット",
-        },
-        {
-            id: 'tv_flg',
-            name: "TV",
-        },
-        {
-            id: 'bgm_flg',
-            name: "BGM",
-        },
-    ]
-
+ 
     const handleSaunaType = (event: ChangeEvent<HTMLSelectElement>) => {
         const saunaTypeIndex = parseInt(event.target.value);
 
