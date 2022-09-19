@@ -124,6 +124,7 @@ func (d *DB) CreateData() {
 		HeatWaveFlg:     "1",
 		AirBathFlg:      "1",
 		BreakSpaceFlg:   "0",
+		WaterServerFlg:  "1",
 	}
 	if err := d.Connection.Create(&facility).Error; err != nil {
 		fmt.Println(err)
