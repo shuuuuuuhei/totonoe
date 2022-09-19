@@ -10,8 +10,8 @@ import { TermsCheckBox } from './form-components/TermsCheckBox'
 import { IsRequiredCheckForm } from '../@types/Form'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { isUint16Array } from 'util/types'
 const MinPrice = 1;
+
 export const FacilitySubmitComponent = () => {
     const navigate = useNavigate();
     const {getAccessTokenSilently, isAuthenticated, loginWithRedirect} = useAuth0();
@@ -312,7 +312,12 @@ export const FacilitySubmitComponent = () => {
                             <Form.Control.Feedback type='invalid'>{errors?.name}</Form.Control.Feedback>
                         </Form.Group>
                         <Form.Label htmlFor="">住所</Form.Label>
-                        <SelectAddress address={address} setAddress={setAddress} error={{prefecture: errors?.prefecture, city: errors?.city, street: errors?.street}}handleSetAddressErrorNull={handleSetAddressErrorNull}/>
+                        <SelectAddress 
+                            address={address} 
+                            setAddress={setAddress} 
+                            error={{prefecture: errors?.prefecture, city: errors?.city, street: errors?.street}}
+                            handleSetAddressErrorNull={handleSetAddressErrorNull}
+                            />
                         <Form.Label htmlFor="">営業時間</Form.Label>
                         <div className="eigyo-time row">
                             <div className="col-5">
