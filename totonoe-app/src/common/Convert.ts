@@ -8,7 +8,7 @@ export const UndefinedConvertToZero = (val: number|undefined) => {
 /**
  * 値を受け取り、Undefinedなら空文字に変換する
  */
-export const UndefinedConvertToEmpty = (val: string|undefined) => {
+export const UndefinedOrNullConvertToEmpty = (val: string|undefined|null) => {
     return !val ? "" : val
 }
 
