@@ -167,7 +167,7 @@ export const SearchResultPage = () => {
 
         return(
             <Fragment>
-                <div className="border row container" style={{position: "absolute", top: "450px", left: "400px", backgroundColor: "white", width: "850px",}}>
+                <div className="border row container" style={{position: "absolute", top: "450px", left: "400px", backgroundColor: "white", width: "850px",}} onClick={() => setShow(false)}>
                     {areaParams === '' ?
                     // 全国の都道府県を表示
                         detailAreaPrefectureList?.map((detailArea) => {
