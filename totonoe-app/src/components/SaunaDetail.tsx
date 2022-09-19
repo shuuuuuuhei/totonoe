@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { StrConvertStrTime, ConvertKBToMaruORHyphen, UndefinedConvertToEmpty } from '../common/Convert'
+import { StrConvertStrTime, ConvertKBToMaruORHyphen, UndefinedOrNullConvertToEmpty } from '../common/Convert'
 
 type SaunaDetailProps = {
     facility: Facility|undefined
