@@ -6,16 +6,16 @@ import { Link } from 'react-router-dom';
 export const SearchBox = () => {
     
     const [area, setArea] = useState("");
-    const [keyWord, setKeyWord] = useState("");
+    const [facilityName, setFacilityName] = useState("");
 
     const handleArea = (event: React.ChangeEvent<HTMLInputElement>) => {
         setArea(event.target.value)
     }
 
-    const handleKeyWord = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setKeyWord(event.target.value);
+    const handleFacilityName = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setFacilityName(event.target.value);
     }
-    
+
     return (
         <Fragment>
             <Form className="container">
@@ -35,9 +35,9 @@ export const SearchBox = () => {
                             type="text"
                             className="input-sm"
                             name=""
-                            value={keyWord}
-                            onChange={handleKeyWord}
-                            placeholder="施設名・キーワード"
+                            value={facilityName}
+                            onChange={handleFacilityName}
+                            placeholder="施設名"
                         />
                     </div>
                     <div className="col-1 p-0">
@@ -46,7 +46,7 @@ export const SearchBox = () => {
                         </Button>
                     </div>
                     <div className="col-2 text">
-                        <Link to={"/search?lang=jp&area="+area+"&keyword="+keyWord}><Button className="btn-warning btn-blockb　w-auto">検索</Button></Link>
+                        <Link to={"/search?lang=jp&area="+area+"&name="+facilityName}><Button className="btn-warning btn-blockb　w-auto">検索</Button></Link>
                     </div>
                 </div>
             </Form>
