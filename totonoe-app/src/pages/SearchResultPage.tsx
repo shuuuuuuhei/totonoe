@@ -1,6 +1,6 @@
 import React, { Component, Fragment, useState, useEffect, useRef } from 'react'
 import Dropdown from "react-bootstrap/Dropdown";
-import { DropdownButton } from 'react-bootstrap';
+import { DropdownButton, Pagination } from 'react-bootstrap';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { ModalHover } from 'react-modal-hover'
 import { HiOutlinePencilAlt } from 'react-icons/hi';
@@ -240,6 +240,25 @@ export const SearchResultPage = () => {
                                 <FacilityList facilities={facilities}/>
                             </div>
                         </div>
+                    </div>
+                    <div className="position-relative">
+                        <Pagination className="position-absolute bottom-0 start-50 translate-middle">
+                            <Pagination.First />
+                            <Pagination.Prev />
+                            <Pagination.Item>{1}</Pagination.Item>
+                            <Pagination.Ellipsis />
+
+                            <Pagination.Item>{10}</Pagination.Item>
+                            <Pagination.Item>{11}</Pagination.Item>
+                            <Pagination.Item active>{12}</Pagination.Item>
+                            <Pagination.Item>{13}</Pagination.Item>
+                            <Pagination.Item disabled>{14}</Pagination.Item>
+
+                            <Pagination.Ellipsis />
+                            <Pagination.Item>{20}</Pagination.Item>
+                            <Pagination.Next />
+                            <Pagination.Last />
+                        </Pagination>
                     </div>
                 </div>
         </Fragment>
