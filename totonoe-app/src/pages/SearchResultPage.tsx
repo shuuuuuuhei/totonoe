@@ -19,6 +19,8 @@ type city = {
     prefectureID: string,
 }
 
+const MinPageCount = 1;
+
 export const SearchResultPage = () => {
     const { search } = useLocation();
     const queryParams = new URLSearchParams(search);
@@ -30,6 +32,12 @@ export const SearchResultPage = () => {
     const temperatureEnd = UndefinedOrNullConvertToEmpty(queryParams.get("temperature_end"));
     const [detailAreaPrefectureList, setDetailArea] = useState<string[]>();
     const [detailAreaCityList, setDetailAreaCityList] = useState<city[]>([]);
+    const [pageCount, setPageCount] = useState({
+        targetPage: MinPageCount,
+        prevPage: 0,
+        nextPage: MinPageCount+1,
+    });
+    const [maxPageCount, setMaxPage] = useState(1);
 
     const [selected, setSelected] = useState({
         key: "",
@@ -44,6 +52,14 @@ export const SearchResultPage = () => {
 
     const [facilities, setFacilitiesState] = useState<Facility[]>();
     const [show, setShow] = useState(false);
+
+    const handlePageCount = (targetPage: number) => {
+        setPageCount({
+            targetPage: targetPage,
+            prevPage: targetPage-1,
+            nextPage: targetPage+1,
+        });
+    };
 
 
     const handleSearch = (searchOption: string) => {
@@ -98,9 +114,10 @@ export const SearchResultPage = () => {
                     }
                     return response.json();
                 })
-                .then((resData) => {
+                .then((resData: []) => {
                     setFacilitiesState(resData);
-                    console.log(resData)
+                    setMaxPage(resData.length);
+                    console.log(maxPageCount)
                 })
             .catch(err => {
                 console.log(err)
@@ -167,7 +184,7 @@ export const SearchResultPage = () => {
 
         return(
             <Fragment>
-                <div className="border row container" style={{position: "absolute", top: "450px", left: "400px", backgroundColor: "white", width: "850px",}} onClick={() => setShow(false)}>
+                <div className="border row container" style={{position: "absolute", top: "400px", left: "400px", backgroundColor: "white", width: "850px",}} onClick={() => setShow(false)}>
                     {areaParams === '' ?
                     // 全国の都道府県を表示
                         detailAreaPrefectureList?.map((detailArea) => {
@@ -191,8 +208,6 @@ export const SearchResultPage = () => {
             </Fragment>
         )
     }
-
-    //{show && <p style={{ color: 'red', fontWeight: 'bold' }}>{prefectureList.map((prefecture) => prefecture)}</p>}
 
     return(
         <Fragment>
@@ -243,21 +258,17 @@ export const SearchResultPage = () => {
                     </div>
                     <div className="position-relative">
                         <Pagination className="position-absolute bottom-0 start-50 translate-middle">
-                            <Pagination.First />
-                            <Pagination.Prev />
-                            <Pagination.Item>{1}</Pagination.Item>
-                            <Pagination.Ellipsis />
-
-                            <Pagination.Item>{10}</Pagination.Item>
-                            <Pagination.Item>{11}</Pagination.Item>
-                            <Pagination.Item active>{12}</Pagination.Item>
-                            <Pagination.Item>{13}</Pagination.Item>
-                            <Pagination.Item disabled>{14}</Pagination.Item>
-
-                            <Pagination.Ellipsis />
-                            <Pagination.Item>{20}</Pagination.Item>
-                            <Pagination.Next />
-                            <Pagination.Last />
+                            <Pagination.First onClick={() => handlePageCount(MinPageCount)}/>
+                            <Pagination.Prev disabled={pageCount.targetPage === MinPageCount} onClick={() => handlePageCount(pageCount.prevPage)}/>
+                            {pageCount.targetPage > MinPageCount + 1 && <Pagination.Item>{MinPageCount}</Pagination.Item>}
+                            {pageCount.targetPage > MinPageCount + 2 && <Pagination.Ellipsis disabled/>}
+                            {pageCount.targetPage !== MinPageCount && <Pagination.Item >{pageCount.prevPage}</Pagination.Item>}
+                            <Pagination.Item active>{pageCount.targetPage}</Pagination.Item>
+                            {pageCount.targetPage !== maxPageCount && <Pagination.Item >{pageCount.nextPage}</Pagination.Item>}
+                            {pageCount.targetPage < maxPageCount - 2 && <Pagination.Ellipsis disabled/>}
+                            {pageCount.targetPage < maxPageCount - 1 && <Pagination.Item>{maxPageCount}</Pagination.Item>}
+                            <Pagination.Next disabled={pageCount.targetPage === maxPageCount} onClick={() => handlePageCount(pageCount.nextPage)}/>
+                            <Pagination.Last onClick={() => handlePageCount(maxPageCount)} />
                         </Pagination>
                     </div>
                 </div>
