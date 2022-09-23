@@ -18,6 +18,7 @@ type Facility = {
     saunas: Sauna[],
     water_baths: WaterBath[],
     amenities: Amenity[],
+    full_count: number,
 }
 
 type NewFacility = {
