@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/url"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/shopspring/decimal"
@@ -80,16 +81,38 @@ func (f *Facility) GetFacilities(c *gin.Context) (*[]ValueObject.FacilityVO, err
 	// リクエストパラメータからWhere句を作成する
 	getFacilityQuery := createFacilityWhereQuery(conn, requestPrams)
 
+	// リクエストパラメータからページンング処理を行う
+	getFacilityQuery = createPagingLimitQuery(getFacilityQuery, requestPrams)
+
 	// 施設情報取得
-	getFacilityQuery.Debug().
-		Table("(?) as f", conn.Table("facility").
-			Select("facility.id,facility.name,prefecture.name || city.name AS address,facility.tel,facility.eigyo_start,facility.eigyo_end,facility.price,facility.lodging_flg,facility.restaurant_flg,facility.working_space_flg,facility.books_flg,facility.heat_wave_flg,facility.air_bath_flg,facility.break_space_flg, facility.water_server_flg").
+	getFacilityQuery.Debug().Table("facility").
+			Select("count(facility.id) over() as full_count, facility.id,facility.name,prefecture.name || city.name AS address,facility.tel,facility.eigyo_start,facility.eigyo_end,facility.price,facility.lodging_flg,facility.restaurant_flg,facility.working_space_flg,facility.books_flg,facility.heat_wave_flg,facility.air_bath_flg,facility.break_space_flg, facility.water_server_flg").
 			Joins("left join address on address.facility_id = facility.id").
 			Joins("left join prefecture on prefecture.id = address.prefecture_id").
-			Joins("left join city on city.id = address.city_id")).
-		Scan(&facilities)
+			Joins("left join city on city.id = address.city_id").Scan(&facilities)
 
 	return &facilities, nil
+}
+
+// createPagingLimitQuery ページングの条件を付与する
+func createPagingLimitQuery(conn *gorm.DB, requestPrams url.Values) *gorm.DB {
+
+	// ページング処理
+	if requestPrams.Get("page") != "" {
+		// 1ページに表示する件数
+		rowCountPerPage := 20
+		targetPageCount, err := strconv.Atoi(requestPrams.Get("page"))
+
+		if err != nil {
+			return conn
+		}
+
+		startRowCount := rowCountPerPage * (targetPageCount - 1)
+
+		conn.Limit(rowCountPerPage)
+		conn.Offset(startRowCount)
+	}
+	return conn
 }
 
 // createOptionWhereQuery 施設オプション追加検索の条件を作成
@@ -110,45 +133,44 @@ func createFacilityWhereQuery(conn *gorm.DB, requestPrams url.Values) *gorm.DB {
 
 	// エリア情報の指定があればエリアの条件を付与する
 	if requestPrams.Get("area") != "" {
-		query = query.Where("f.address like ?", "%"+requestPrams.Get("area")+"%")
+		query = query.Where("prefecture.name || city.name like ?", "%"+requestPrams.Get("area")+"%")
 	}
 
 	// 施設名の指定があれば施設名の条件を付与する
 	if requestPrams.Get("facilityName") != "" {
-		query = query.Where("f.name like ?", "%"+requestPrams.Get("facilityName")+"%")
+		query = query.Where("facility.name like ?", "%"+requestPrams.Get("facilityName")+"%")
 	}
 
 	// 値段の指定があれば施設名の条件を付与する
 	if requestPrams.Get("price_start") != "" {
-		query = query.Where("f.price >= ?", requestPrams.Get("price_start"))
+		query = query.Where("facility.price >= ?", requestPrams.Get("price_start"))
 	}
 
 	// 値段の指定があれば施設名の条件を付与する
 	if requestPrams.Get("price_end") != "" {
-		query = query.Where("f.price <= ?", requestPrams.Get("price_end"))
+		query = query.Where("facility.price <= ?", requestPrams.Get("price_end"))
 	}
 
 	// 各施設オプションの指定があれば件を付与する
 	if requestPrams.Has("restaurant_flg") {
-		query = query.Where("f.restaurant_flg = ?", requestPrams.Get("restaurant_flg"))
+		query = query.Where("facility.restaurant_flg = ?", requestPrams.Get("restaurant_flg"))
 	}
 	if requestPrams.Has("working_space_flg") {
-		query = query.Where("f.working_space_flg = ?", requestPrams.Get("working_space_flg"))
+		query = query.Where("facility.working_space_flg = ?", requestPrams.Get("working_space_flg"))
 	}
 	if requestPrams.Has("air_bath_flg") {
-		query = query.Where("f.air_bath_flg = ?", requestPrams.Get("air_bath_flg"))
+		query = query.Where("facility.air_bath_flg = ?", requestPrams.Get("air_bath_flg"))
 	}
 	if requestPrams.Has("water_server_flg") {
-		query = query.Where("f.water_server_flg = ?", requestPrams.Get("water_server_flg"))
+		query = query.Where("facility.water_server_flg = ?", requestPrams.Get("water_server_flg"))
 	}
 	if requestPrams.Has("books_flg") {
-		query = query.Where("f.books_flg = ?", requestPrams.Get("books_flg"))
+		query = query.Where("facility.books_flg = ?", requestPrams.Get("books_flg"))
 	}
 
 	if requestPrams.Has("heat_wave_flg") {
-		query = query.Where("f.heat_wave_flg = ?", requestPrams.Get("heat_wave_flg"))
+		query = query.Where("facility.heat_wave_flg = ?", requestPrams.Get("heat_wave_flg"))
 	}
-
 	return query
 }
 
