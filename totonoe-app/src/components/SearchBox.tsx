@@ -3,6 +3,7 @@ import { Button, Form } from 'react-bootstrap';
 import "../style/Search-Box.css"
 import { Link } from 'react-router-dom';
 
+const MinPageCount = 1;
 export const SearchBox = () => {
     
     const [area, setArea] = useState("");
@@ -46,7 +47,7 @@ export const SearchBox = () => {
                         </Button>
                     </div>
                     <div className="col-2 text">
-                        <Link to={"/search?lang=jp&area="+area+"&name="+facilityName}><Button className="btn-warning btn-blockb　w-auto">検索</Button></Link>
+                        <Link to={`/search?lang=jp&area=${area}&name=${facilityName}&page=${MinPageCount}`}><Button className="btn-warning btn-blockb　w-auto">検索</Button></Link>
                     </div>
                 </div>
             </Form>
