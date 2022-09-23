@@ -8,10 +8,11 @@ import { BsHeart } from 'react-icons/bs';
 import { FacilityList } from '../components/SaunaList';
 import { SearchOption } from '../components/SearchOption';
 import { Link, useLocation } from 'react-router-dom';
-import { UndefinedOrNullConvertToEmpty } from '../common/Convert';
+import { UndefinedOrNullConvertToEmpty, ConvertNaNToOne } from '../common/Convert';
 import { prefectureList } from '../utils/constants';
 
 const baseUri = 'http://localhost:4000/facilities?';
+const facilityCountPerPage = 20;
 
 type city = {
     id: string,
@@ -33,10 +34,11 @@ export const SearchResultPage = () => {
     const [detailAreaPrefectureList, setDetailArea] = useState<string[]>();
     const [detailAreaCityList, setDetailAreaCityList] = useState<city[]>([]);
     const [pageCount, setPageCount] = useState({
-        targetPage: MinPageCount,
-        prevPage: 0,
-        nextPage: MinPageCount+1,
+        targetPage: parseInt(UndefinedOrNullConvertToEmpty(queryParams.get("page"))),
+        prevPage: parseInt(UndefinedOrNullConvertToEmpty(queryParams.get("page"))) - 1,
+        nextPage: parseInt(UndefinedOrNullConvertToEmpty(queryParams.get("page"))) + 1,
     });
+    const url = `/search?lang=jp&area=${areaParams}&facilityName=${facilityName}&priceStart=${priceStart}&priceEnd=${priceEnd}&temperatureStart=${temperatureStart}&temperatureEnd=${temperatureEnd}`
     const [maxPageCount, setMaxPage] = useState(1);
 
     const [selected, setSelected] = useState({
@@ -61,7 +63,22 @@ export const SearchResultPage = () => {
         });
     };
 
+    /**
+    * 再検索の後に使用できるページカウンターの初期化メソッド
+    * */
+    const handlePageCountInitialized = () => {
+        setPageCount({targetPage: MinPageCount, prevPage: MinPageCount - 1, nextPage: MinPageCount + 1})
+    }
 
+    /**
+     * @param facilityFullCount 施設取得件数
+    * 施設取得件数から最大ページ数を計算する
+    * */
+    const calculateMaxPageCount = (facilityFullCount: number) => {
+        return Math.ceil(facilityFullCount/facilityCountPerPage)
+    }
+
+    // searchOptionで指定された条件から検索を行う
     const handleSearch = (searchOption: string) => {
         const uri = baseUri+`area=${areaParams}&facilityName=${facilityName}${searchOption}`;
 
@@ -73,7 +90,7 @@ export const SearchResultPage = () => {
             },
         };
 
-        const fetchSaunas = async() => {
+        const fetchFacilities = async() => {
             await fetch(uri, requestOption)
                 .then((response) => {
                     if (!response.ok) {
@@ -83,20 +100,25 @@ export const SearchResultPage = () => {
                     }
                     return response.json();
                 })
-                .then((resData) => {
+                .then((resData: Facility[]) => {
+                    console.log("res:",resData)
                     setFacilitiesState(resData);
-                    console.log(resData)
+                    setMaxPage(ConvertNaNToOne(calculateMaxPageCount(resData[0]?.full_count)));
+
+                    // ページカウントの初期化
+                    handlePageCountInitialized();
                 })
             .catch(err => {
                 console.log(err)
             });
         }
-        fetchSaunas();
-       }
+        fetchFacilities();
+    }
 
     useEffect(() => {
+        // window.alert(pageCount.targetPage)
+        const uri = `${baseUri}area=${areaParams}&facilityName=${facilityName}&page=${pageCount.targetPage.toString()}&priceStart=${priceStart}&priceEnd=${priceEnd}&priceStart=${priceStart}&temperatureStart=${temperatureStart}&temperatureEnd=${temperatureEnd}`;
         const fetchSaunas = async() => {
-            const uri = `http://localhost:4000/facilities?area=${areaParams}&facilityName=${facilityName}&priceStart=${priceStart}&priceEnd=${priceEnd}&priceStart=${priceStart}&temperatureStart=${temperatureStart}&temperatureEnd=${temperatureEnd}`;
             const requestOption: RequestInit = {
                 method: "GET",
                 mode: "cors",
@@ -114,10 +136,9 @@ export const SearchResultPage = () => {
                     }
                     return response.json();
                 })
-                .then((resData: []) => {
+                .then((resData: Facility[]) => {
                     setFacilitiesState(resData);
-                    setMaxPage(resData.length);
-                    console.log(maxPageCount)
+                    setMaxPage(ConvertNaNToOne(calculateMaxPageCount(resData[0]?.full_count)));
                 })
             .catch(err => {
                 console.log(err)
@@ -135,7 +156,7 @@ export const SearchResultPage = () => {
         const fetchAreaDetail = async () => {
             // 「県」を省いた検索になるので前方一致で検索をかける
             const prefectureID = prefectureList.findIndex(prefecture => prefecture.startsWith(areaParams)) + 1;
-            const uri = `http://localhost:4000/prefecture/${prefectureID}/cities`;
+            const fetchAreaDetailUri = `http://localhost:4000/prefecture/${prefectureID}/cities`;
             const requestOption: RequestInit = {
                 method: "GET",
                 mode: "cors",
@@ -143,7 +164,7 @@ export const SearchResultPage = () => {
                     "Content-Type": "application/json",
                 },
             };
-            await fetch(uri, requestOption)
+            await fetch(fetchAreaDetailUri, requestOption)
                 .then((response) => {
                     if (!response.ok) {
                         const err = new Error;
@@ -190,7 +211,7 @@ export const SearchResultPage = () => {
                         detailAreaPrefectureList?.map((detailArea) => {
                             return(
                                 <div className="col-1 py-2 text-center">
-                                    <Link to={`/search?lang=jp&area=${detailArea}`}><p className="m-0 py-1" style={{fontSize: "10px",fontWeight: 'bold'}}>{detailArea}</p></Link>
+                                    <Link to={`/search?lang=jp&page=${MinPageCount}&area=${detailArea}`} onClick={() => handlePageCount(MinPageCount)}><p className="m-0 py-1" style={{fontSize: "10px",fontWeight: 'bold'}}>{detailArea}</p></Link>
                                 </div>
                             )
                         })
@@ -199,7 +220,7 @@ export const SearchResultPage = () => {
                         detailAreaCityList.map((detailAreaCity) => {
                             return(
                                 <div className="col-1 py-2 text-center">
-                                    <Link to={`/search?lang=jp&area=${areaParams}${detailAreaCity.name}`}><p className="m-0 py-1" style={{fontSize: "10px",fontWeight: 'bold'}}>{detailAreaCity.name}</p></Link>
+                                    <Link to={`/search?lang=jp&page=${MinPageCount}&area=${areaParams}${detailAreaCity.name}`} onClick={() => handlePageCount(MinPageCount)}><p className="m-0 py-1" style={{fontSize: "10px",fontWeight: 'bold'}}>{detailAreaCity.name}</p></Link>
                                 </div>
                             )
                         })
@@ -225,12 +246,13 @@ export const SearchResultPage = () => {
                         <SearchOption handleSearch={handleSearch}/>
                     </div>
                     <div className="result-list col-9 pt-5 px-5">
-                            <div className="list-header row">
+                            <div className="list-header row" id="list-header">
                                 {facilities.length === 0 ? <p>サウナ施設が見つかりませんでした</p> :
                                     <>
                                         <div className="list-header-left col-8 text-start">
                                             <h3>サウナ一覧</h3>
-                                            <p>{facilities.length}件(1~20)</p>
+                                            {/* 表示件数 */}
+                                            <p>{facilities[0].full_count}件({(pageCount.targetPage - 1) * facilityCountPerPage + 1}~{facilities.length < facilityCountPerPage ? facilities[0].full_count: facilityCountPerPage*pageCount.targetPage})</p>
                                         </div>
                                         <div className="list-option col-4 text-end">
                                             <DropdownButton
@@ -256,20 +278,45 @@ export const SearchResultPage = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="position-relative">
-                        <Pagination className="position-absolute bottom-0 start-50 translate-middle">
-                            <Pagination.First onClick={() => handlePageCount(MinPageCount)}/>
-                            <Pagination.Prev disabled={pageCount.targetPage === MinPageCount} onClick={() => handlePageCount(pageCount.prevPage)}/>
-                            {pageCount.targetPage > MinPageCount + 1 && <Pagination.Item>{MinPageCount}</Pagination.Item>}
-                            {pageCount.targetPage > MinPageCount + 2 && <Pagination.Ellipsis disabled/>}
-                            {pageCount.targetPage !== MinPageCount && <Pagination.Item >{pageCount.prevPage}</Pagination.Item>}
-                            <Pagination.Item active>{pageCount.targetPage}</Pagination.Item>
-                            {pageCount.targetPage !== maxPageCount && <Pagination.Item >{pageCount.nextPage}</Pagination.Item>}
-                            {pageCount.targetPage < maxPageCount - 2 && <Pagination.Ellipsis disabled/>}
-                            {pageCount.targetPage < maxPageCount - 1 && <Pagination.Item>{maxPageCount}</Pagination.Item>}
-                            <Pagination.Next disabled={pageCount.targetPage === maxPageCount} onClick={() => handlePageCount(pageCount.nextPage)}/>
-                            <Pagination.Last onClick={() => handlePageCount(maxPageCount)} />
-                        </Pagination>
+                    <div className="py-5 position-relative">
+                        {
+                            maxPageCount !== 0 &&
+                            <Pagination className="position-absolute bottom-0 start-50 translate-middle">
+
+                                {/* MinCountPage(1)に移動矢印 */}
+                                <Pagination.First onClick={() => handlePageCount(MinPageCount)}/>
+
+                                {/* 前ページに移動矢印 */}
+                                <Pagination.Prev disabled={pageCount.targetPage === MinPageCount} onClick={() => handlePageCount(pageCount.prevPage)}/>
+
+                                {/* MinPageCountフィールド (1)*/}
+                                {pageCount.targetPage > MinPageCount + 1 && <Pagination.Item href={url+`&page=${MinPageCount}`}>{MinPageCount}</Pagination.Item>}
+
+                                {/* ・・・フィールド */}
+                                {pageCount.targetPage > MinPageCount + 2 && <Pagination.Ellipsis disabled/>}
+
+                                {/* 前ページ数フィールド */}
+                                {pageCount.targetPage !== MinPageCount && <Pagination.Item href={url+`&page=${pageCount.prevPage}`}>{pageCount.prevPage}</Pagination.Item>}
+
+                                {/* 現在ページ数フィールド */}
+                                <Pagination.Item active>{pageCount.targetPage}</Pagination.Item>
+
+                                {/* 次ページ数フィールド */}
+                                {pageCount.targetPage !== maxPageCount && <Pagination.Item href={url+`&page=${pageCount.nextPage}`}>{pageCount.nextPage}</Pagination.Item>}
+                                
+                                {/* ・・・フィールド */}
+                                {pageCount.targetPage < maxPageCount - 2 && <Pagination.Ellipsis disabled/>}
+
+                                {/* MinCountPage(1)に移動矢印 */}
+                                {pageCount.targetPage < maxPageCount - 1 && <Pagination.Item href={url+`&page=${maxPageCount}`}>{maxPageCount}</Pagination.Item>}
+
+                                {/* 次ページに移動矢印 */}
+                                <Pagination.Next disabled={pageCount.targetPage === maxPageCount} onClick={() => handlePageCount(pageCount.nextPage)}/>
+
+                                {/* MaxPageCountに移動矢印 */}
+                                <Pagination.Last onClick={() => handlePageCount(maxPageCount)} />
+                            </Pagination>
+                        }
                     </div>
                 </div>
         </Fragment>
