@@ -38,3 +38,10 @@ export const ConvertKBToMaruORHyphen = (kb: string) => {
     return "○"
 }
 
+/**
+ * NaN(非数値)であれば１に変換する
+*/
+export const ConvertNaNToOne = (num: number) => {
+    if(isNaN(num)) return 1
+    return num
+}
