@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react'
+import { termsList } from '../../utils/constants';
 
 type termsCheckBoxProps = {
     terms: {
@@ -13,36 +14,6 @@ type termsCheckBoxProps = {
 
 
 export const TermsCheckBox = (props: termsCheckBoxProps) => {
-    const termsList = [
-        {
-            id: 'lodging_flg',
-            name: "宿泊",
-        },
-        {
-            id: 'restaurant_flg',
-            name: "飯処",
-        },
-        {
-            id: 'working_space_flg',
-            name: "コワーキングスペース",
-        },
-        {
-            id: 'air_bath_flg',
-            name: "外気浴",
-        },
-        {
-            id: 'books_flg',
-            name: "読書",
-        },
-        {
-            id: 'water_server_flg',
-            name: "給水機",
-        },
-        {
-            id: 'heat_wave_flg',
-            name: "熱波師",
-        },
-    ];
 
 const handleChangeTerms = (e: React.FormEvent<HTMLInputElement>) => {
     const id = e.currentTarget.id;

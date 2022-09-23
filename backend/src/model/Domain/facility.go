@@ -13,6 +13,7 @@ type Facility struct {
 	EigyoStart      string      `json:"eigyo_start,omitempty"`
 	EigyoEnd        string      `json:"eigyo_end,omitempty"`
 	Price           uint32      `json:"price,omitempty"`
+	WaterServerFlg  string      `gorm:"type:varchar(2)" json:"water_server_flg,omitempty"`
 	LodgingFlg      string      `gorm:"type:varchar(2)" json:"lodging_flg,omitempty"`
 	RestaurantFlg   string      `gorm:"type:varchar(2)" json:"restaurant_flg,omitempty"`
 	WorkingSpaceFlg string      `gorm:"type:varchar(2)" json:"working_space_flg,omitempty"`

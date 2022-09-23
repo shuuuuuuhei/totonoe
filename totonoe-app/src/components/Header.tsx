@@ -48,7 +48,7 @@ export const Header = () => {
             pauseOnHover
             />
             
-            <div className="header row">
+            <div className="header row" id="top-header">
                 <div className="header-top d-flex justify-content-between">
                     <div className="header-top-left">
                         <Link to={'saunas/new'}><GiHotSpices size={50} /></Link>

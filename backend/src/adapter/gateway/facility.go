@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"net/url"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/shopspring/decimal"
@@ -16,6 +18,11 @@ import (
 
 type Facility struct {
 	conn *gorm.DB
+}
+
+// GetFacilitiesBySaunaOption implements port.FacilityRepository
+func (*Facility) GetFacilitiesBySaunaOption(*gin.Context) (*[]ValueObject.FacilityVO, error) {
+	panic("unimplemented")
 }
 
 type facilityParams struct {
@@ -63,21 +70,108 @@ func (f *Facility) GetFacilitiesByMapInfomation(c *gin.Context) (*[]ValueObject.
 	return &facilities, nil
 }
 
-// GetFacilities implements port.FacilityRepository
+// GetFacilities サウナ施設条件検索を行う
 func (f *Facility) GetFacilities(c *gin.Context) (*[]ValueObject.FacilityVO, error) {
 	conn := f.conn
 
 	facilities := []ValueObject.FacilityVO{}
-	query := conn.Debug().Table("facility").
-		Select("facility.id,facility.name,prefecture.name || city.name || address.street_name AS address,facility.tel,facility.eigyo_start,facility.eigyo_end,facility.price,facility.lodging_flg,facility.restaurant_flg,facility.working_space_flg,facility.books_flg,facility.heat_wave_flg,facility.air_bath_flg,facility.break_space_flg, sauna.sauna_type, sauna.temperature, sauna.capacity, sauna.rouryu_flg, sauna.sauna_mat_flg, sauna.tv_flg, sauna.bgm_flg").
-		Joins("left join sauna on sauna.facility_id = facility.id").
-		Joins("left join address on address.facility_id = facility.id").
-		Joins("left join prefecture on prefecture.id = address.prefecture_id").
-		Joins("left join city on city.id = address.city_id")
+	requestPrams := c.Request.URL.Query()
+	fmt.Println(requestPrams)
 
-	query.Scan(&facilities)
+	// リクエストパラメータからWhere句を作成する
+	getFacilityQuery := createFacilityWhereQuery(conn, requestPrams)
+
+	// リクエストパラメータからページンング処理を行う
+	getFacilityQuery = createPagingLimitQuery(getFacilityQuery, requestPrams)
+
+	// 施設情報取得
+	getFacilityQuery.Debug().Table("facility").
+			Select("count(facility.id) over() as full_count, facility.id,facility.name,prefecture.name || city.name AS address,facility.tel,facility.eigyo_start,facility.eigyo_end,facility.price,facility.lodging_flg,facility.restaurant_flg,facility.working_space_flg,facility.books_flg,facility.heat_wave_flg,facility.air_bath_flg,facility.break_space_flg, facility.water_server_flg").
+			Joins("left join address on address.facility_id = facility.id").
+			Joins("left join prefecture on prefecture.id = address.prefecture_id").
+			Joins("left join city on city.id = address.city_id").Scan(&facilities)
 
 	return &facilities, nil
+}
+
+// createPagingLimitQuery ページングの条件を付与する
+func createPagingLimitQuery(conn *gorm.DB, requestPrams url.Values) *gorm.DB {
+
+	// ページング処理
+	if requestPrams.Get("page") != "" {
+		// 1ページに表示する件数
+		rowCountPerPage := 20
+		targetPageCount, err := strconv.Atoi(requestPrams.Get("page"))
+
+		if err != nil {
+			return conn
+		}
+
+		startRowCount := rowCountPerPage * (targetPageCount - 1)
+
+		conn.Limit(rowCountPerPage)
+		conn.Offset(startRowCount)
+	}
+	return conn
+}
+
+// createOptionWhereQuery 施設オプション追加検索の条件を作成
+func createOptionWhereQuery(conn *gorm.DB, requestPrams url.Values) *gorm.DB {
+	query := conn.Where("")
+
+	if requestPrams.Has("lodging_flg") {
+		query = query.Where("f.address like ?", "%"+requestPrams.Get("area")+"%")
+	}
+
+	return query
+}
+
+// createFacilityWhereQuery 施設検索で使用するWhere句の条件を作成
+func createFacilityWhereQuery(conn *gorm.DB, requestPrams url.Values) *gorm.DB {
+
+	query := conn.Where("")
+
+	// エリア情報の指定があればエリアの条件を付与する
+	if requestPrams.Get("area") != "" {
+		query = query.Where("prefecture.name || city.name like ?", "%"+requestPrams.Get("area")+"%")
+	}
+
+	// 施設名の指定があれば施設名の条件を付与する
+	if requestPrams.Get("facilityName") != "" {
+		query = query.Where("facility.name like ?", "%"+requestPrams.Get("facilityName")+"%")
+	}
+
+	// 値段の指定があれば施設名の条件を付与する
+	if requestPrams.Get("price_start") != "" {
+		query = query.Where("facility.price >= ?", requestPrams.Get("price_start"))
+	}
+
+	// 値段の指定があれば施設名の条件を付与する
+	if requestPrams.Get("price_end") != "" {
+		query = query.Where("facility.price <= ?", requestPrams.Get("price_end"))
+	}
+
+	// 各施設オプションの指定があれば件を付与する
+	if requestPrams.Has("restaurant_flg") {
+		query = query.Where("facility.restaurant_flg = ?", requestPrams.Get("restaurant_flg"))
+	}
+	if requestPrams.Has("working_space_flg") {
+		query = query.Where("facility.working_space_flg = ?", requestPrams.Get("working_space_flg"))
+	}
+	if requestPrams.Has("air_bath_flg") {
+		query = query.Where("facility.air_bath_flg = ?", requestPrams.Get("air_bath_flg"))
+	}
+	if requestPrams.Has("water_server_flg") {
+		query = query.Where("facility.water_server_flg = ?", requestPrams.Get("water_server_flg"))
+	}
+	if requestPrams.Has("books_flg") {
+		query = query.Where("facility.books_flg = ?", requestPrams.Get("books_flg"))
+	}
+
+	if requestPrams.Has("heat_wave_flg") {
+		query = query.Where("facility.heat_wave_flg = ?", requestPrams.Get("heat_wave_flg"))
+	}
+	return query
 }
 
 // CreateFacility implements port.FacilityRepository
@@ -91,11 +185,6 @@ func (f *Facility) CreateFacility(c *gin.Context) error {
 	}
 
 	return nil
-}
-
-// GetFacilitiesBySaunaOption implements port.FacilityRepository
-func (*Facility) GetFacilitiesBySaunaOption(*gin.Context) (*[]ValueObject.FacilityVO, error) {
-	panic("unimplemented")
 }
 
 // GetFacilityByID implements port.FacilityRepository

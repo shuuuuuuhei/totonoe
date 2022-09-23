@@ -20,4 +20,5 @@ type FacilityVO struct {
 	Saunas          []Sauna         `json:"saunas,omitempty"`
 	Latitude        decimal.Decimal `json:"latitude,omitempty"`
 	Longitude       decimal.Decimal `json:"longitude,omitempty"`
+	FullCount       uint            `json:"full_count,omitempty"`
 }

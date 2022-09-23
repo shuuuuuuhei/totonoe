@@ -1,50 +1,132 @@
-import React, { Component, Fragment } from 'react'
+import React, { Component, Fragment, useState } from 'react'
 import { Input } from './form-components/Input'
-import { Button } from 'react-bootstrap'
+import { Button, Form } from 'react-bootstrap'
 import { InputScope } from './form-components/InputScope'
+import { Link } from 'react-router-dom'
+import { termsList } from '../utils/constants'
 
-export const SearchOption = () => {
-    const handleChange = () => {
+type searchOptionProps = {
+    handleSearch: (searchOption: string) => void
+}
+type terms = {
+    id: string,
+    link: string,
+}
 
+export const SearchOption = (props: searchOptionProps) => {
+
+    const [temperature, setTemperature] = useState({start: "", end: ""});
+    const [price, setPrice] = useState({start: "", end: ""});
+    const [termsListState, setTermsListState] = useState<terms[]|undefined>([]);
+    const [termsLinkState, setTermsLinkState] = useState("");
+
+
+    const handleTemperatureChange = (event: React.ChangeEvent<HTMLInputElement>) => {    
+        // 入力区分(開始or終了)を受け取る
+        const inputKb = event.target.id;
+        const inputPrice = event.target.value;
+
+       setTemperature({...temperature, [inputKb]: inputPrice});
+    }
+    
+    const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        // 入力区分(開始or終了)を受け取る
+        const inputKb = event.target.id;
+        setPrice({...temperature, [inputKb]: event.target.value});
     }
 
-    const termsList = [
-        "宿泊", "飯処", "コワーキングスペース", "外気浴", "読書", "給水機", "熱波師",
-    ]
+    console.log(termsListState)
+
+    const handleChangeTerms = (e: React.FormEvent<HTMLInputElement>) => {
+        const id = e.currentTarget.id;
+    
+        // チェックがある場合は、配列から要素を追加
+        if(e.currentTarget.checked) {
+    
+            setTermsListState((prevState) => (
+                // 配列が存在していない場合は、代入する
+                !prevState ? 
+                [
+                    {
+                        id: id,
+                        link: "",
+                    }
+                ]
+                :
+                // 配列が存在している場合は、配列に追加する
+                [
+                    ...prevState,
+                    {
+                        id: id,
+                        link: "",
+                    }
+                ]
+            ))
+            return
+        }
+    
+        // 配列から要素を削除
+        const newTerms = termsListState?.filter((term, index) => {
+            if(term.id != id) {
+                return term;
+            }
+        })
+        setTermsListState(newTerms);
+
+    }
+    
+    const returnPositionFromTop = () => {
+        const positionFromTop = document.getElementById('top-header')?.offsetTop;
+        window.scrollTo({
+            top: positionFromTop,
+            behavior: "auto",
+        })
+    }
+
+    const handleSearchButton = () => {
+        // termsリストでチェックがある項目のリンクを作成
+        const termsOption = termsListState?.map((terms) => { return "&"+terms.id+"=1"});
+
+        // 追加検索のuriに検索条件を付与して、検索関数に引数として渡す
+        const searchOption = "&price_start="+price.start+"&price_end="+price.end+"&temperature_start="+temperature.start+"&temperature_end="+termsOption?.join('');
+        props.handleSearch(searchOption);
+
+        returnPositionFromTop();
+    }
 
     return(
         <Fragment>
             <div className="option-box border px-3 py-2 text-start">
                 <label htmlFor="" className="py-3">■条件を絞る</label>
-                <div className="temperature-option row">
+                <Form.Group className="temperature row py-2">
+                    <Form.Label>温度</Form.Label>
                     <InputScope
                         className="input-sm"
                         name=""
-                        value=""
-                        onChange={handleChange}
+                        valueStart={temperature.start.toString()}
+                        valueEnd={temperature.end.toString()}
+                        onChange={handleTemperatureChange}
                         placehodlder="温度"
-                        errorDiv=""
-                        errorMsg=""
                     />
-                </div>
-                <div className="temperature-option row">
+                </Form.Group>
+                <div className="temperature-option row py-2">
+                    <Form.Label>値段</Form.Label>
                     <InputScope
                         className="input-sm"
                         name=""
-                        value=""
-                        onChange={handleChange}
+                        valueStart={price.start}
+                        valueEnd={price.end}
+                        onChange={handlePriceChange}
                         placehodlder="値段"
-                        errorDiv=""
-                        errorMsg=""
                     />
                 </div>
                 <div className="terms-options text-start">
                     {termsList.map((terms, index) => {
                         return(
                             <div className="terms-option py-1 px-2">
-                                <input type="checkbox" className="form-check-input pl-2" value="" id={"formCheckDefault"+index.toString()}/>
+                                <input type="checkbox" className="form-check-input pl-2" value="" id={terms.id} onClick={handleChangeTerms}/>
                                 <label htmlFor={"formCheckDefault"+index.toString()} className="px-3 border-bottom">
-                                    {terms}
+                                    {terms.name}
                                 </label>
                             </div>
                         )
@@ -52,7 +134,7 @@ export const SearchOption = () => {
                 </div>
                 <div className="row">
                     <div className="research-button py-2 col-6">
-                        <Button>検索</Button>
+                        <Button className="btn-warning btn-blockb　w-auto" onClick={handleSearchButton}>検索</Button>
                     </div>
                     <div className="clear-button py-2 col-6">
                         <Button>クリア</Button>

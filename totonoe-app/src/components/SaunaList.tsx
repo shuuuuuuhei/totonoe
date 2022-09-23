@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react'
 import { HiOutlinePencilAlt } from 'react-icons/hi'
 import { BsHeart } from 'react-icons/bs'
 import { Link } from 'react-router-dom'
-import { StrConvertStrTime, UndefinedConvertToEmpty } from '../common/Convert'
+import { StrConvertStrTime, UndefinedOrNullConvertToEmpty } from '../common/Convert'
 
 type FacilityListProps = {
     facilities: Facility[]

@@ -112,58 +112,62 @@ func (d *DB) CreateData() {
 	if err := d.Connection.Create(&profile).Error; err != nil {
 		fmt.Println(err)
 	}
+	cityList := []Domain.City{}
+	d.Connection.Debug().Table("prefecture").Select("prefecture.id AS prefecture_id, city.id AS ID").Joins("left join city on city.prefecture_id = prefecture.id").Scan(&cityList)
 
-	facility := Domain.Facility{
-		Name:            "test",
-		Tel:             "0000-1234-67890",
-		Price:           1000,
-		LodgingFlg:      "1",
-		RestaurantFlg:   "0",
-		WorkingSpaceFlg: "1",
-		BooksFlg:        "1",
-		HeatWaveFlg:     "1",
-		AirBathFlg:      "1",
-		BreakSpaceFlg:   "0",
-	}
-	if err := d.Connection.Create(&facility).Error; err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	for i := 0; i < 3; i++ {
-		sauna := Domain.Sauna{}
-		waterBath := Domain.WaterBath{}
-		sauna.FacilityID = facility.ID
-		sauna.Capacity = uint(i) * 10
-		sauna.Temperature = i * 40
-		sauna.SaunaType = 4
-		waterBath.FacilityID = facility.ID
-		waterBath.Capacity = uint(i) * 5
-		waterBath.Temperature = i * 3
-		sauna.BgmFlg = "0"
-		sauna.RouryuFlg = "1"
-		sauna.SaunaMatFlg = "1"
-		sauna.TvFlg = "1"
-
-		if err := d.Connection.Create(&sauna).Error; err != nil {
+	for i := 0; i < len(cityList); i++ {
+		facility := Domain.Facility{
+			Name:            "test",
+			Tel:             "0000-1234-67890",
+			Price:           1000,
+			LodgingFlg:      "1",
+			RestaurantFlg:   "0",
+			WorkingSpaceFlg: "1",
+			BooksFlg:        "1",
+			HeatWaveFlg:     "1",
+			AirBathFlg:      "1",
+			BreakSpaceFlg:   "0",
+			WaterServerFlg:  "1",
+		}
+		if err := d.Connection.Create(&facility).Error; err != nil {
 			fmt.Println(err)
 			return
 		}
-		if err := d.Connection.Create(&waterBath).Error; err != nil {
+
+		address := Domain.Address{
+			FacilityID:   uint32(i + 1),
+			CityID:       cityList[i].ID,
+			PrefectureID: cityList[i].PrefectureID,
+			StreetName:   "3-50-11",
+		}
+		if err := d.Connection.Create(&address).Error; err != nil {
 			fmt.Println(err)
 			return
 		}
-	}
 
-	address := Domain.Address{
-		FacilityID:   1,
-		CityID:       1100,
-		PrefectureID: 1,
-		StreetName:   "3-50-11",
-	}
-	if err := d.Connection.Create(&address).Error; err != nil {
-		fmt.Println(err)
-		return
+		for i := 0; i < 3; i++ {
+			sauna := Domain.Sauna{}
+			waterBath := Domain.WaterBath{}
+			sauna.FacilityID = facility.ID
+			sauna.Capacity = uint(i) * 10
+			sauna.Temperature = i * 40
+			sauna.SaunaType = 4
+			waterBath.FacilityID = facility.ID
+			waterBath.Capacity = uint(i) * 5
+			waterBath.Temperature = i * 3
+			sauna.BgmFlg = "0"
+			sauna.RouryuFlg = "1"
+			sauna.SaunaMatFlg = "1"
+			sauna.TvFlg = "1"
+			if err := d.Connection.Create(&sauna).Error; err != nil {
+				fmt.Println(err)
+				return
+			}
+			if err := d.Connection.Create(&waterBath).Error; err != nil {
+				fmt.Println(err)
+				return
+			}
+		}
 	}
 
 	tmpUser := Domain.User{}
@@ -193,7 +197,7 @@ func (d *DB) CreateData() {
 		article := Domain.Article{}
 		article.Title = "test_" + strconv.Itoa(i)
 		article.Content = "content_" + strconv.Itoa(i)
-		article.FacilityID = facility.ID
+		article.FacilityID = 1
 		article.UserID = user.ID
 		if err := d.Connection.Create(&article).Error; err != nil {
 			fmt.Println(err)
@@ -221,7 +225,7 @@ func (d *DB) CreateData() {
 		article := Domain.Article{}
 		article.Title = "test2_" + strconv.Itoa(i)
 		article.Content = "content2_" + strconv.Itoa(i)
-		article.FacilityID = facility.ID
+		article.FacilityID = 1
 		article.UserID = tmpUser.ID
 		if err := d.Connection.Create(&article).Error; err != nil {
 			fmt.Println(err)

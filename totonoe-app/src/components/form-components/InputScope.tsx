@@ -1,14 +1,14 @@
 import React, { Component, Fragment } from 'react'
 import { Input } from './Input'
 import { propTypes } from 'react-bootstrap/esm/Image'
+import { Form } from 'react-bootstrap'
 
 type InputScopeProps = {
     name: string,
-    value: string,
+    valueStart: string,
+    valueEnd: string,
     onChange: React.ChangeEventHandler,
-    placehodlder?: string,
-    errorDiv: string,
-    errorMsg: string,
+    placehodlder: string,
     className: string,
 }
 
@@ -17,16 +17,14 @@ export const InputScope = (props: InputScopeProps) => {
     return(
         <Fragment>
             <div className="col-5 text-center">
-                <Input 
-                    type="text"
+                <Form.Control 
+                    type="number"
                     className={props.className}
+                    id="start"
                     name={props.name}
-                    value={props.value}
-                    onChange={props.onChange}
-                    placehodlder={props.placehodlder}
-                    errorDiv={props.errorDiv}
-                    errorMsg={props.errorMsg}
-                    required={true}
+                    value={props.valueStart}
+                    onChange={(e) => (props.onChange(e))}
+                    placeholder={props.placehodlder}
                 />
             </div>
             <div className="col-2 text-center">
@@ -35,16 +33,14 @@ export const InputScope = (props: InputScopeProps) => {
                 </p>
             </div>
             <div className="col-5">
-                <Input 
-                    type="text"
-                    className="input-sm"
+                <Form.Control 
+                    type="number"
+                    className={props.className}
+                    id="end"
                     name={props.name}
-                    value={props.value}
+                    value={props.valueEnd}
                     onChange={props.onChange}
-                    placehodlder={props.placehodlder}
-                    errorDiv={props.errorDiv}
-                    errorMsg={props.errorMsg}
-                    required={true}
+                    placeholder={props.placehodlder}
                 />
             </div>
         </Fragment>
