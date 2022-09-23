@@ -74,6 +74,14 @@ export const SearchOption = (props: searchOptionProps) => {
         setTermsListState(newTerms);
 
     }
+    
+    const returnPositionFromTop = () => {
+        const positionFromTop = document.getElementById('top-header')?.offsetTop;
+        window.scrollTo({
+            top: positionFromTop,
+            behavior: "auto",
+        })
+    }
 
     const handleSearchButton = () => {
         // termsリストでチェックがある項目のリンクを作成
@@ -82,6 +90,8 @@ export const SearchOption = (props: searchOptionProps) => {
         // 追加検索のuriに検索条件を付与して、検索関数に引数として渡す
         const searchOption = "&price_start="+price.start+"&price_end="+price.end+"&temperature_start="+temperature.start+"&temperature_end="+termsOption?.join('');
         props.handleSearch(searchOption);
+
+        returnPositionFromTop();
     }
 
     return(
