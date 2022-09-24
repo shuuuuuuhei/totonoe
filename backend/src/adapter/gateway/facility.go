@@ -38,6 +38,9 @@ type mapInfo struct {
 	Name string `json:"name"`
 }
 
+// latlng_literal: google.maps.LatLngLiteral,
+// showInfoWindow: boolean,
+
 type mapInfoListParams struct {
 	MapInfoList []mapInfo `json:"map_info_list,omitempty"`
 }
@@ -53,18 +56,26 @@ func (f *Facility) GetFacilitiesByMapInfomation(c *gin.Context) (*[]ValueObject.
 	for i := 0; i < len(params.MapInfoList); i++ {
 		facility := ValueObject.FacilityVO{}
 		if err := conn.Debug().Table("facility").
-			Select("facility.id, facility.name, address.latitude, address.longitude").
-			Joins("left join address on address.facility_id = facility.id").
-			Where("address.Latitude=? and address.Longitude=?", params.MapInfoList[i].LatLngLiteral.Lat, params.MapInfoList[i].LatLngLiteral.Lng).First(&facility).Error; err != nil {
+			Select("facility.id, facility.name, address.latitude, address.longitude, count(article.id) as article_count").
+			Joins("left join address on address.facility_id = facility.id").Joins("left join article on article.facility_id = facility.id").
+			Where("address.Latitude=? and address.Longitude=?", params.MapInfoList[i].LatLngLiteral.Lat, params.MapInfoList[i].LatLngLiteral.Lng).Group("facility.id, facility.name, address.latitude, address.longitude").
+			First(&facility).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				// 施設情報が登録されていなければマップ情報のみ代入を行い、リストに追加する。次ループ処理を行う。
 				fmt.Println("施設情報が見つかりませんでした。 user_id =", params.MapInfoList[i].Name)
-				facilities = append(facilities, ValueObject.FacilityVO{Name: params.MapInfoList[i].Name, Latitude: params.MapInfoList[i].LatLngLiteral.Lat, Longitude: params.MapInfoList[i].LatLngLiteral.Lng})
+
+				facilities = append(facilities, ValueObject.FacilityVO{
+					Name: params.MapInfoList[i].Name,
+					Lat:  params.MapInfoList[i].LatLngLiteral.Lat,
+					Lng:  params.MapInfoList[i].LatLngLiteral.Lng,
+				})
 				continue
 			}
 			log.Println(err)
 			return nil, errors.New("Internal Server Error. 施設情報取得に失敗しました。")
 		}
+		facility.Lat = params.MapInfoList[i].LatLngLiteral.Lat
+		facility.Lng = params.MapInfoList[i].LatLngLiteral.Lng
 		facilities = append(facilities, facility)
 	}
 	return &facilities, nil
@@ -86,10 +97,10 @@ func (f *Facility) GetFacilities(c *gin.Context) (*[]ValueObject.FacilityVO, err
 
 	// 施設情報取得
 	getFacilityQuery.Debug().Table("facility").
-			Select("count(facility.id) over() as full_count, facility.id,facility.name,prefecture.name || city.name AS address,facility.tel,facility.eigyo_start,facility.eigyo_end,facility.price,facility.lodging_flg,facility.restaurant_flg,facility.working_space_flg,facility.books_flg,facility.heat_wave_flg,facility.air_bath_flg,facility.break_space_flg, facility.water_server_flg").
-			Joins("left join address on address.facility_id = facility.id").
-			Joins("left join prefecture on prefecture.id = address.prefecture_id").
-			Joins("left join city on city.id = address.city_id").Scan(&facilities)
+		Select("count(facility.id) over() as full_count, facility.id,facility.name,prefecture.name || city.name AS address,facility.tel,facility.eigyo_start,facility.eigyo_end,facility.price,facility.lodging_flg,facility.restaurant_flg,facility.working_space_flg,facility.books_flg,facility.heat_wave_flg,facility.air_bath_flg,facility.break_space_flg, facility.water_server_flg").
+		Joins("left join address on address.facility_id = facility.id").
+		Joins("left join prefecture on prefecture.id = address.prefecture_id").
+		Joins("left join city on city.id = address.city_id").Scan(&facilities)
 
 	return &facilities, nil
 }
