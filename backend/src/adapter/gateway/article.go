@@ -103,18 +103,18 @@ func (a *ArticleRepository) GetArticlesByUserID(c *gin.Context) (*[]ValueObject.
 }
 
 // CreateArticle Articleを作成&登録
-func (a *ArticleRepository) CreateArticle(c *gin.Context) error {
+func (a *ArticleRepository) CreateArticle(c *gin.Context) (*ValueObject.ArticleVO, error) {
 	conn := a.conn
 	params := articleParams{}
 	json.NewDecoder(c.Request.Body).Decode(&params)
 
 	// ユーザ存在チェック
 	if err := common.CheckUserByID(params.UserID, conn); err != nil {
-		return err
+		return nil, err
 	}
 	// サウナ存在チェック
 	if err := common.CheckFacilityByID(params.FacilityID, conn); err != nil {
-		return err
+		return nil, err
 	}
 
 	article := params.Article
@@ -122,7 +122,7 @@ func (a *ArticleRepository) CreateArticle(c *gin.Context) error {
 	article.FacilityID = params.FacilityID
 
 	err := conn.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Create(&article).Error; err != nil {
+		if err := tx.Debug().Create(&article).Error; err != nil {
 			if err == sql.ErrNoRows {
 				return fmt.Errorf("Can't create Article")
 			}
@@ -133,11 +133,15 @@ func (a *ArticleRepository) CreateArticle(c *gin.Context) error {
 	})
 
 	if err != nil {
-		return err
+		return nil, err
+	}
+
+	postedArticle := ValueObject.ArticleVO{
+		ID: article.ID,
 	}
 
 	// 登録成功
-	return nil
+	return &postedArticle, nil
 }
 
 // GetArticlesOrderByDate 最新の記事取得
@@ -267,14 +271,14 @@ func (a *ArticleRepository) GetArticleByFacilityID(ctx *gin.Context) (*[]ValueOb
 	articles := []ValueObject.ArticleVO{}
 
 	if err := conn.Debug().Table("article").
-		Select(`article.*,"user".name AS user_name, facility.name AS facility, count(likes_count.id) AS like_count,  case when liked.id is null  then false else true end AS is_liked, count(comment.id) AS comment_count`).
+		Select(`article.*, "user".id AS user_id, "user".name AS user_name, facility.id AS facility_id, facility.name AS facility_name, count(likes_count.id) AS like_count,  case when liked.id is null  then false else true end AS is_liked, count(comment.id) AS comment_count`).
 		Joins(`left join  "user" on "user".id = article.user_id`).
 		Joins("left join facility on facility.id = article.facility_id").
 		Joins("left join article_like likes_count on likes_count.article_id = article.id").
 		Joins("left join article_like liked on liked.article_id = article.id AND liked.user_id=?", loginUserID).
 		Joins("left join comment on comment.article_id = article.id").
 		Where("article.facility_id = ?", facilityID).
-		Group(`article.id, "user".name, facility.name, liked.id`).
+		Group(`article.id, "user".id, "user".name, facility.id, facility.name, liked.id`).
 		Scan(&articles).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Println("記事が見つかりませんでした。)")

@@ -29,7 +29,7 @@ type ArticleOutputPort interface {
 // ArticleRepository ロジックインタフェース
 type ArticleRepository interface {
 	GetArticleByID(ctx *gin.Context) (*ValueObject.ArticleVO, error)
-	CreateArticle(ctx *gin.Context) error
+	CreateArticle(ctx *gin.Context) (*ValueObject.ArticleVO, error)
 	UpdateArticleByID(ctx *gin.Context) error
 	DeleteArticleByID(ctx *gin.Context) error
 	GetArticlesByUserID(ctx *gin.Context) (*[]ValueObject.ArticleVO, error)
