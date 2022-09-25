@@ -45,6 +45,25 @@ type mapInfoListParams struct {
 	MapInfoList []mapInfo `json:"map_info_list,omitempty"`
 }
 
+// GetFacilityNameByID 施設IDから施設名を取得
+func (f *Facility) GetFacilityNameByID(c *gin.Context) (*ValueObject.FacilityVO, error) {
+	conn := f.conn
+	facilityID := c.Param("facilityID")
+
+	facility := ValueObject.FacilityVO{}
+
+	if err := conn.Debug().Table("facility").
+		Select("facility.id,facility.name").
+		Where("facility.id=?", facilityID).
+		First(&facility).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("サウナ情報が見つかりませんでした。")
+		}
+		return nil, fmt.Errorf("サウナ名取得に失敗しました。")
+	}
+	return &facility, nil
+}
+
 // GetFacilitiesByMapInfomation マップ情報から登録されている施設の基本情報を返す
 func (f *Facility) GetFacilitiesByMapInfomation(c *gin.Context) (*[]ValueObject.FacilityVO, error) {
 	conn := f.conn
@@ -103,6 +122,53 @@ func (f *Facility) GetFacilities(c *gin.Context) (*[]ValueObject.FacilityVO, err
 		Joins("left join city on city.id = address.city_id").Scan(&facilities)
 
 	return &facilities, nil
+}
+
+// CreateFacility implements port.FacilityRepository
+func (f *Facility) CreateFacility(c *gin.Context) error {
+	conn := f.conn
+	params := facilityParams{}
+	json.NewDecoder(c.Request.Body).Decode(&params)
+
+	if err := conn.Debug().Create(&params.Facility).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// GetFacilityByID implements port.FacilityRepository
+func (f *Facility) GetFacilityByID(c *gin.Context) (*ValueObject.FacilityVO, error) {
+	conn := f.conn
+	facilityID := c.Param("facilityID")
+
+	facility := ValueObject.FacilityVO{}
+
+	query := conn.Debug().Table("facility").
+		Select("facility.id,facility.name,prefecture.name || city.name || address.street_name AS address,facility.tel,facility.eigyo_start,facility.eigyo_end,facility.price,facility.lodging_flg,facility.restaurant_flg,facility.working_space_flg,facility.books_flg,facility.heat_wave_flg,facility.air_bath_flg,facility.break_space_flg, sauna.sauna_type, sauna.temperature, sauna.capacity, sauna.rouryu_flg, sauna.sauna_mat_flg, sauna.tv_flg, sauna.bgm_flg").
+		Joins("left join sauna on sauna.facility_id = facility.id").
+		Joins("left join address on address.facility_id = facility.id").
+		Joins("left join prefecture on prefecture.id = address.prefecture_id").
+		Joins("left join city on city.id = address.city_id").
+		Where("facility.id=?", facilityID)
+
+	query.Scan(&facility)
+
+	rows, err := query.Rows()
+	if err != nil {
+		return nil, fmt.Errorf("サウナ情報が見つかりませんでした。")
+	}
+
+	for rows.Next() {
+		sauna := ValueObject.Sauna{}
+
+		err := query.ScanRows(rows, &sauna)
+		if err != nil {
+			return nil, err
+		}
+		facility.Saunas = append(facility.Saunas, sauna)
+	}
+	return &facility, nil
 }
 
 // createPagingLimitQuery ページングの条件を付与する
@@ -183,53 +249,6 @@ func createFacilityWhereQuery(conn *gorm.DB, requestPrams url.Values) *gorm.DB {
 		query = query.Where("facility.heat_wave_flg = ?", requestPrams.Get("heat_wave_flg"))
 	}
 	return query
-}
-
-// CreateFacility implements port.FacilityRepository
-func (f *Facility) CreateFacility(c *gin.Context) error {
-	conn := f.conn
-	params := facilityParams{}
-	json.NewDecoder(c.Request.Body).Decode(&params)
-
-	if err := conn.Debug().Create(&params.Facility).Error; err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// GetFacilityByID implements port.FacilityRepository
-func (f *Facility) GetFacilityByID(c *gin.Context) (*ValueObject.FacilityVO, error) {
-	conn := f.conn
-	facilityID := c.Param("facilityID")
-
-	facility := ValueObject.FacilityVO{}
-
-	query := conn.Debug().Table("facility").
-		Select("facility.id,facility.name,prefecture.name || city.name || address.street_name AS address,facility.tel,facility.eigyo_start,facility.eigyo_end,facility.price,facility.lodging_flg,facility.restaurant_flg,facility.working_space_flg,facility.books_flg,facility.heat_wave_flg,facility.air_bath_flg,facility.break_space_flg, sauna.sauna_type, sauna.temperature, sauna.capacity, sauna.rouryu_flg, sauna.sauna_mat_flg, sauna.tv_flg, sauna.bgm_flg").
-		Joins("left join sauna on sauna.facility_id = facility.id").
-		Joins("left join address on address.facility_id = facility.id").
-		Joins("left join prefecture on prefecture.id = address.prefecture_id").
-		Joins("left join city on city.id = address.city_id").
-		Where("facility.id=?", facilityID)
-
-	query.Scan(&facility)
-
-	rows, err := query.Rows()
-	if err != nil {
-		return nil, err
-	}
-
-	for rows.Next() {
-		sauna := ValueObject.Sauna{}
-
-		err := query.ScanRows(rows, &sauna)
-		if err != nil {
-			return nil, err
-		}
-		facility.Saunas = append(facility.Saunas, sauna)
-	}
-	return &facility, nil
 }
 
 func NewFacilityRepository(c *gorm.DB) port.FacilityRepository {
