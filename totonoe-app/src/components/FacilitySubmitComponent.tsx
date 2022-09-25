@@ -7,18 +7,26 @@ import { useCookies } from 'react-cookie'
 import { useAuth0 } from '@auth0/auth0-react'
 import { SelectAddress } from './form-components/SelectAdress'
 import { TermsCheckBox } from './form-components/TermsCheckBox'
-import { IsRequiredCheckForm } from '../@types/Form'
-import { useNavigate } from 'react-router-dom'
+import { IsRequiredCheckFacilitySubmitForm } from '../@types/Form'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { toast } from 'react-toastify'
 const MinPrice = 1;
-
+interface MapInfo {
+    map_name: string,
+    map_lat: number,
+    map_lng: number,
+}
 export const FacilitySubmitComponent = () => {
     const navigate = useNavigate();
     const {getAccessTokenSilently, isAuthenticated, loginWithRedirect} = useAuth0();
     const [cookies, setCookie,removeCookie] = useCookies();
     const [validated, setValidated] = useState(false);
-    const [errors, setErrors] = useState<IsRequiredCheckForm>();
+    const [errors, setErrors] = useState<IsRequiredCheckFacilitySubmitForm>();
+    const location = useLocation();
+    const {map_name, map_lat, map_lng} = location.state as MapInfo;
+    const [latlngLiteral, setLatLngLiteral] = useState({lat: map_lat ? map_lat : null, lng: map_lng ? map_lng : null})
 
+    const getPlace
     // サウナState
     const [saunas, setSaunas] = useState<NewSauna[]>([
         {
@@ -45,7 +53,7 @@ export const FacilitySubmitComponent = () => {
     // 施設State
     const [facility, setFacilityState] = useState<NewFacility>({
         id: "",
-        name: "",
+        name: map_name ? map_name : "",
         price: 0,
         address: {
             prefecture_id: 0,
@@ -107,7 +115,7 @@ export const FacilitySubmitComponent = () => {
         const value = event.target.value;
 
         if(errors) {
-            if(errors[name as keyof IsRequiredCheckForm]) setErrors({...errors, [name]: null})
+            if(errors[name as keyof IsRequiredCheckFacilitySubmitForm]) setErrors({...errors, [name]: null})
         }
 
         // number型の更新の場合
@@ -205,7 +213,7 @@ export const FacilitySubmitComponent = () => {
     // 保存前入力チェック
     const validateForm = () => {
 
-        const newErrors: IsRequiredCheckForm = {
+        const newErrors: IsRequiredCheckFacilitySubmitForm = {
             name: "",
             prefecture: "",
             city: "",
@@ -271,7 +279,7 @@ export const FacilitySubmitComponent = () => {
                     })
                     .then((data) => {
                         console.log("登録成功", data)
-                        toast.success('新規登録が成功しました！');
+                        toast.success('サウナ施設の新規登録が成功しました！');
                         navigate('/');
                     })
             } catch (err)
