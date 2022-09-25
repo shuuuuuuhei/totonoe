@@ -28,12 +28,12 @@ func CheckUserByID(userID string, conn *gorm.DB) error {
 }
 
 // CheckFacilityByID サウナ存在チェック
-func CheckFacilityByID(saunaID uint32, conn *gorm.DB) error {
-	sauna := Domain.Facility{}
+func CheckFacilityByID(facilityID uint32, conn *gorm.DB) error {
+	facility := Domain.Facility{}
 
-	if err := conn.Where("id = ?", saunaID).First(&sauna).Error; err != nil {
+	if err := conn.Where("id = ?", facilityID).First(&facility).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return fmt.Errorf("サウナが見つかりませんでした = %d", saunaID)
+			return fmt.Errorf("サウナが見つかりませんでした = %d", facilityID)
 		}
 		log.Println(err)
 		return errors.New("Internal Server Error. adapter/common/CheckSaunaByID")
