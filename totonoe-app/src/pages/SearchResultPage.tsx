@@ -2,7 +2,7 @@ import React, { Component, Fragment, useState, useEffect, useRef } from 'react'
 import Dropdown from "react-bootstrap/Dropdown";
 import { DropdownButton, Pagination } from 'react-bootstrap';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
-import { FacilityList } from '../components/SaunaList';
+import { FacilityList } from '../components/FacilityList';
 import { SearchOption } from '../components/SearchOption';
 import { Link, useLocation } from 'react-router-dom';
 import { UndefinedOrNullConvertToEmpty, ConvertNaNToOne } from '../common/Convert';
