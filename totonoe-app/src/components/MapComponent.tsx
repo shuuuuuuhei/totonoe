@@ -4,8 +4,8 @@ import { GoogleMap, LoadScript, StandaloneSearchBox, Marker, InfoWindow } from "
 
 import "../style/Map.css"
 import { UndefinedOrNullConvertToEmpty, UndefinedConvertToZero } from '../common/Convert';
-import { useLocation } from 'react-router-dom';
-import { IsNullOrUndefined } from '../common/Check';
+import { useLocation, Link } from 'react-router-dom';
+import { IsNullOrUndefinedOrEmpty } from '../common/Check';
 
 type Position = {
     latlng_literal: google.maps.LatLngLiteral,
@@ -13,27 +13,10 @@ type Position = {
     showInfoWindow: boolean,
 }
 
-type FacilityMapInfo = {
-    id: string,
-    name: string,
-    price: number,
-    address: {
-        prefecture_id: number,
-        city_id: number,
-        street_name: string,
-    },
-    article_count: number,
-    location_index: number,
-    lat: number;
-    lng: number;
-    showInfoWindow: boolean,
-}
-
 type Libraries = ("drawing" | "geometry" | "localContext" | "places" | "visualization")[];
 
 const defaultZoom = 10;
 const containerStyle = {
-    width: "auto",
     height: "800px",
 };
 
@@ -182,6 +165,7 @@ const containerStyle = {
         if (status == google.maps.places.PlacesServiceStatus.OK && results !== null) {
             for(var i = 0; i < results.length; i++) {
                 var place = results[i];
+                console.log(results[i])
 
                 if(!place.geometry?.location?.toJSON()) {
                     break
@@ -193,6 +177,7 @@ const containerStyle = {
                 })
             }
         }
+        console.log(newLocationList)
         
         /**取得した緯度経度情報から施設情報を取得(まだ試行なし) */
         getFacilitiesInfo(newLocationList);
@@ -233,17 +218,34 @@ const containerStyle = {
     return(
         <Fragment>
             {/* <button onClick={fetchMap}>click here!</button> */}
-            <div className="container text-center">
-                <div className="row border-bottom">
-                    {facilityMapInfoList?.length}件表示
+            <div className="container text-center py-5">
+                <div className="row border-bottom text-start">
+                    <h5 className="py-2">{areaParams}の周辺にあるサウナ</h5>
                 </div>
                 <div className="row py-3">
-                    <div className="col-1 facility-list overflow-auto border py-4" style={containerStyle}>
-                        <h5 className="border-bottom">サウナ一覧</h5>
+                    <div className="facility-list overflow-auto border py-4 col-4" style={containerStyle}>
+                        <h5 className="border-bottom py-2">サウナ一覧({facilityMapInfoList?.length}件)</h5>
                         {facilityMapInfoList?.map((facility, index) => {
                             return(
                                 <div className="row text-start border-bottom py-2 search-facility" onMouseEnter={() => handleToShowedInfoWindow(index)} onMouseLeave={() => handleToNotShowedInfoWindow(index)}>
                                     <p className="m-0">{facility.name}</p>
+                                    {facility.id ?
+                                        <Link to={`/saunas/${facility.id}`}><p>施設情報を確認する</p></Link>
+                                        :
+                                            <div className="row">
+                                                <div className="col-6">
+                                                    施設情報なし
+                                                </div>
+                                                <div className="col-6" style={{fontSize: "12px"}}>
+                                                    <Link 
+                                                        to={`/saunas/new`}  
+                                                        state={{map_name: facility.name, map_lat: facility.lat, map_lng: facility.lng}}
+                                                    >
+                                                            ▶︎施設情報を登録する
+                                                    </Link>
+                                                </div>
+                                            </div>
+                                    }
                                 </div>
                             )
                         })}
@@ -270,7 +272,7 @@ const containerStyle = {
                                             {facility.showInfoWindow && infoStyle && <InfoWindow position={{lat: facility.lat, lng: facility.lng}} options={{pixelOffset: infoStyle}}>
                                                 <div>
                                                         <p>{facility.name}</p>
-                                                        {facility.id ? <p>サウナ情報あり</p> : <p>サウナ情報なし</p>}
+                                                        {facility.id ? <Link to={`/saunas/${facility.id}`}><p>施設情報を確認する</p></Link> : <p>施設情報なし</p>}
                                                 </div>
                                             </InfoWindow>
                                             }

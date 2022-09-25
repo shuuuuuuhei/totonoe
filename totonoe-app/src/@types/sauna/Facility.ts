@@ -46,3 +46,19 @@ type NewFacility = {
     water_baths: WaterBath[],
     amenities: Amenity[],
 }
+
+type FacilityMapInfo = {
+    id: string,
+    name: string,
+    price: number,
+    address: {
+        prefecture_id: number,
+        city_id: number,
+        street_name: string,
+    },
+    article_count: number,
+    location_index: number,
+    lat: number;
+    lng: number;
+    showInfoWindow: boolean,
+}
