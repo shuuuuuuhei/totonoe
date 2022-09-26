@@ -10,6 +10,7 @@ import { TermsCheckBox } from './form-components/TermsCheckBox'
 import { IsRequiredCheckFacilitySubmitForm } from '../@types/Form'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { IsNullOrUndefinedOrEmpty } from '../common/Check'
 const MinPrice = 1;
 interface MapInfo {
     map_name: string,
@@ -24,9 +25,8 @@ export const FacilitySubmitComponent = () => {
     const [errors, setErrors] = useState<IsRequiredCheckFacilitySubmitForm>();
     const location = useLocation();
     const {map_name, map_lat, map_lng} = location.state as MapInfo;
-    const [latlngLiteral, setLatLngLiteral] = useState({lat: map_lat ? map_lat : null, lng: map_lng ? map_lng : null})
+    const [latlngLiteral, setLatLngLiteral] = useState<google.maps.LatLngLiteral>({ lat: map_lat, lng: map_lng })
 
-    const getPlace
     // サウナState
     const [saunas, setSaunas] = useState<NewSauna[]>([
         {
@@ -93,6 +93,7 @@ export const FacilitySubmitComponent = () => {
 
     // 登録前にfacilityの更新を行うと最新のfacilityを登録できないので、useEffect内で該当の要素に変更があればfacilityの更新を行うようにする
     useEffect(() => {
+        getAddressByLatLng();
 
         setFacilityState((prevState) => ({
             ...prevState,
@@ -296,7 +297,31 @@ export const FacilitySubmitComponent = () => {
         }
     }
 
-    console.log(isAuthenticated)
+    const getAddressByLatLng = () => {
+
+        const geocoder = new google.maps.Geocoder();
+
+        if(IsNullOrUndefinedOrEmpty(latlngLiteral)) {
+            return
+        }
+        
+        geocoder.geocode({ location: latlngLiteral }, (results, status) => {
+            if(status === 'OK' && results) {
+                console.log(results[0])
+                const addressByGeocode = results[0].address_components;
+                const prefectureName = addressByGeocode[6].long_name;
+                const cityName = addressByGeocode[5].long_name;
+                const cityName2 = addressByGeocode[4].long_name;
+                const cityName3 = addressByGeocode[3].long_name + addressByGeocode[2].long_name + "-" + addressByGeocode[1].long_name + addressByGeocode[0].long_name;
+
+
+                console.log(prefectureName, cityName, cityName2, cityName3)
+                // const prefecture = addressByGeocode.replace(/^(.{2}[都道府県]|.{3}県)(.+)/)
+                // 日本、〒672-8057 兵庫県姫路市飾磨区恵美酒２７０−８
+            }
+        })
+    }
+
     return(
         <Fragment>
             <div className="container p-5">
