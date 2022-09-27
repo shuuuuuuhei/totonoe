@@ -236,14 +236,6 @@ const containerStyle = {
                                                 <div className="col-6">
                                                     施設情報なし
                                                 </div>
-                                                <div className="col-6" style={{fontSize: "12px"}}>
-                                                    <Link 
-                                                        to={`/saunas/new`}  
-                                                        state={{map_name: facility.name, map_lat: facility.lat, map_lng: facility.lng}}
-                                                    >
-                                                            ▶︎施設情報を登録する
-                                                    </Link>
-                                                </div>
                                             </div>
                                     }
                                 </div>
