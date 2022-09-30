@@ -241,6 +241,26 @@ export const FacilitySubmitComponent = () => {
         })
     }
 
+    const getLatLngLiteral = () => {
+        const geocoder = new google.maps.Geocoder();
+
+        // geocoder.geocode({address: address}, function(results, status) {
+        //     if(status === 'OK' && results !== null) {
+        //         const latlngLiteral = {
+        //             lat: results[0].geometry.location.lat(),
+        //             lng: results[0].geometry.location.lng(),
+        //         }
+
+        //         return latlngLiteral
+        //     }
+        // })
+    }
+
+    console.log()
+
+    /**
+     * 登録ボタン押下時に発火
+     */
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         
@@ -253,6 +273,10 @@ export const FacilitySubmitComponent = () => {
             returnPositionFromTop();
             return
         }
+
+        // 入力した住所から経度緯度を求める
+        const latlngLiteral = getLatLngLiteral();
+
 
         const fetchPostFacility = async() => {
             try {
