@@ -56,6 +56,9 @@ type FacilityMapInfo = {
         city_id: number,
         street_name: string,
     },
-    
-    articleCounts: number,
+    article_count: number,
+    location_index: number,
+    lat: number;
+    lng: number;
+    showInfoWindow: boolean,
 }

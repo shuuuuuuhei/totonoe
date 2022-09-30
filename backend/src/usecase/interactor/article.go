@@ -31,12 +31,12 @@ func (a *Article) GetArticleByID(ctx *gin.Context) {
 
 // CreateArticle Articleを作成する。Err or nilを返す
 func (a *Article) CreateArticle(ctx *gin.Context) {
-	err := a.ArticleRepo.CreateArticle(ctx)
+	article, err := a.ArticleRepo.CreateArticle(ctx)
 	if err != nil {
 		a.OutputPort.RenderError(err)
 		return
 	}
-	a.OutputPort.RenderOK(ctx)
+	a.OutputPort.RenderArticle(article)
 }
 
 // UpdateArticleByID ArticleRepositoryに登録されているUpdateArticleByIDを呼び出してArticleを更新してOutputPortに結果を渡す

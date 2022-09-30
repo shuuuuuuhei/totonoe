@@ -29,6 +29,6 @@ func NewConfig() *Config {
 	c.DB.Production.Username = "postgres"
 	c.DB.Production.Password = "postgres"
 	c.DB.Production.DBName = "totonoe"
-	c.Routing.Port = ":8080"
+	c.Routing.Port = ":5432"
 	return &c
 }

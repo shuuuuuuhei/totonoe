@@ -4,10 +4,10 @@ export type Article = {
     content: string,
     user_id: string,
     facility_id: string,
+    facility_name: string,
     user_name: string,
     like_count: number,
     comment_count: number,
-    facility_name: string,
     is_liked: boolean,
-    CreatedAt: string,
+    created_at: string,
 }

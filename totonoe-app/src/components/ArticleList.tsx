@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react'
-import '../style/Article-List.css'
 import { Article } from '../@types/article/Article';
 import { DetailArticle } from './Article';
 import { ArticleBox } from './ArticleBox';
@@ -8,10 +7,10 @@ type ArticlesProps = {
     articles: [Article]|undefined;
 }
 export const ArticleList: React.VFC<ArticlesProps> = ({articles}) => {
-    
+    console.log(articles)
     return (
         <Fragment>
-            <div className="article-list container">
+            <div className="article-list container p-5">
                 {articles?.map((article, key) => {
                     return(
                         <DetailArticle article={article}/>

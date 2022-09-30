@@ -18,7 +18,8 @@ type FacilityVO struct {
 	AirBathFlg      string          `json:"air_bath_flg,omitempty"`
 	BreakSpaceFlg   string          `json:"break_space_flg,omitempty"`
 	Saunas          []Sauna         `json:"saunas,omitempty"`
-	Latitude        decimal.Decimal `json:"latitude,omitempty"`
-	Longitude       decimal.Decimal `json:"longitude,omitempty"`
+	Lat             decimal.Decimal `json:"lat"`
+	Lng             decimal.Decimal `json:"lng"`
 	FullCount       uint            `json:"full_count,omitempty"`
+	ArticleCount    uint            `json:"article_count,omitempty"`
 }

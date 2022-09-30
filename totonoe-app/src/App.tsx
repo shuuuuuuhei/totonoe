@@ -10,8 +10,8 @@ import { ArticlePage } from './pages/ArticlePage';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useCookies } from 'react-cookie';
 import { SearchResultPage } from './pages/SearchResultPage';
-import { SaunaPage } from './pages/SaunaPage';
-import { SaunaSubmitPage } from './pages/SaunaSubmitPage';
+import { SaunaPage } from './pages/FacilityPage';
+import { SaunaSubmitPage } from './pages/FacilitySubmitPage';
 import { SearchMapPage } from './pages/SearchMapPage';
 
 function App() {
@@ -35,7 +35,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/profile/:userID" element={<ProfilePage/>}></Route>
           <Route path="/articles/new" element={<ArticlePostPage />}></Route>
-          <Route path="/saunas/:saunaID/articles/:articleID" element={<ArticlePage />}></Route>
+          <Route path="/saunas/:facilityID/articles/new" element={<ArticlePostPage />}></Route>
+          <Route path="/articles/:articleID" element={<ArticlePage />}></Route>
           <Route path="/search" element={<SearchResultPage />}></Route>
           <Route path="/saunas/:facilityID" element={<SaunaPage />}></Route>
           <Route path="/saunas/new/" element={<SaunaSubmitPage />}></Route>

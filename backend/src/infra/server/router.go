@@ -99,8 +99,11 @@ func (r *Routing) setRouting() {
 	// 市町村取得
 	r.Gin.GET("/prefecture/:prefectureID/cities", cityController.GetCitiesByPrefectureID)
 
-	// 施設取得
+	// 施設情報取得
 	r.Gin.GET("/facility/:facilityID", facilityController.GetFacilityByID)
+	
+	// 施設名取得
+	r.Gin.GET("/facility/:facilityID/facilityName", facilityController.GetFacilityNameyID)
 
 	// 記事取得
 	r.Gin.GET("/facilities/:facilityID/articles", articleController.GetArticleByFacilityID)

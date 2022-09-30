@@ -1,17 +1,18 @@
 version: '3'
 services: 
     db:
+        image: postgres:latest
         build:
             context: .
             dockerfile: ./db/Dockerfile
             args:
                 - DB_LANG=ja_JP
         environment:
-            - POSTGRES_USER=kamakurashuuhei
-            - POSTGRES_PASSWORD=1
-            - POSTGRES_DB=
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: totonoe
         ports:
-            - "5432:5432"
+            - 5432:5432
         restart: always
         volumes:
             - ./db:/usr/local/bin/postgres
@@ -39,5 +40,6 @@ services:
         tty: true
         volumes:
             - ./backend:/backend
-        # ports:
-        #     - 4000:4000
+        ports:
+            - 4000:4000
+        command: go run main.go

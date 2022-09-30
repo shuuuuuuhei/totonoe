@@ -10,6 +10,16 @@ type Facility struct {
 	FacilityRepo port.FacilityRepository
 }
 
+// GetFacilityNameByID implements port.FacilityInputPort
+func (f *Facility) GetFacilityNameByID(c *gin.Context) {
+	facility, err := f.FacilityRepo.GetFacilityNameByID(c)
+	if err != nil {
+		f.OutputPort.RenderError(err)
+		return
+	}
+	f.OutputPort.RenderFacility(facility)
+}
+
 // GetFacilitiesByMapInfomation マップ情報を受け取り、該当する施設情報を返す
 func (f *Facility) GetFacilitiesByMapInfomation(c *gin.Context) {
 	facilities, err := f.FacilityRepo.GetFacilitiesByMapInfomation(c)

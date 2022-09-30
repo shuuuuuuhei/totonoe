@@ -7,17 +7,23 @@ import { useCookies } from 'react-cookie'
 import { useAuth0 } from '@auth0/auth0-react'
 import { SelectAddress } from './form-components/SelectAdress'
 import { TermsCheckBox } from './form-components/TermsCheckBox'
-import { IsRequiredCheckForm } from '../@types/Form'
-import { useNavigate } from 'react-router-dom'
+import { IsRequiredCheckFacilitySubmitForm } from '../@types/Form'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { IsNullOrUndefinedOrEmpty } from '../common/Check'
+import { prefectureList } from '../utils/constants'
 const MinPrice = 1;
-
+interface MapInfo {
+    map_name: string | null,
+    map_lat: number | null,
+    map_lng: number | null,
+}
 export const FacilitySubmitComponent = () => {
     const navigate = useNavigate();
     const {getAccessTokenSilently, isAuthenticated, loginWithRedirect} = useAuth0();
     const [cookies, setCookie,removeCookie] = useCookies();
     const [validated, setValidated] = useState(false);
-    const [errors, setErrors] = useState<IsRequiredCheckForm>();
+    const [errors, setErrors] = useState<IsRequiredCheckFacilitySubmitForm>();
 
     // サウナState
     const [saunas, setSaunas] = useState<NewSauna[]>([
@@ -85,6 +91,7 @@ export const FacilitySubmitComponent = () => {
 
     // 登録前にfacilityの更新を行うと最新のfacilityを登録できないので、useEffect内で該当の要素に変更があればfacilityの更新を行うようにする
     useEffect(() => {
+        //getAddressByLatLng();
 
         setFacilityState((prevState) => ({
             ...prevState,
@@ -107,7 +114,7 @@ export const FacilitySubmitComponent = () => {
         const value = event.target.value;
 
         if(errors) {
-            if(errors[name as keyof IsRequiredCheckForm]) setErrors({...errors, [name]: null})
+            if(errors[name as keyof IsRequiredCheckFacilitySubmitForm]) setErrors({...errors, [name]: null})
         }
 
         // number型の更新の場合
@@ -205,7 +212,7 @@ export const FacilitySubmitComponent = () => {
     // 保存前入力チェック
     const validateForm = () => {
 
-        const newErrors: IsRequiredCheckForm = {
+        const newErrors: IsRequiredCheckFacilitySubmitForm = {
             name: "",
             prefecture: "",
             city: "",
@@ -234,6 +241,26 @@ export const FacilitySubmitComponent = () => {
         })
     }
 
+    const getLatLngLiteral = () => {
+        const geocoder = new google.maps.Geocoder();
+
+        // geocoder.geocode({address: address}, function(results, status) {
+        //     if(status === 'OK' && results !== null) {
+        //         const latlngLiteral = {
+        //             lat: results[0].geometry.location.lat(),
+        //             lng: results[0].geometry.location.lng(),
+        //         }
+
+        //         return latlngLiteral
+        //     }
+        // })
+    }
+
+    console.log()
+
+    /**
+     * 登録ボタン押下時に発火
+     */
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         
@@ -246,6 +273,10 @@ export const FacilitySubmitComponent = () => {
             returnPositionFromTop();
             return
         }
+
+        // 入力した住所から経度緯度を求める
+        const latlngLiteral = getLatLngLiteral();
+
 
         const fetchPostFacility = async() => {
             try {
@@ -271,7 +302,7 @@ export const FacilitySubmitComponent = () => {
                     })
                     .then((data) => {
                         console.log("登録成功", data)
-                        toast.success('新規登録が成功しました！');
+                        toast.success('サウナ施設の新規登録が成功しました！');
                         navigate('/');
                     })
             } catch (err)
@@ -288,7 +319,6 @@ export const FacilitySubmitComponent = () => {
         }
     }
 
-    console.log(isAuthenticated)
     return(
         <Fragment>
             <div className="container p-5">

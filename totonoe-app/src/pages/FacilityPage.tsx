@@ -98,7 +98,7 @@ export const SaunaPage = () => {
                     <li className="nav-item"><button id='nav-2' className="nav-link" onClick={handleClick}>投稿</button></li>
                     <li className="nav-item"><button id='nav-3' className="nav-link" onClick={handleClick}>評価</button></li>
                 </ul>
-                <div className="sauna-contents p-5">
+                <div className="sauna-contents">
                     {
                         (() => {
                             if(activeMode == 'nav-1') return( <SaunaDetail facility={facility}/> )

@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react'
 import { HiOutlinePencilAlt } from 'react-icons/hi'
 import { BsHeart } from 'react-icons/bs'
 import { Link } from 'react-router-dom'
-import { StrConvertStrTime, UndefinedOrNullConvertToEmpty } from '../common/Convert'
+import { StrConvertStrTime } from '../common/Convert'
 
 type FacilityListProps = {
     facilities: Facility[]
@@ -15,10 +15,13 @@ export const FacilityList = (props: FacilityListProps) => {
                     <div className="facility py-4">
                         <div className="row facility-top">
                             <div className="col-10 facility-name">
+                                {/* サウナ施設詳細ページリンク */}
                                 <Link to={'/saunas/'+facility.id}><h3>{facility.name}</h3></Link>
                             </div>
                             <div className="facility-action col-2 row">
-                                <HiOutlinePencilAlt size={40} className="col-6"/>
+                                {/* 投稿ページのリンク */}
+                                <Link to={`/saunas/${facility.id}/articles/new`} className="col-6"><HiOutlinePencilAlt size={40}/></Link>
+                                {/* お気に入り登録(未着手) */}
                                 <BsHeart size={35} className="col-6"/>
                             </div>
                             <p className="facility-address">{facility.address}</p>
@@ -30,7 +33,6 @@ export const FacilityList = (props: FacilityListProps) => {
                     </div>
                 )
             })}
-
         </Fragment>
     )
 }

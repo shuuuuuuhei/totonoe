@@ -13,6 +13,11 @@ type Facility struct {
 	Conn          *gorm.DB
 }
 
+func (f Facility) GetFacilityNameyID(c *gin.Context) {
+	inputport := f.newInputPort(c)
+	inputport.GetFacilityNameByID(c)
+}
+
 func (f Facility) GetFacilityByID(c *gin.Context) {
 	inputport := f.newInputPort(c)
 	inputport.GetFacilityByID(c)

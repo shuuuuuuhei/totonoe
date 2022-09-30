@@ -2,10 +2,7 @@ import React, { Component, Fragment, useState, useEffect, useRef } from 'react'
 import Dropdown from "react-bootstrap/Dropdown";
 import { DropdownButton, Pagination } from 'react-bootstrap';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
-import { ModalHover } from 'react-modal-hover'
-import { HiOutlinePencilAlt } from 'react-icons/hi';
-import { BsHeart } from 'react-icons/bs';
-import { FacilityList } from '../components/SaunaList';
+import { FacilityList } from '../components/FacilityList';
 import { SearchOption } from '../components/SearchOption';
 import { Link, useLocation } from 'react-router-dom';
 import { UndefinedOrNullConvertToEmpty, ConvertNaNToOne } from '../common/Convert';
@@ -205,7 +202,7 @@ export const SearchResultPage = () => {
 
         return(
             <Fragment>
-                <div className="border row container" style={{position: "absolute", top: "400px", left: "400px", backgroundColor: "white", width: "850px",}} onClick={() => setShow(false)}>
+                <div className="border row container" style={{position: "absolute", top: "400px", left: "380px", backgroundColor: "white", width: "850px",}} onClick={() => setShow(false)}>
                     {areaParams === '' ?
                     // 全国の都道府県を表示
                         detailAreaPrefectureList?.map((detailArea) => {
@@ -241,7 +238,7 @@ export const SearchResultPage = () => {
                                 <p className="border-bottom" style={{cursor: 'pointer', fontWeight: 'bold'}}>{areaParams === '' ? "全国" : areaParams}</p>
                                 {show && <AreaDetail />}
                             </div>
-                            <button><Link to='/map'>GoogleMapで探す</Link></button>
+                            <button><Link to={`/map?lang=jp&area=${areaParams}`}>GoogleMapで探す</Link></button>
                         </div>
                         <SearchOption handleSearch={handleSearch}/>
                     </div>
