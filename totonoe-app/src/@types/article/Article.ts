@@ -1,6 +1,5 @@
 export type Article = {
     id: number,
-    title: string,
     content: string,
     user_id: string,
     facility_id: string,

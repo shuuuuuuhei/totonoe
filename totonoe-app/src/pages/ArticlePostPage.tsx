@@ -90,7 +90,6 @@ export const ArticlePostPage = () => {
     const [facilityName, setFacilityName] = useState(getFacilityName(facilityID));
     const [article, setArticle] = useState<NewArticle>({
         ID: "",
-        Title: "",
         Content: "",
         UserID: "",
         SaunaID: "",

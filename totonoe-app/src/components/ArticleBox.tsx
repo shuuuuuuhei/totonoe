@@ -11,7 +11,6 @@ export const ArticleBox:React.VFC<ArticleBoxProps> = (props) => {
             <div className="card col-3">
                 <div className="card-body">
                     <div className="row">
-                        <h5 className="card-title col-4"><Link to={'saunas/'+props.article?.facility_id+'/articles/'+props.article?.id}>{props.article?.title}</Link></h5>
                         <p className="card-title col-3"><Link to={'profile/'+props.article?.user_id}>{props.article?.user_name}?テスト</Link></p>
                     </div>
                     <p className="card-text">{props.article?.content}</p>
