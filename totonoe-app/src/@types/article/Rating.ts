@@ -1,9 +1,9 @@
 export type RatingScore = {
-    totonoi_score: number,
-    relax_score: number,
-    price_score: number,
-    service_score: number,
-    ambience_score: number,
+    totonoi_score: number|undefined,
+    relax_score: number|undefined,
+    price_score: number|undefined,
+    service_score: number|undefined,
+    ambience_score: number|undefined,
 }
 
 export interface RatingProperty {
