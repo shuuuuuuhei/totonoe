@@ -6,6 +6,9 @@ import { FaRegCommentDots } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useCookies } from 'react-cookie'
+import { ratingList, precisionScore } from 'utils/constants'
+import { RatingScore, RatingOptionProps } from '../@types/article/Rating'
+import { Rating } from '@mui/material'
 
 type ArticleProps = {
     article: Article|undefined
@@ -15,6 +18,13 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
     const [article, setArticle] = useState<Article|undefined>(props.article);
     const {getAccessTokenSilently} = useAuth0();
     const [cookies, setCookie, removeCookie] = useCookies();
+    const ratingScore: RatingScore | undefined = {
+        totonoi_score: article?.totonoi_score,
+        relax_score: article?.relax_score,
+        price_score: article?.price_score,
+        service_score: article?.service_score,
+        ambience_score: article?.ambience_score,
+    }
 
     const handleLike = async() => {
         
@@ -27,7 +37,6 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
         if (!accessToken) {
             throw Error("アクセストークンがありません。");
         }
-
         
         // 未いいねの場合
         if(!article?.is_liked) {
@@ -96,10 +105,11 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
         }
         fetchUnLike();
     }
+    console.log(article)
 
     return(
         <Fragment>
-                <div className="article-wrap p-3 border container text-center my-3 p-5" style={{width: "800px"}}>
+                <div className="article-wrap border container text-center my-3 p-5" style={{width: "800px"}}>
                     <Link
                         to={`/articles/${article?.id}`}
                         style={{
@@ -132,8 +142,27 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
                         </div>
                     </div>
                     <div className="article-bottom row">
-                        <div className="col-5 article-evaluate">
-                            評価
+                        <div className="col-5 article-rating py-3">
+                            <p>評価</p>
+                                {ratingList.map((rating, index) => {
+                                    return(
+                                        <div className="row py-2">
+                                            <div className="col-3">
+                                                <p style={{fontSize: "9px"}}>{rating.name}</p>
+                                            </div>
+                                            <div className="col-4">
+                                                <Rating
+                                                    value={ratingScore[rating.id]}
+                                                    precision={precisionScore}
+                                                    readOnly
+                                                />
+                                            </div>
+                                            <div className="col-4">
+                                                {ratingScore[rating.id]}
+                                            </div>
+                                        </div>
+                                    )
+                                })}
                         </div>
                         <div className="col-7 article-content">
                             <div className="facility text-start">
