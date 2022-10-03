@@ -1,5 +1,5 @@
 import { useAuth0 } from '@auth0/auth0-react'
-import React, { Component, Fragment, useState } from 'react'
+import React, { Component, Fragment, useState, useEffect } from 'react'
 import { Form, Button } from 'react-bootstrap'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { Article } from '../@types/article/Article'
@@ -13,7 +13,7 @@ import DatePicker, { registerLocale } from "react-datepicker";
 import ja from 'date-fns/locale/ja';
 import "react-datepicker/dist/react-datepicker.css";
 import { RatingScore, RatingOptionProps } from '../@types/article/Rating'
-import { defaultScore, precisionScore, ratingList } from 'utils/constants'
+import { defaultScore, precisionScore, ratingList } from '../utils/constants'
 import { Rating } from '@mui/material';
 import Box from '@mui/material/Box';
 import StarIcon from '@mui/icons-material/Star';
@@ -44,7 +44,7 @@ const getLabelText = (value: number) => {
 }
 
 /**
- * サウナ施設 IDをリンクから受け取って施設情報と記事情報を紐づける処理を行う(紐付け処理は未着手)
+ * サウナ施設 IDをリンクから受け取って施設情報と記事情報を紐づける処理を行う
  */
 export const ArticlePostPage = () => {
     const {facilityID} = useParams();
@@ -87,10 +87,10 @@ export const ArticlePostPage = () => {
         fetchGetFacilityName();
     }
 
-    const [facilityName, setFacilityName] = useState(getFacilityName(facilityID));
+    const [facilityName, setFacilityName] = useState<string>();
     const [article, setArticle] = useState<NewArticle>({
         ID: "",
-        Content: "",
+        Content: ``,
         UserID: "",
         SaunaID: "",
     });
@@ -104,6 +104,11 @@ export const ArticlePostPage = () => {
         ambience_score: defaultScore,
         service_score: defaultScore,
     });
+
+    useEffect(() => {
+        // 施設名を取得する
+        getFacilityName(facilityID);
+    }, [])
     
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const name = event.target.name;
@@ -139,6 +144,7 @@ export const ArticlePostPage = () => {
                 },
                 body: JSON.stringify({article, 'user_id': cookies.userID, "facility_id": parseInt(UndefinedOrNullConvertToEmpty(facilityID)), "rating": rating})
             }
+            console.log(requestOption)
             fetch(uri, requestOption)
                 .then((response) => response.json())
                 .then(data => {
@@ -182,7 +188,7 @@ export const ArticlePostPage = () => {
         )
     }
 
-    console.log(rating)
+    console.log(article)
 
     return (
         <Fragment>
