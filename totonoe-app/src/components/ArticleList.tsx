@@ -7,7 +7,6 @@ type ArticlesProps = {
     articles: [Article]|undefined;
 }
 export const ArticleList: React.VFC<ArticlesProps> = ({articles}) => {
-    console.log(articles)
     return (
         <Fragment>
             <div className="article-list container p-5">

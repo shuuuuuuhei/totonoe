@@ -6,7 +6,7 @@ import { FaRegCommentDots } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useCookies } from 'react-cookie'
-import { ratingList, precisionScore } from 'utils/constants'
+import { ratingList, precisionScore } from '../utils/constants'
 import { RatingScore, RatingOptionProps } from '../@types/article/Rating'
 import { Rating } from '@mui/material'
 
@@ -25,6 +25,8 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
         service_score: article?.service_score,
         ambience_score: article?.ambience_score,
     }
+
+    console.log("test:",article)
 
     const handleLike = async() => {
         
@@ -128,6 +130,7 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
                                 </div>
                             </div>
                         </div>
+
                         <div className="col-3 article-right">
                             <div className="row text-end">
                                 <div className="col-6 article-like-count">
@@ -168,7 +171,10 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
                             <div className="facility text-start">
                                 <Link to={`/saunas/${article?.facility_id}`}><p className="m-0">{article?.facility_name}</p></Link>
                             </div>
-                            <p>{article?.content}</p>
+                            <div className="text-start py-3">
+                                {/* 改行コードを含む場合は<br/>に変換する */}
+                                <p>{article?.content.split('\n').map(t => (<span>{t}<br /></span>))}</p>
+                            </div>
                         </div>
                     </div>
                 </Link>
