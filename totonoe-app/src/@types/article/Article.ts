@@ -7,6 +7,11 @@ export type Article = {
     user_name: string,
     like_count: number,
     comment_count: number,
+    totonoi_score: number,
+    relax_score: number,
+    price_score: number,
+    service_score: number,
+    ambience_score: number,
     is_liked: boolean,
     created_at: string,
 }
