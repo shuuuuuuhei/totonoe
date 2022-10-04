@@ -7,6 +7,7 @@ import { SearchOption } from '../components/SearchOption';
 import { Link, useLocation } from 'react-router-dom';
 import { UndefinedOrNullConvertToEmpty, ConvertNaNToOne } from '../common/Convert';
 import { prefectureList } from '../utils/constants';
+import { Facility } from '../@types/sauna/Facility';
 
 const baseUri = 'http://localhost:4000/facilities?';
 const facilityCountPerPage = 20;

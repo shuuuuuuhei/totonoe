@@ -195,7 +195,6 @@ func (d *DB) CreateData() {
 
 	for i := 0; i < 10; i++ {
 		article := Domain.Article{}
-		article.Title = "test_" + strconv.Itoa(i)
 		article.Content = "content_" + strconv.Itoa(i)
 		article.FacilityID = 1
 		article.UserID = user.ID
@@ -223,7 +222,6 @@ func (d *DB) CreateData() {
 	}
 	for i := 0; i < 10; i++ {
 		article := Domain.Article{}
-		article.Title = "test2_" + strconv.Itoa(i)
 		article.Content = "content2_" + strconv.Itoa(i)
 		article.FacilityID = 1
 		article.UserID = tmpUser.ID

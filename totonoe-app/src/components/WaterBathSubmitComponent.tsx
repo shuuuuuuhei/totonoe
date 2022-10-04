@@ -1,6 +1,7 @@
 import React, { Fragment, useState } from 'react'
 import { Accordion, Button } from 'react-bootstrap'
 import { Input } from './form-components/Input'
+import { WaterBath } from '../@types/sauna/Waterbath'
 
 type waterBathSubmitComponentProps = {
     waterBath: WaterBath,

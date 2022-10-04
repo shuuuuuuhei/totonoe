@@ -1,3 +1,5 @@
+import { RatingProperty } from "../@types/article/Rating";
+
 /**
 * 都道府県リスト
 */
@@ -89,3 +91,34 @@ export const termsList = [
         name: "熱波師",
     },
 ];
+
+/**
+ * 評価用定数
+ */
+export const defaultScore = 3;
+export const MaxScore = 5;
+export const MinScore = 1;
+export const precisionScore = 0.5;
+
+export const ratingList:RatingProperty[]= [
+    {
+        name: "ととのい度",
+        id: 'totonoi_score',
+    },
+    {
+        name: "心地よさ",
+        id: 'relax_score',
+    },
+    {
+        name: "価格満足度",
+        id: 'price_score',
+    },
+    {
+        name: "雰囲気",
+        id: 'ambience_score',
+    },
+    {
+        name: "サービス",
+        id: 'service_score',
+    },
+]

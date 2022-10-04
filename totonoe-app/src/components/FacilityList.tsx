@@ -3,6 +3,7 @@ import { HiOutlinePencilAlt } from 'react-icons/hi'
 import { BsHeart } from 'react-icons/bs'
 import { Link } from 'react-router-dom'
 import { StrConvertStrTime } from '../common/Convert'
+import { Facility } from '../@types/sauna/Facility'
 
 type FacilityListProps = {
     facilities: Facility[]

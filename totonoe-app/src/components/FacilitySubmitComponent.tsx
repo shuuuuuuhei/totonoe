@@ -12,6 +12,9 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { IsNullOrUndefinedOrEmpty } from '../common/Check'
 import { prefectureList } from '../utils/constants'
+import { WaterBath } from '../@types/sauna/Waterbath'
+import { NewFacility } from '../@types/sauna/Facility'
+import { NewSauna } from '../@types/sauna/Sauna'
 const MinPrice = 1;
 interface MapInfo {
     map_name: string | null,

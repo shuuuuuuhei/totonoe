@@ -45,8 +45,7 @@ export const ArticlePage = () => {
                 }
                 return response.json();
             })
-            .then((resData) => {
-                console.log(resData)
+            .then((resData: Article) => {
                 setArticle(resData)
             })
             .catch(err => {

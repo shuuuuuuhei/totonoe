@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import { StrConvertStrTime, ConvertKBToMaruORHyphen, UndefinedOrNullConvertToEmpty } from '../common/Convert'
+import { Facility } from '../@types/sauna/Facility'
 
 type SaunaDetailProps = {
     facility: Facility|undefined

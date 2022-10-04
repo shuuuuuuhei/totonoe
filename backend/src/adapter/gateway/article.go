@@ -13,6 +13,7 @@ import (
 	"main.go/adapter/gateway/common"
 
 	"github.com/gin-gonic/gin"
+	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 
 	"main.go/usecase/port"
@@ -31,9 +32,16 @@ func NewArticleRepository(conn *gorm.DB) port.ArticleRepository {
 }
 
 type articleParams struct {
-	UserID     string `json:"user_id"`
-	Article    Domain.Article
-	FacilityID uint32 `json:"facility_id"`
+	UserID     string         `json:"user_id,omitempty"`
+	FacilityID uint32         `json:"facility_id,omitempty"`
+	Article    Domain.Article `json:"article,omitempty"`
+	Rating     struct {
+		TotonoiScore  decimal.NullDecimal `json:"totonoi_score,omitempty"`
+		RelaxScore    decimal.NullDecimal `json:"relax_score,omitempty"`
+		PriceScore    decimal.NullDecimal `json:"price_score,omitempty"`
+		ServiceScore  decimal.NullDecimal `json:"service_score,omitempty"`
+		AmbienceScore decimal.NullDecimal `json:"ambience_score,omitempty"`
+	} `json:"rating,omitempty"`
 }
 
 // GetArticleByID はDBからデータを取得
@@ -120,6 +128,12 @@ func (a *ArticleRepository) CreateArticle(c *gin.Context) (*ValueObject.ArticleV
 	article := params.Article
 	article.UserID = params.UserID
 	article.FacilityID = params.FacilityID
+
+	article.PriceScore = params.Rating.PriceScore
+	article.RelaxScore = params.Rating.RelaxScore
+	article.TotonoiScore = params.Rating.TotonoiScore
+	article.ServiceScore = params.Rating.ServiceScore
+	article.AmbienceScore = params.Rating.AmbienceScore
 
 	err := conn.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Debug().Create(&article).Error; err != nil {
@@ -310,11 +324,9 @@ func (a *ArticleRepository) DeleteArticleByID(c *gin.Context) error {
 
 // context.form からFormに入力された値を受け取る
 func newArticleFromForm(c *gin.Context) *Domain.Article {
-	title := c.PostForm("title")
 	content := c.PostForm("content")
 
 	return &Domain.Article{
 		Content: content,
-		Title:   title,
 	}
 }

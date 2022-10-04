@@ -6,6 +6,7 @@ import "../style/Map.css"
 import { UndefinedOrNullConvertToEmpty, UndefinedConvertToZero } from '../common/Convert';
 import { useLocation, Link } from 'react-router-dom';
 import { IsNullOrUndefinedOrEmpty } from '../common/Check';
+import { FacilityMapInfo } from '../@types/sauna/Facility';
 
 type Position = {
     latlng_literal: google.maps.LatLngLiteral,

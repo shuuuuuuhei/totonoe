@@ -83,7 +83,7 @@ export const Comments: React.VFC<CommentProps> = (props) => {
 
     return(
         <Fragment>
-            <div className="comment-wrap">
+            <div className="comment-wrap container p-5">
                 <h4 className="comment">コメント</h4>
                 <div className="comments">
                     {props.comments?.map((comment) => {
