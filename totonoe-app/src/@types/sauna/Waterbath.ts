@@ -1,4 +1,4 @@
-type WaterBath = {
+export type WaterBath = {
     id: string,
     facility_id: string,
     temperature: number,

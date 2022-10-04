@@ -17,6 +17,7 @@ import { defaultScore, precisionScore, ratingList } from '../utils/constants'
 import { Rating } from '@mui/material';
 import Box from '@mui/material/Box';
 import StarIcon from '@mui/icons-material/Star';
+import { Facility } from '../@types/sauna/Facility'
 
 type Data = {
     article: Article,

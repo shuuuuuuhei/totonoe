@@ -1,4 +1,4 @@
-type Sauna = {
+export type Sauna = {
     id: string,
     facility_id: string,
     sauna_type: number,
@@ -10,7 +10,7 @@ type Sauna = {
     sauna_mat_flg: string,
 }
 
-type NewSauna = {
+export type NewSauna = {
     id: string,
     facility_id: string,
     sauna_type: number,

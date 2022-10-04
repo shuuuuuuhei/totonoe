@@ -6,6 +6,7 @@ import { Article } from '../@types/article/Article';
 import { ArticleList } from '../components/ArticleList';
 import { HiOutlinePencilAlt } from 'react-icons/hi';
 import { BsHeart } from 'react-icons/bs';
+import { Facility } from '../@types/sauna/Facility';
 
 export const SaunaPage = () => {
 

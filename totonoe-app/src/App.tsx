@@ -41,6 +41,7 @@ function App() {
           <Route path="/saunas/:facilityID" element={<SaunaPage />}></Route>
           <Route path="/saunas/new/" element={<SaunaSubmitPage />}></Route>
           <Route path="/map" element={<SearchMapPage />}></Route>
+          <Route path="/singup" element={<SignUpPage />}></Route>
         </Routes>
       </div>
     </BrowserRouter>

@@ -1,4 +1,8 @@
-type Facility = {
+import { Amenity } from "./Amenity"
+import { NewSauna, Sauna } from "./Sauna"
+import { WaterBath } from "./Waterbath"
+
+export type Facility = {
     id: string
     name: string,
     address: string,
@@ -21,7 +25,7 @@ type Facility = {
     full_count: number,
 }
 
-type NewFacility = {
+export type NewFacility = {
     id: string,
     name: string,
     price: number,
@@ -47,7 +51,7 @@ type NewFacility = {
     amenities: Amenity[],
 }
 
-type FacilityMapInfo = {
+export type FacilityMapInfo = {
     id: string,
     name: string,
     price: number,
