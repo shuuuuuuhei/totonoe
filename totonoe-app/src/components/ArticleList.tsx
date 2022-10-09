@@ -1,7 +1,6 @@
-import React, { Fragment } from 'react'
+import React, { Fragment } from 'react';
 import { Article } from '../@types/article/Article';
 import { DetailArticle } from './Article';
-import { ArticleBox } from './ArticleBox';
 
 type ArticlesProps = {
     articles: [Article]|undefined;

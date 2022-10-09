@@ -1,11 +1,11 @@
 import { useAuth0 } from '@auth0/auth0-react'
-import React, { Component, Fragment, useEffect, useState } from 'react'
-import {Navigate, useParams} from 'react-router-dom'
+import React, { Fragment, useEffect, useState } from 'react'
+import { useCookies } from "react-cookie"
+import { Navigate, useParams } from 'react-router-dom'
 import { Article } from '../@types/article/Article'
 import { Profile } from '../@types/Profile'
 import { ArticleList } from '../components/ArticleList'
 import { ProfileComponent } from '../components/ProfileComponent'
-import { useCookies } from "react-cookie";
 
 export const ProfilePage = () => {
     const [profile, setProfile] = useState<Profile|null>();

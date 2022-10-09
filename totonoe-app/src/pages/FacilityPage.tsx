@@ -1,12 +1,12 @@
-import React, { Component, Fragment, useState, useEffect } from 'react'
+import React, { Fragment, useEffect, useState } from 'react';
+import { BsHeart } from 'react-icons/bs';
+import { HiOutlinePencilAlt } from 'react-icons/hi';
+import { Link, useParams } from 'react-router-dom';
+import { Article } from '../@types/article/Article';
+import { Facility } from '../@types/sauna/Facility';
+import { ArticleList } from '../components/ArticleList';
 import { SaunaDetail } from '../components/SaunaDetail';
 import { Valuation } from '../components/Valuation';
-import { useParams, Link } from 'react-router-dom';
-import { Article } from '../@types/article/Article';
-import { ArticleList } from '../components/ArticleList';
-import { HiOutlinePencilAlt } from 'react-icons/hi';
-import { BsHeart } from 'react-icons/bs';
-import { Facility } from '../@types/sauna/Facility';
 
 export const SaunaPage = () => {
 

@@ -1,13 +1,12 @@
-import React, { Component, Fragment, useState, useEffect, useRef } from 'react'
-import Dropdown from "react-bootstrap/Dropdown";
+import React, { Fragment, useEffect, useState } from 'react';
 import { DropdownButton, Pagination } from 'react-bootstrap';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
+import { Link, useLocation } from 'react-router-dom';
+import { Facility } from '../@types/sauna/Facility';
+import { ConvertNaNToOne, UndefinedOrNullConvertToEmpty } from '../common/Convert';
 import { FacilityList } from '../components/FacilityList';
 import { SearchOption } from '../components/SearchOption';
-import { Link, useLocation } from 'react-router-dom';
-import { UndefinedOrNullConvertToEmpty, ConvertNaNToOne } from '../common/Convert';
 import { prefectureList } from '../utils/constants';
-import { Facility } from '../@types/sauna/Facility';
 
 const baseUri = 'http://localhost:4000/facilities?';
 const facilityCountPerPage = 20;

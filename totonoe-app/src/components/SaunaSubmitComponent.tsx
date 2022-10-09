@@ -1,8 +1,7 @@
-import React, { Component, Fragment, useState, ChangeEvent } from 'react'
-import { Button, DropdownButton, Dropdown, ButtonGroup, Accordion, Form} from 'react-bootstrap'
-import { Input } from './form-components/Input'
-import { saunaTypeList, saunaOptions } from '../utils/constants';
+import React, { ChangeEvent, Fragment, useState } from 'react';
+import { Accordion, Button, Form } from 'react-bootstrap';
 import { NewSauna } from '../@types/sauna/Sauna';
+import { saunaOptions, saunaTypeList } from '../utils/constants';
 const MinCapacity = 1;
 
 type SaunaSubmitComponentProps = {

@@ -1,23 +1,36 @@
-import React, { Fragment } from 'react'
-import {Card, Button} from "react-bootstrap"
-import "../style/Header.css"
-import { HiOutlineLogin, HiOutlinePencilAlt } from "react-icons/hi";
-import { GiHotSpices } from "react-icons/gi";
-import { CgProfile } from "react-icons/cg";
-import { Link } from 'react-router-dom';
-import { IconContext } from 'react-icons';
 import { useAuth0 } from '@auth0/auth0-react';
+import React, { Fragment } from 'react';
+import { Button } from "react-bootstrap";
 import { useCookies } from 'react-cookie';
-import { ToastContainer, Zoom, toast } from 'react-toastify';
+import { IconContext } from 'react-icons';
+import { CgProfile } from "react-icons/cg";
+import { GiHotSpices } from "react-icons/gi";
+import { HiOutlineLogin, HiOutlinePencilAlt } from "react-icons/hi";
+import { Link } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import "../style/Header.css";
 
 export const Header = () => {
     const { loginWithRedirect, isAuthenticated, logout } = useAuth0();
     const [cookies, setCookie,removeCookie] = useCookies();
     
-    const authenticateUser = () => {
+    /**
+     * ユーザ認証機能
+     */
+    const authenticateUser = async() => {
         // 認証処理
-        loginWithRedirect()
+        try {
+       
+            const options = {
+              redirect_uri: window.location.origin,
+              audience: 'https://totonoe-app.com'
+            };
+    
+            await loginWithRedirect(options);
+          } catch (err) {
+            console.log("Log in failed", err);
+          }
     }
 
     const logoutUser = () => {
@@ -66,6 +79,7 @@ export const Header = () => {
                                 </Button>
                             </li>
                             :
+                            // サインアップ or ログイン
                                 <li className="col">
                                     <Button onClick={authenticateUser}>
                                         <HiOutlineLogin/>

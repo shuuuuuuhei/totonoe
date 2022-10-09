@@ -1,14 +1,14 @@
-import React, { Component, Fragment, useState } from 'react'
-import { Article } from '../@types/article/Article'
+import { useAuth0 } from '@auth0/auth0-react'
+import { Rating } from '@mui/material'
+import React, { Fragment, useState } from 'react'
+import { useCookies } from 'react-cookie'
+import { FaRegCommentDots } from 'react-icons/fa'
 import { GrLike } from 'react-icons/gr'
 import { MdInsertEmoticon } from 'react-icons/md'
-import { FaRegCommentDots } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
-import { useAuth0 } from '@auth0/auth0-react'
-import { useCookies } from 'react-cookie'
-import { ratingList, precisionScore } from '../utils/constants'
-import { RatingScore, RatingOptionProps } from '../@types/article/Rating'
-import { Rating } from '@mui/material'
+import { Article } from '../@types/article/Article'
+import { RatingScore } from '../@types/article/Rating'
+import { precisionScore, ratingList } from '../utils/constants'
 
 type ArticleProps = {
     article: Article|undefined

@@ -1,12 +1,10 @@
-import React, { Component, Fragment, useState, useEffect } from 'react'
-import axios from "axios"
-import { GoogleMap, LoadScript, StandaloneSearchBox, Marker, InfoWindow } from "@react-google-maps/api";
-
-import "../style/Map.css"
-import { UndefinedOrNullConvertToEmpty, UndefinedConvertToZero } from '../common/Convert';
-import { useLocation, Link } from 'react-router-dom';
-import { IsNullOrUndefinedOrEmpty } from '../common/Check';
+import { GoogleMap, InfoWindow, LoadScript, Marker } from "@react-google-maps/api";
+import React, { Fragment, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { FacilityMapInfo } from '../@types/sauna/Facility';
+import { UndefinedConvertToZero, UndefinedOrNullConvertToEmpty } from '../common/Convert';
+import "../style/Map.css";
+
 
 type Position = {
     latlng_literal: google.maps.LatLngLiteral,

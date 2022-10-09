@@ -1,11 +1,10 @@
-import React, { Component, Fragment, useState } from 'react'
-import { MdInsertEmoticon } from 'react-icons/md'
-import { Textarea } from './form-components/Textarea';
-import { Comment } from '../@types/article/Comment'
-import { NewComment } from '../@types/article/NewComment'
-import { useCookies } from 'react-cookie';
 import { useAuth0 } from '@auth0/auth0-react';
-import { Navigate } from 'react-router-dom';
+import React, { Fragment, useState } from 'react';
+import { useCookies } from 'react-cookie';
+import { MdInsertEmoticon } from 'react-icons/md';
+import { Comment } from '../@types/article/Comment';
+import { NewComment } from '../@types/article/NewComment';
+import { Textarea } from './form-components/Textarea';
 
 type CommentProps = {
     comments: Comment[] | undefined

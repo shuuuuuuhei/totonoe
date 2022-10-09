@@ -1,4 +1,10 @@
 {
     "typescript.tsdk": "node_modules/typescript/lib",
-    "compile-hero.disable-compile-files-on-did-save-code": false
+    "compile-hero.disable-compile-files-on-did-save-code": false,
+    // 保存したタイミングで不要なインポートを削除する
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": [
+        "source.addMissingImports",
+        "source.fixAll.eslint",
+    ],
 }

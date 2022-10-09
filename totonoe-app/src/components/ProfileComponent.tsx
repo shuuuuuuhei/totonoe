@@ -1,13 +1,12 @@
-import React, { Fragment, useEffect, useState, VFC } from 'react';
-import { Button } from 'react-bootstrap';
-import '../style/Profile.css'
-import {MdInsertEmoticon} from 'react-icons/md'
-import {CgDetailsMore} from 'react-icons/cg'
-import { Profile } from '../@types/Profile';
-import { Navigate } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
+import React, { Fragment } from 'react';
+import { Button } from 'react-bootstrap';
 import { useCookies } from 'react-cookie';
+import { CgDetailsMore } from 'react-icons/cg';
+import { MdInsertEmoticon } from 'react-icons/md';
+import { Profile } from '../@types/Profile';
 import { UndefinedConvertToZero } from '../common/Convert';
+import '../style/Profile.css';
 
 type profileProps = {
     profile: Profile|undefined
