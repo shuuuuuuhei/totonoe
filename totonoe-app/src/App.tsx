@@ -12,82 +12,97 @@ import { ProfilePage } from './pages/ProfilePage';
 import { SearchMapPage } from './pages/SearchMapPage';
 import { SearchResultPage } from './pages/SearchResultPage';
 import { SignUpPage } from './pages/SignUpPage';
+import { toast } from 'react-toastify'
 
 
 function App() {
-  const {user, getIdTokenClaims, getAccessTokenSilently} = useAuth0();
-  const [loginCount, setLoginCount] = useState(0);
+  const { user, getIdTokenClaims, getAccessTokenWithPopup, isAuthenticated } = useAuth0();
   const [cookies, setCookie, removeCookie] = useCookies();
+  const [isSignUpped, setIsSignUpped] = useState(false);
 
-  const getUserInfo = async() => {
-    const user = await getIdTokenClaims();
-    setLoginCount(user?.loginCount);
-  }
+  // 無駄なレンダリングを検知する
+  // if (process.env.NODE_ENV !== 'production') {
+  //   const {whyDidYouUpdate} = require('why-did-you-update')
+  //   whyDidYouUpdate(React)
+  // }
 
-  getUserInfo();
-  console.log("ログイン回数：",user?.loginCount)
   /**
    * ユーザを新規登録する
    */
-  const fetchSubmitUser = async() => {
+  const fetchSubmitUser = async () => {
 
     const uri = "http://localhost:4000/signup";
-    const accessToken = await getAccessTokenSilently({
-        audience: 'https://totonoe-app.com',
-        scope: 'read:posts',
+    const accessToken = await getAccessTokenWithPopup({
+      audience: 'https://totonoe-app.com',
+      scope: 'read:current_user',
     });
+
+    if (!accessToken) {
+      throw Error("アクセストークンがありません。");
+    }
+
     const submitUser = {
       id: userID,
       name: user?.name,
-      email: user?.email
+      email: user?.email,
     }
-    console.log(submitUser)
+
     const requestOption: RequestInit = {
-        method: "POST",
-        mode: "cors",
-        headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-            "User-ID": cookies.userID,
-        },
-        body: JSON.stringify({'user_id':submitUser.id, 'name':submitUser.name, 'email': submitUser.email })
+      method: "POST",
+      mode: "cors",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+        "User-ID": cookies.userID,
+      },
+      body: JSON.stringify({ 'user_id': submitUser.id, 'name': submitUser.name, 'email': submitUser.email })
     };
     fetch(uri, requestOption)
       .then((response) => {
-          if (!response.ok) {
-              const err = new Error;
-              console.log(response);
-              err.message = "ユーザ登録に失敗しました。レスポンスコード：" + response.status;
-              throw err;
-          }
-          return response.json();
+        if (!response.ok) {
+          const err = new Error;
+          console.log(response);
+          err.message = "ユーザ登録に失敗しました。レスポンスコード：" + response.status + response.statusText;
+          throw err;
+        }
+        return response.json();
       })
       .then(() => {
-          
+        setIsSignUpped(true);
+        toast.success('ユーザ登録が完了しました！');
       })
       .catch(err => {
-          console.log(err)
-      });       
+        toast.warning(err)
+      });
+  }
+
+  /**
+   * ユーザIDをクッキー情報として登録する
+   */
+  const setUserInfoCookie = () => {
+    var now = new Date();
+    now.setTime(now.getTime() + 1 * 3600 * 1000);
+    setCookie("userID", userID, { expires: now, path: '/' });
   }
 
   const userID = user?.sub?.split('|').at(1);
+  console.log(userID, isAuthenticated)
   useEffect(() => {
-    if(typeof cookies.userID == 'undefined' && typeof userID !== 'undefined') {
-      var now = new Date();
-      now.setTime(now.getTime() + 1 * 3600 * 1000);
-      setCookie("userID", userID, { expires: now, path: '/' })
+    if (typeof cookies.userID == 'undefined' && isAuthenticated) {
+      setUserInfoCookie();
     }
 
     // ログイン回数が初回の場合はユーザ新規登録を行う
-    if(user?.loginCount === 1) {
-      console.log("test")
+    if (user?.loginCount === 1 && !isSignUpped) {
       // サインアップ
       fetchSubmitUser().then(() => {
         console.log("success sign up!");
       })
-      .catch(() => {
-        console.log("失敗")
-      })
+        .catch(() => {
+          console.log("失敗")
+        })
+    } else if(isAuthenticated) {
+      toast.success('おかえりなさい！');
     }
 
   }, [userID])
@@ -95,11 +110,11 @@ function App() {
 
   return (
     <BrowserRouter>
-    <Header />
+      <Header />
       <div>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/profile/:userID" element={<ProfilePage/>}></Route>
+          <Route path="/profile/:userID" element={<ProfilePage />}></Route>
           <Route path="/articles/new" element={<ArticlePostPage />}></Route>
           <Route path="/saunas/:facilityID/articles/new" element={<ArticlePostPage />}></Route>
           <Route path="/articles/:articleID" element={<ArticlePage />}></Route>
