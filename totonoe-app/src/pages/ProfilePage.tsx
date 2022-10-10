@@ -113,8 +113,16 @@ export const ProfilePage = () => {
 
     return (
         <Fragment>
-            <ProfileComponent profile={profile} setProfile={setProfile} />
-            <ArticleList articles={articles} />
+            <div className="container">
+                <div className="row py-5">
+                    <div className="col-4 py-5">
+                        <ProfileComponent profile={profile} setProfile={setProfile} />
+                    </div>
+                    <div className="col-8">
+                        <ArticleList articles={articles} />
+                    </div>
+                </div>
+            </div>
         </Fragment>
     )
 }
