@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+
 	"main.go/model/Domain"
 	"main.go/model/ValueObject"
 
@@ -24,9 +25,9 @@ type User struct {
 // Params クライアントパラメータ
 type userParams struct {
 	UserID      string `json:"user_id"`
-	FollowingID string `json:"following_id"`
+	Name        string `json:"name"`
 	Email       string `json:"email"`
-	NickName    string `json:"nickname"`
+	FollowingID string `json:"following_id"`
 }
 
 const (
@@ -159,22 +160,34 @@ func (u *User) Unfollow(c *gin.Context) error {
 	return nil
 }
 
-func (u *User) SignUp(c *gin.Context) (*Domain.User, error) {
+// ユーザ情報をDBに登録する
+func (u *User) SignUp(c *gin.Context) error {
 	conn := u.conn
 	var params userParams
-	json.NewDecoder(c.Request.Body).Decode(&params)
+	var isExists bool
+		json.NewDecoder(c.Request.Body).Decode(&params)
 
+	// リクエスト情報から登録ユーザを作成
 	user, err := newUserByParams(params)
-
 	if err != nil {
-		return nil, fmt.Errorf("パラメータに不備がありました。パラメータ：%w", err)
+		return fmt.Errorf("パラメータに不備がありました。パラメータ：%w", err)
 	}
 
-	if err = conn.Select("user_id", "email", "name").Create(&user).Error; err != nil {
-		return nil, err
+	// ユーザが登録済かどうかチェックを行う
+	if err = conn.Table("user").Select("count(*) > 0").Where("id=?", user.ID).Find(&isExists).Error; err != nil {
+		return err
 	}
 
-	return user, nil
+	if isExists {
+		return fmt.Errorf("ユーザIDが登録済みです。%s", user.ID)
+	}
+
+	// ユーザ登録
+	if err = conn.Debug().Create(&user).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func newUserByParams(p userParams) (*Domain.User, error) {
@@ -187,26 +200,24 @@ func newUserByParams(p userParams) (*Domain.User, error) {
 	}
 
 	return &Domain.User{
-		ID:    "",
-		Name:  p.NickName,
+		ID:    p.UserID,
+		Name:  p.Name,
 		Email: p.Email,
 	}, nil
 }
 
-// タイプ別パラメータ存在チェック
+// パラメータ存在チェック
 func checkParams(p userParams) error {
 
-	// switch p.ParamsType {
-	// case SIGN_UP:
-	// 	if p.ID == "" {
-	// 		return errors.New("ID(パラメータ)がありません")
-	// 	}
-	// 	if p.Name == "" {
-	// 		return errors.New("Name(パラメータ)がありません")
-	// 	}
-	// 	if p.Email == "" {
-	// 		return errors.New("Email(パラメータ)がありません")
-	// 	}
-	// }
+	if p.UserID == "" {
+		return errors.New("ID(パラメータ)がありません")
+	}
+	if p.Name == "" {
+		return errors.New("Name(パラメータ)がありません")
+	}
+	if p.Email == "" {
+		return errors.New("Email(パラメータ)がありません")
+	}
+
 	return nil
 }

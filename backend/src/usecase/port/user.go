@@ -2,7 +2,6 @@ package port
 
 import (
 	"github.com/gin-gonic/gin"
-	"main.go/model/Domain"
 	"main.go/model/ValueObject"
 )
 
@@ -11,6 +10,7 @@ type UserInputPort interface {
 	GetProfile(c *gin.Context)
 	Follow(c *gin.Context)
 	Unfollow(c *gin.Context)
+	SignUp(c *gin.Context)
 }
 
 // UserOutputPort ResponseWriter
@@ -25,5 +25,5 @@ type UserRepository interface {
 	GetProfile(c *gin.Context) (*ValueObject.ProfileVO, error)
 	Follow(c *gin.Context) error
 	Unfollow(c *gin.Context) error
-	SignUp(c *gin.Context) (*Domain.User, error)
+	SignUp(c *gin.Context) error
 }

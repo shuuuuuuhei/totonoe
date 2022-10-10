@@ -10,11 +10,14 @@ type User struct {
 	UserRepo   port.UserRepository
 }
 
-func NewUserInport(o port.UserOutputPort, u port.UserRepository) port.UserInputPort {
-	return &User{
-		OutputPort: o,
-		UserRepo:   u,
+// SignUp ユーザ新規登録機能
+func (u *User) SignUp(c *gin.Context) {
+	err := u.UserRepo.SignUp(c)
+	if err != nil {
+		u.OutputPort.RenderError(err)
+		return
 	}
+	u.OutputPort.RenderOK()
 }
 
 // GetProfile repository ユーザログイン機能を呼び出す。結果をOutputportに渡す。
@@ -45,4 +48,11 @@ func (u User) Unfollow(c *gin.Context) {
 		return
 	}
 	u.OutputPort.RenderOK()
+}
+
+func NewUserInport(o port.UserOutputPort, u port.UserRepository) port.UserInputPort {
+	return &User{
+		OutputPort: o,
+		UserRepo:   u,
+	}
 }

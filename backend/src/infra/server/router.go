@@ -135,6 +135,7 @@ func (r *Routing) setRouting() {
 	r.Gin.POST("/profile", userController.GetProfile)
 	r.Gin.POST("/follow", userController.Follow)
 	r.Gin.POST("/unfollow", userController.Unfollow)
+	r.Gin.POST("/signup", userController.SingUp)
 
 	// 記事コメント
 	r.Gin.GET("/articles/:articleID/comments", commentController.GetAllCommentsByArticleID)
