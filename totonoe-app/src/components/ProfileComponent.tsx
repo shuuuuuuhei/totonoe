@@ -6,7 +6,6 @@ import { CgDetailsMore } from 'react-icons/cg';
 import { MdInsertEmoticon } from 'react-icons/md';
 import { Profile } from '../@types/Profile';
 import { UndefinedConvertToZero } from '../common/Convert';
-import '../style/Profile.css';
 
 type profileProps = {
     profile: Profile|undefined
@@ -82,47 +81,50 @@ export const ProfileComponent: React.VFC<profileProps> = ({profile, setProfile})
 
     return (
         <Fragment>
-            <h3>Profile</h3>
-            <div className="container profile-wrap">
-                <div className="user-info">
-                    <div className="row justify-content-center">
-                        <div className="col-1 user-image">
-                            <MdInsertEmoticon size={50}/>
-                        </div>
-                        <div className="col-2 user-name">
-                            <div className="name">
-                                name:
-                                {profile?.nick_name}
-                            </div>
-                            <div className="email">
-                                @yamada
+            <div className="border py-5 text-center">
+                <div className="container profile-wrap">
+                    <div className="user-info">
+                        <div className="row">
+                            <div className="user-image">
+                                <MdInsertEmoticon size={50}/>
                             </div>
                         </div>
-                        <div className="col-4 follow-wrap float-right">
-                                {profile?.is_me
-                                    ? ""
-                                    :
-                                    profile?.is_following ?
-                                        <div className="follow-btn">
-                                            <Button onClick={handleUnfollow}>フォロー中</Button>
-                                            <CgDetailsMore />
-                                        </div>
-                                    :
-                                        <div className="follow-btn">
-                                            <Button onClick={handleFollow}>フォローする</Button>
-                                            <CgDetailsMore />
-                                        </div>
-                                        
-                                }
-                            <div className="follow-info row">
-                                <p className="col-6">フォロワー{profile?.followed_count ? profile?.followed_count : 0}人</p>
-                                <p className="col-6">フォロー{profile?.following_count ? profile?.following_count : 0}人</p>
+                        <div className="row">
+                            <div className="user-name">
+                                <div className="name">
+                                    name:
+                                    {profile?.nick_name}
+                                </div>
+                                <div className="email">
+                                    @yamada
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div className="row justify-content-center">
-                        <div className="user-introduce">
-                            {profile?.introduction}
+                        <div className="row">
+                            <p>投稿数：10件</p>
+                        </div>
+                        <div className="row py-3 border-bottom">
+                            {profile?.is_me
+                                ? ""
+                                :
+                                profile?.is_following ?
+                                    <div className="follow-btn">
+                                        <Button onClick={handleUnfollow}>フォロー中</Button>
+                                    </div>
+                                :
+                                    <div className="follow-btn">
+                                        <Button onClick={handleFollow}>フォローする</Button>
+                                    </div>
+                            }
+                        </div>
+                        <div className="follow-info row py-3 ">
+                            <p className="col-6">フォロワー{profile?.followed_count ? profile?.followed_count : 0}人</p>
+                            <p className="col-6">フォロー{profile?.following_count ? profile?.following_count : 0}人</p>
+                        </div>
+                        <div className="row">
+                            <div className="user-introduce">
+                                {profile?.introduction}
+                            </div>
                         </div>
                     </div>
                 </div>
