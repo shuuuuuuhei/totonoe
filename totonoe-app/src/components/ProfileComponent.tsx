@@ -92,7 +92,6 @@ export const ProfileComponent: React.VFC<profileProps> = ({profile, setProfile})
                         <div className="row">
                             <div className="user-name">
                                 <div className="name">
-                                    name:
                                     {profile?.nick_name}
                                 </div>
                                 <div className="email">
