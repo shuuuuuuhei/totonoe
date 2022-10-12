@@ -1,5 +1,5 @@
 import { useAuth0 } from '@auth0/auth0-react';
-import React, { Fragment } from 'react';
+import React, { Fragment, useState } from 'react';
 import { Button } from "react-bootstrap";
 import { useCookies } from 'react-cookie';
 import { IconContext } from 'react-icons';
@@ -10,10 +10,12 @@ import { Link } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "../style/Header.css";
-
+import { MdOutlineLogin } from 'react-icons/md';
+import { toast } from 'react-toastify'
 export const Header = () => {
-    const { loginWithRedirect, isAuthenticated, logout } = useAuth0();
+    const { loginWithRedirect, isAuthenticated, logout, user } = useAuth0();
     const [cookies, setCookie,removeCookie] = useCookies();
+    const [isShowedUserContents, setIsShowedUserContents] = useState(false);
     
     /**
      * ユーザ認証機能
@@ -21,21 +23,19 @@ export const Header = () => {
     const authenticateUser = async() => {
         // 認証処理
         try {
-       
-            const options = {
-              redirect_uri: window.location.origin,
-              audience: 'https://totonoe-app.com'
-            };
-    
-            await loginWithRedirect(options);
-          } catch (err) {
+            await loginWithRedirect();
+        } catch (err) {
             console.log("Log in failed", err);
-          }
+        }
     }
 
     const logoutUser = () => {
-        removeCookie("userID",{path:'/'});
-        logout({returnTo: window.location.origin});
+        try {
+            removeCookie("userID",{path:'/'});
+            logout({returnTo: window.location.origin});
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     const contextClass = {
@@ -66,31 +66,56 @@ export const Header = () => {
                     <div className="header-top-left">
                         <Link to={'saunas/new'}><GiHotSpices size={50} /></Link>
                     </div>
-                    <ul className="header-top-right row">
+                    <div className="row text-end">
                         <IconContext.Provider value={{ color: '#000000', size: '50' }}>
-                            {isAuthenticated || typeof cookies.userID != 'undefined'? 
-                            <li className="col">
-                                <Link to={'profile/'+cookies.userID}><CgProfile /></Link>
-                                <Button 
-                                    onClick={logoutUser}
-                                    variant="outline-primary"
-                                >
-                                    ログアウト
-                                </Button>
-                            </li>
+                            {typeof cookies.userID != 'undefined'? 
+                            <div>
+                                <CgProfile onClick={() => setIsShowedUserContents(!isShowedUserContents)} style={{cursor: "pointer"}}/>
+                                {
+                                    // ログイン済み
+                                    isShowedUserContents && 
+                                    <div className="row border py-3 px-2 text-center" style={{position: "absolute",right: "20px", width: "150px", backgroundColor: "white"}}>
+                                        <div className="row p-0">
+                                            <div className="col-4 text-center">
+                                                <CgProfile size={40}/>
+                                            </div>
+                                            <div className="col-8 text-start py-2">
+                                                <p style={{fontSize: "12px"}}>{user.name}</p>
+                                            </div>
+                                        </div>
+                                        <Link to={"profile/"+cookies.userID} className="my-2 p-0">
+                                            <Button 
+                                                variant="outline-warning"
+                                                className="px-4"
+                                                onClick={() => setIsShowedUserContents(!isShowedUserContents)}
+                                            >
+                                                マイページ
+                                            </Button>
+                                        </Link>
+                                        <Button 
+                                            variant="outline-warning"
+                                            className="my-2"
+                                        >
+                                            設定
+                                        </Button>
+                                        <Button 
+                                            onClick={logoutUser}
+                                            variant="outline-warning"
+                                            className="my-2"
+                                        >
+                                            ログアウト
+                                        </Button>
+                                    </div>
+                                }
+                            </div>
                             :
                             // サインアップ or ログイン
                                 <li className="col">
-                                    <Button onClick={authenticateUser}>
-                                        <HiOutlineLogin/>
-                                    </Button>
+                                    <MdOutlineLogin onClick={authenticateUser} cursor="pointer"/>
                                 </li>
                             }
-                            <li className="col">
-                                <Link to="/articles/new"><HiOutlinePencilAlt /></Link>
-                            </li>
                         </IconContext.Provider>
-                    </ul>
+                    </div>
                 </div>
                 <div className="d-flex justify-content-center">
                     <div className="header-title">
