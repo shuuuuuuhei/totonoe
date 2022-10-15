@@ -55,12 +55,12 @@ func (u *User) GetProfile(c *gin.Context) (*ValueObject.ProfileVO, error) {
 
 	profile := ValueObject.ProfileVO{}
 
-	if err := conn.Debug().Table(`"profile"`).
-		Select(`profile.id, profile.user_id, profile.nick_name, profile.introduction, count(tbl_following.user_id) AS following_count, count(tbl_followed.following_id) AS followed_count`).
-		Joins(`left join user_relation_ship tbl_following on tbl_following.user_id = profile.user_id`).
-		Joins(`left join user_relation_ship tbl_followed on tbl_followed.following_id = profile.user_id`).
-		Where(`profile.user_id = ?`, params.UserID).
-		Group(`profile.id, profile.user_id, profile.nick_name, profile.introduction`).
+	if err := conn.Debug().Table(`"user"`).
+		Select(`"user".id, "user"."name", "user".introduction, count(tbl_following.user_id) AS following_count, count(tbl_followed.following_id) AS followed_count`).
+		Joins(`left join user_relation_ship tbl_following on tbl_following.user_id = "user".id`).
+		Joins(`left join user_relation_ship tbl_followed on tbl_followed.following_id = "user".id`).
+		Where(`"user".id = ?`, params.UserID).
+		Group(`"user".id, "user"."name", "user".introduction`).
 		Scan(&profile).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("プロフィールが見つかりませんでした。 user_id = %s", params.UserID)
@@ -70,7 +70,7 @@ func (u *User) GetProfile(c *gin.Context) (*ValueObject.ProfileVO, error) {
 	}
 
 	// Me?
-	profile.IsMe = common.IsMe(profile.UserID, token)
+	profile.IsMe = common.IsMe(profile.ID, token)
 
 	// フォローチェック
 	if !profile.IsMe {
@@ -165,7 +165,7 @@ func (u *User) SignUp(c *gin.Context) error {
 	conn := u.conn
 	var params userParams
 	var isExists bool
-		json.NewDecoder(c.Request.Body).Decode(&params)
+	json.NewDecoder(c.Request.Body).Decode(&params)
 
 	// リクエスト情報から登録ユーザを作成
 	user, err := newUserByParams(params)
