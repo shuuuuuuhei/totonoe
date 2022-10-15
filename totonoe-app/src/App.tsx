@@ -14,7 +14,6 @@ import { SearchResultPage } from './pages/SearchResultPage';
 import { SignUpPage } from './pages/SignUpPage';
 import { toast } from 'react-toastify'
 
-
 function App() {
   const { user, getIdTokenClaims, getAccessTokenWithPopup, isAuthenticated } = useAuth0();
   const [cookies, setCookie, removeCookie] = useCookies();
@@ -101,12 +100,10 @@ function App() {
         .catch(() => {
           console.log("失敗")
         })
-    } else if(isAuthenticated) {
+    } else if (isAuthenticated) {
       toast.success('おかえりなさい！');
     }
-
   }, [userID])
-
 
   return (
     <BrowserRouter>
