@@ -79,6 +79,8 @@ export const ProfileComponent: React.VFC<profileProps> = ({profile, setProfile})
         }
     }
 
+    console.log(useCookies)
+
     return (
         <Fragment>
             <div className="border py-5 text-center">
@@ -92,10 +94,7 @@ export const ProfileComponent: React.VFC<profileProps> = ({profile, setProfile})
                         <div className="row">
                             <div className="user-name">
                                 <div className="name">
-                                    {profile?.nick_name}
-                                </div>
-                                <div className="email">
-                                    @yamada
+                                    {profile?.name}
                                 </div>
                             </div>
                         </div>
