@@ -68,7 +68,7 @@ export const Header = () => {
                                     {
                                         // ログイン済み
                                         isShowedUserContents &&
-                                        <div className="row border py-3 px-4 text-center" style={{ position: "absolute", right: "20px", width: "250px", backgroundColor: "white" }}>
+                                        <div className="row border py-3 px-4 text-center" style={{ position: "absolute", right: "20px", width: "250px", backgroundColor: "white" }} onClick={() => setIsShowedUserContents(!isShowedUserContents)}>
                                             <div className="row p-0">
                                                 <div className="col-4 text-center">
                                                     <CgProfile size={40} />
@@ -81,19 +81,19 @@ export const Header = () => {
                                             <Link to={"profile/" + cookies.userID} className="my-2 p-0">
                                                 <Button
                                                     variant="outline-warning"
-                                                    style={{ width: "auto" }}
                                                     className="px-4"
-                                                    onClick={() => setIsShowedUserContents(!isShowedUserContents)}
                                                 >
                                                     マイページ
                                             </Button>
                                             </Link>
-                                            <Button
-                                                variant="outline-warning"
-                                                className="my-2"
-                                            >
-                                                設定
-                                        </Button>
+                                            <Link to={"setting/profile"}>
+                                                <Button
+                                                    variant="outline-warning"
+                                                    className="my-2 px-4"
+                                                >
+                                                    設定
+                                                </Button>
+                                            </Link>
                                             <Button
                                                 onClick={logoutUser}
                                                 variant="outline-warning"
