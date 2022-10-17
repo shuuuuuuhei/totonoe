@@ -21,7 +21,7 @@ import { defaultScore, precisionScore, ratingList } from '../utils/constants'
 
 type Data = {
     article: Article,
-    user_id: string|undefined,
+    user_id: string | undefined,
 }
 
 const baseUri = "http://localhost:4000/"
@@ -48,20 +48,20 @@ const getLabelText = (value: number) => {
  * サウナ施設 IDをリンクから受け取って施設情報と記事情報を紐づける処理を行う
  */
 export const ArticlePostPage = () => {
-    const {facilityID} = useParams();
+    const { facilityID } = useParams();
     const navigate = useNavigate();
-    
+
     /**
      * @param id facilityID
      * facilityIDから施設名を取得する
      */
     const getFacilityName = (id: string | undefined) => {
 
-        if(IsNullOrUndefinedOrEmpty(id)) {
+        if (IsNullOrUndefinedOrEmpty(id)) {
             return "";
         }
 
-        const fetchGetFacilityName = async() => {
+        const fetchGetFacilityName = async () => {
             const uri = baseUri + `facility/${id}/facilityName`;
             const requestOption: RequestInit = {
                 method: "GET",
@@ -72,7 +72,7 @@ export const ArticlePostPage = () => {
 
             await fetch(uri, requestOption)
                 .then((response) => {
-                    if(!response.ok) {
+                    if (!response.ok) {
                         throw new Error(response.status + "施設名の取得に失敗しました。")
                     }
                     return response.json();
@@ -80,9 +80,9 @@ export const ArticlePostPage = () => {
                 .then((facility: Facility) => {
                     setFacilityName(facility.name)
                 })
-            .catch(err => {
-                console.log(err)
-            });
+                .catch(err => {
+                    console.log(err)
+                });
         }
 
         fetchGetFacilityName();
@@ -96,8 +96,8 @@ export const ArticlePostPage = () => {
         SaunaID: "",
     });
 
-    const {getAccessTokenSilently} = useAuth0();
-    const [cookies, setCookie,removeCookie] = useCookies();
+    const { getAccessTokenSilently } = useAuth0();
+    const [cookies, setCookie, removeCookie] = useCookies();
     const [rating, setRatingScore] = useState<RatingScore>({
         totonoi_score: defaultScore,
         relax_score: defaultScore,
@@ -110,7 +110,7 @@ export const ArticlePostPage = () => {
         // 施設名を取得する
         getFacilityName(facilityID);
     }, [])
-    
+
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const name = event.target.name;
         const value = event.target.value;
@@ -122,14 +122,14 @@ export const ArticlePostPage = () => {
         console.log(article)
     }
 
-    const handleSubmit = async(evt: any) => {
+    const handleSubmit = async (evt: any) => {
         evt.preventDefault();
 
-        if(!cookies.userID) return
-        
+        if (!cookies.userID) return
+
         // facilityIDが空文字もしくはUndefinedなら処理終了
-        if(IsNullOrUndefinedOrEmpty(facilityID)) return
-       
+        if (IsNullOrUndefinedOrEmpty(facilityID)) return
+
         console.log(facilityID)
         try {
             const uri = baseUri + "articles/new";
@@ -138,12 +138,12 @@ export const ArticlePostPage = () => {
                 scope: 'read:posts',
             })
             const requestOption: RequestInit = {
-            method: "POST",
+                method: "POST",
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({article, 'user_id': cookies.userID, "facility_id": parseInt(UndefinedOrNullConvertToEmpty(facilityID)), "rating": rating})
+                body: JSON.stringify({ article, 'user_id': cookies.userID, "facility_id": parseInt(UndefinedOrNullConvertToEmpty(facilityID)), "rating": rating })
             }
             console.log(requestOption)
             fetch(uri, requestOption)
@@ -153,8 +153,8 @@ export const ArticlePostPage = () => {
                     navigate(`/articles/${data.id}`);
                 })
         }
-        catch(error) {
-            console.log("エラー",error)
+        catch (error) {
+            console.log("エラー", error)
         }
     }
     const [startDate, setStartDate] = useState(new Date());
@@ -171,7 +171,7 @@ export const ArticlePostPage = () => {
             })
         }
 
-        return(
+        return (
             <>
                 <Rating
                     className="col-1"
@@ -179,13 +179,13 @@ export const ArticlePostPage = () => {
                     defaultValue={defaultScore}
                     precision={precisionScore}
                     getLabelText={getLabelText}
-                    onChange={(event, newValue) => {handleScore(newValue)}}
+                    onChange={(event, newValue) => { handleScore(newValue) }}
                     emptyIcon={<StarIcon style={{ opacity: 0.55 }} fontSize="inherit" />}
                 />
                 {rating[ratingOptionProps.id] !== null && (
                     <Box className="col-2 py-1" sx={{ ml: 2 }}>{rating[ratingOptionProps.id]}</Box>
                 )}
-        </>
+            </>
         )
     }
 
@@ -200,9 +200,9 @@ export const ArticlePostPage = () => {
                 <div className="row visited-date text-start py-4">
                     <div className="col-1">訪問日</div>
                     <div className="col-1">
-                        <DatePicker 
+                        <DatePicker
                             selected={startDate}
-                            onChange={(date:Date) => setStartDate(date)}
+                            onChange={(date: Date) => setStartDate(date)}
                             dateFormat="yyyy/MM/dd"
                             locale='ja'
                         />
@@ -210,25 +210,25 @@ export const ArticlePostPage = () => {
                 </div>
                 <Form onSubmit={handleSubmit}>
                     <Form.Group className="form-content">
-                        <Form.Control 
-                                as="textarea"
-                                className="input-sm"
-                                name="Content"
-                                value={article.Content}
-                                onChange={handleChange}
-                                placeholder="ととのいを"
-                                required={true}
-                                rows={10}
+                        <Form.Control
+                            as="textarea"
+                            className="input-sm"
+                            name="Content"
+                            value={article.Content}
+                            onChange={handleChange}
+                            placeholder="ととのいを共有"
+                            required={true}
+                            rows={10}
                         />
                     </Form.Group>
                     <div className="text-start">
                         {ratingList.map((rating, index) => {
-                            return(
+                            return (
                                 <div className="row py-3">
                                     <div className="col-2">
                                         <p>{rating.name}</p>
                                     </div>
-                                    <RatingForm id={rating.id}/>
+                                    <RatingForm id={rating.id} />
                                 </div>
                             )
                         })}
