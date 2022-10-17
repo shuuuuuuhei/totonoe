@@ -13,6 +13,7 @@ import { SearchMapPage } from './pages/SearchMapPage';
 import { SearchResultPage } from './pages/SearchResultPage';
 import { SignUpPage } from './pages/SignUpPage';
 import { toast } from 'react-toastify'
+import { UserSettingPage } from './pages/UserSettingPage';
 
 function App() {
   const { user, getIdTokenClaims, getAccessTokenWithPopup, isAuthenticated } = useAuth0();
@@ -120,6 +121,7 @@ function App() {
           <Route path="/saunas/new/" element={<SaunaSubmitPage />}></Route>
           <Route path="/map" element={<SearchMapPage />}></Route>
           <Route path="/signup" element={<SignUpPage />}></Route>
+          <Route path="/setting/profile" element={<UserSettingPage />}></Route>
         </Routes>
       </div>
     </BrowserRouter>
