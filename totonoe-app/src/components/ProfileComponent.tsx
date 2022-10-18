@@ -8,15 +8,15 @@ import { Profile } from '../@types/Profile';
 import { UndefinedConvertToZero } from '../common/Convert';
 
 type profileProps = {
-    profile: Profile|undefined
+    profile: Profile | undefined
     setProfile: React.Dispatch<React.SetStateAction<Profile | null | undefined>>
 }
-export const ProfileComponent: React.VFC<profileProps> = ({profile, setProfile}) => {
-    const {getAccessTokenSilently} = useAuth0();
+export const ProfileComponent: React.VFC<profileProps> = ({ profile, setProfile }) => {
+    const { getAccessTokenSilently } = useAuth0();
     const [cookies, setCookie, removeCookie] = useCookies();
 
-    const handleFollow = async() => {
-        if(!cookies.userID) {
+    const handleFollow = async () => {
+        if (!cookies.userID) {
             return
         }
         try {
@@ -26,29 +26,29 @@ export const ProfileComponent: React.VFC<profileProps> = ({profile, setProfile})
                 scope: 'read:posts',
             })
             const requestOption: RequestInit = {
-            method: "POST",
+                method: "POST",
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({'user_id': cookies.userID, "following_id": profile?.user_id})
+                body: JSON.stringify({ 'user_id': cookies.userID, "following_id": profile?.user_id })
             }
             fetch(uri, requestOption)
                 .then((response) => response.json())
                 .then(data => {
                     console.log("prev:", profile?.followed_count)
                     setProfile((prevState) => (
-                        prevState ? { ...prevState, is_following: true, followed_count: UndefinedConvertToZero(prevState.followed_count) + 1,} : null
+                        prevState ? { ...prevState, is_following: true, followed_count: UndefinedConvertToZero(prevState.followed_count) + 1, } : null
                     ))
                 })
         }
-        catch(err) {
-            console.log("エラー",err)
+        catch (err) {
+            console.log("エラー", err)
         }
     }
 
-    const handleUnfollow = async() => {
-        if(!cookies.userID) {
+    const handleUnfollow = async () => {
+        if (!cookies.userID) {
             return
         }
 
@@ -59,23 +59,23 @@ export const ProfileComponent: React.VFC<profileProps> = ({profile, setProfile})
                 scope: 'read:posts',
             })
             const requestOption: RequestInit = {
-            method: "POST",
+                method: "POST",
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({'user_id': cookies.userID, "following_id": profile?.user_id})
+                body: JSON.stringify({ 'user_id': cookies.userID, "following_id": profile?.user_id })
             }
             fetch(uri, requestOption)
                 .then((response) => response.json())
                 .then(data => {
                     setProfile((prevState) => (
-                        prevState && prevState.followed_count ? { ...prevState, is_following: false, followed_count: prevState.followed_count - 1,} : null
+                        prevState && prevState.followed_count ? { ...prevState, is_following: false, followed_count: prevState.followed_count - 1, } : null
                     ))
-            })
+                })
         }
-        catch(err) {
-            console.log("エラー",err)
+        catch (err) {
+            console.log("エラー", err)
         }
     }
 
@@ -88,7 +88,7 @@ export const ProfileComponent: React.VFC<profileProps> = ({profile, setProfile})
                     <div className="user-info">
                         <div className="row">
                             <div className="user-image">
-                                <MdInsertEmoticon size={50}/>
+                                <MdInsertEmoticon size={50} />
                             </div>
                         </div>
                         <div className="row">
@@ -109,7 +109,7 @@ export const ProfileComponent: React.VFC<profileProps> = ({profile, setProfile})
                                     <div className="follow-btn">
                                         <Button onClick={handleUnfollow}>フォロー中</Button>
                                     </div>
-                                :
+                                    :
                                     <div className="follow-btn">
                                         <Button onClick={handleFollow}>フォローする</Button>
                                     </div>
