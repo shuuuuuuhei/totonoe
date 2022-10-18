@@ -66,13 +66,12 @@ func createNewLogger() logger.Interface {
 
 // DBMigrate DBマイグレーションを行う
 func (d *DB) DBMigrate() {
-	err := d.Connection.Migrator().DropTable(Domain.User{}, Domain.Profile{}, Domain.Article{}, Domain.Facility{}, Domain.Comment{}, Domain.ArticleLike{}, Domain.UserRelationShip{}, Domain.Sauna{}, Domain.WaterBath{}, Domain.Address{})
+	err := d.Connection.Migrator().DropTable(Domain.User{}, Domain.Article{}, Domain.Facility{}, Domain.Comment{}, Domain.ArticleLike{}, Domain.UserRelationShip{}, Domain.Sauna{}, Domain.WaterBath{}, Domain.Address{}, Domain.Authorization{})
 	fmt.Println("delete: ", err)
 	err = d.Connection.AutoMigrate(Domain.Facility{})
 	fmt.Println("migrate: ", err)
 	err = d.Connection.AutoMigrate(Domain.User{})
 	fmt.Println("migrate: ", err)
-	err = d.Connection.AutoMigrate(Domain.Profile{})
 	fmt.Println("migrate: ", err)
 	err = d.Connection.AutoMigrate(Domain.Article{})
 	fmt.Println("migrate: ", err)
@@ -90,6 +89,8 @@ func (d *DB) DBMigrate() {
 	fmt.Println("migrate: ", err)
 	err = d.Connection.AutoMigrate(Domain.WaterBath{})
 	fmt.Println("migrate: ", err)
+	err = d.Connection.AutoMigrate(Domain.Authorization{})
+	fmt.Println("migrate: ", err)
 
 }
 
@@ -100,18 +101,12 @@ func (d *DB) CreateData() {
 	user.Email = "aaa@test.com"
 	user.Name = "test"
 	user.ID = "103026814924860204848"
+	user.Introduction = "サウナは月20回いきます！"
 	if err := d.Connection.Create(&user).Error; err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	profile := Domain.Profile{}
-	profile.NickName = "test"
-	profile.Introduction = "こんちは"
-	profile.UserID = user.ID
-	if err := d.Connection.Create(&profile).Error; err != nil {
-		fmt.Println(err)
-	}
 	cityList := []Domain.City{}
 	d.Connection.Debug().Table("prefecture").Select("prefecture.id AS prefecture_id, city.id AS ID").Joins("left join city on city.prefecture_id = prefecture.id").Scan(&cityList)
 
@@ -174,16 +169,8 @@ func (d *DB) CreateData() {
 	tmpUser.ID = "test"
 	tmpUser.Email = "bbb@test.com"
 	tmpUser.Name = "test_2"
+	tmpUser.Introduction = "サウナは週4で通います！"
 	if err := d.Connection.Create(&tmpUser).Error; err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	profile2 := Domain.Profile{}
-	profile2.NickName = "test2"
-	profile2.Introduction = "こんちは2"
-	profile2.UserID = tmpUser.ID
-	if err := d.Connection.Create(&profile2).Error; err != nil {
 		fmt.Println(err)
 		return
 	}

@@ -82,8 +82,14 @@ func (r *Routing) setRouting() {
 	cityController := controller.City{
 		InputFactory:  interactor.NewCityInputPort,
 		OutputFactory: presenter.NewCityOutputPort,
-		RepoFactory: gateway.NewCityRepository,
-		Conn:       r.DB.Connection,
+		RepoFactory:   gateway.NewCityRepository,
+		Conn:          r.DB.Connection,
+	}
+
+	authorizationController := controller.Authorization{
+		InputPortFactory:  interactor.NewAuthorizationInputPort,
+		OutputPortFactory: presenter.NewAuthorizationOutputPort,
+		RepositoryFactory: gateway.NewAuthorizationRepository,
 	}
 
 	r.Gin.Use(corsMiddleware())
@@ -101,7 +107,7 @@ func (r *Routing) setRouting() {
 
 	// 施設情報取得
 	r.Gin.GET("/facility/:facilityID", facilityController.GetFacilityByID)
-	
+
 	// 施設名取得
 	r.Gin.GET("/facility/:facilityID/facilityName", facilityController.GetFacilityNameyID)
 
@@ -119,7 +125,6 @@ func (r *Routing) setRouting() {
 
 	// サウナ施設
 	r.Gin.POST("/facilities/new", facilityController.CreateFacility)
-	
 
 	// 記事
 	r.Gin.GET("/users/:userID/articles/", articleController.GetArticlesByUserID)
@@ -136,6 +141,7 @@ func (r *Routing) setRouting() {
 	r.Gin.POST("/follow", userController.Follow)
 	r.Gin.POST("/unfollow", userController.Unfollow)
 	r.Gin.POST("/signup", userController.SingUp)
+	r.Gin.PUT("/profile", userController.UpdateProfile)
 
 	// 記事コメント
 	r.Gin.GET("/articles/:articleID/comments", commentController.GetAllCommentsByArticleID)
@@ -143,6 +149,11 @@ func (r *Routing) setRouting() {
 	r.Gin.POST("/articles/:articleID/comments/new", commentController.CreateComment)
 	r.Gin.DELETE("/articles/:articleID/comment/new", commentController.DeleteComment)
 
+	// 施設投稿権限申請登録処理
+	r.Gin.POST("/authorization/post/facilities", authorizationController.ApplySubmitFacilityAuth)
+
+	// 申請処理
+	r.Gin.POST("/authorization/certification", authorizationController.CertificationAuth)
 }
 
 // corsMiddleware CORSの設定

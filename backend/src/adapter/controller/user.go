@@ -38,6 +38,13 @@ func (u *User) SingUp(c *gin.Context) {
 	inputport := u.newInputport(c)
 	inputport.SignUp(c)
 }
+
+// プロフィール更新
+func (u *User) UpdateProfile(c *gin.Context) {
+	inputport := u.newInputport(c)
+	inputport.UpdateProfile(c)
+}
+
 func (u *User) newInputport(c *gin.Context) port.UserInputPort {
 	outputport := u.OutputFactory(c)
 	repository := u.RepositoryFactory(u.Conn)

@@ -10,6 +10,18 @@ type User struct {
 	UserRepo   port.UserRepository
 }
 
+// UpdateProfile プロフィール更新処理
+func (u *User) UpdateProfile(c *gin.Context) {
+	err := u.UserRepo.UpdateProfile(c)
+
+	if err != nil {
+		u.OutputPort.RenderError(err)
+		return
+	}
+
+	u.OutputPort.RenderOK()
+}
+
 // SignUp ユーザ新規登録機能
 func (u *User) SignUp(c *gin.Context) {
 	err := u.UserRepo.SignUp(c)
