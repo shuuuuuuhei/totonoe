@@ -1,11 +1,191 @@
-import React, { Component, Fragment } from 'react'
+import React, { Component, Fragment, useState, useEffect, ChangeEvent } from 'react'
 import { Form } from 'react-bootstrap'
+import { Profile } from '../@types/Profile';
+import { UndefinedOrNullConvertToEmpty } from '../common/Convert';
+import { useAuth0 } from '@auth0/auth0-react';
+import { useCookies } from 'react-cookie';
+import { Button } from '@mui/material';
+import { IsNullOrUndefinedOrEmpty } from '../common/Check';
 
 export const SettingProfileComponent = () => {
+    const [introduction, setIntroduction] = useState("");
+    const [familyName, setFamilyName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const { getAccessTokenSilently } = useAuth0();
+    const [cookies, setCookie, removeCookie] = useCookies();
+
+    /**
+     * プロフィール情報取得
+     */
+    const getFetchProfile = async () => {
+        const uri = "http://localhost:4000/profile";
+        const accessToken = await getAccessTokenSilently({
+            audience: 'https://totonoe-app.com',
+            scope: 'read:posts',
+        });
+
+        if (!accessToken) {
+            throw Error("アクセストークンがありません。");
+        }
+
+        const requestOption: RequestInit = {
+            method: "POST",
+            mode: "cors",
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+                "User-ID": cookies.userID,
+            },
+            body: JSON.stringify({
+                user_id: cookies.userID,
+            })
+        };
+        await fetch(uri, requestOption)
+            .then((response) => {
+                if (!response.ok) {
+                    const err = new Error;
+                    err.message = "プロフィールが見つかりませんでした。" + response.status;
+                    throw err;
+                }
+                return response.json();
+            })
+            .then((resData: Profile) => {
+                setFamilyName(resData.family_name)
+                setLastName(resData.last_name)
+                setIntroduction(resData.introduction)
+                console.log(resData);
+            })
+            .catch(err => {
+                console.log(err)
+            });
+    }
+
+    /**
+     * 姓変更ハンドラ
+     * @param event 
+     */
+    const handleFamilyNameChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const newFamilyName = event.target.value;
+        setFamilyName(newFamilyName);
+    }
+
+    /**
+     * 名変更ハンドラ
+     * @param event 
+     */
+    const handleLastNameChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const newLastName = event.target.value;
+        setLastName(newLastName);
+    }
+    /**
+     * 自己紹介変更ハンドラ
+     * @param event 
+     */
+    const handleIntroductionChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const newIntroduction = event.target.value;
+        setIntroduction(newIntroduction);
+    }
+
+
+    useEffect(() => {
+        console.log("test");
+
+        //プロフィール情報の取得
+        getFetchProfile();
+    }, [])
+
+    /**
+     * プロフィール情報更新ハンドラ
+     */
+    const handleUpdateProfile = () => {
+        try {
+
+            // チェック処理
+            //const err = checkUpdateParams();
+
+            // if (err) {
+            //     throw err;
+            // }
+            //更新処理
+            updateFetchProfile();
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    /**
+     * 更新パラメータチェック処理
+     */
+    const checkUpdateParams = () => {
+
+        if (IsNullOrUndefinedOrEmpty(familyName)) {
+            return new Error("姓がない");
+        }
+        if (IsNullOrUndefinedOrEmpty(lastName)) {
+            return new Error("名がない");
+        }
+        if (IsNullOrUndefinedOrEmpty(introduction)) {
+            return new Error("自己紹介がない");
+        }
+
+        return
+    }
+
+
+    /**
+     * プロフィール更新処理
+     */
+    const updateFetchProfile = async () => {
+        const uri = "http://localhost:4000/profile";
+        const accessToken = await getAccessTokenSilently({
+            audience: 'https://totonoe-app.com',
+            scope: 'read:posts',
+        });
+
+        if (!accessToken) {
+            throw Error("アクセストークンがありません。");
+        }
+
+        const requestOption: RequestInit = {
+            method: "PUT",
+            mode: "cors",
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+                "User-ID": cookies.userID,
+            },
+            body: JSON.stringify({
+                user_id: cookies.userID,
+                family_name: familyName,
+                last_name: lastName,
+                introduction: introduction,
+            })
+        };
+        await fetch(uri, requestOption)
+            .then((response) => {
+                if (!response.ok) {
+                    const err = new Error;
+                    err.message = "プロフィールが更新できませんでした" + response.text;
+                    throw err;
+                }
+                return response.json();
+            })
+            .then((resData: Profile) => {
+                setFamilyName(resData.family_name)
+                setLastName(resData.last_name)
+                setIntroduction(resData.introduction)
+                console.log(resData);
+            })
+            .catch(err => {
+                console.log(err)
+            });
+    }
+
     return (
         <Fragment>
             <div className="setting-top">
-                公開プロフィール
+                <h4>公開プロフィール</h4>
             </div>
             <div className="profile-name row py-3">
                 <Form.Label>名前</Form.Label>
@@ -14,6 +194,8 @@ export const SettingProfileComponent = () => {
                         type="text"
                         className="input-sm"
                         placeholder="姓"
+                        value={familyName}
+                        onChange={handleFamilyNameChange}
                     />
                     <Form.Control.Feedback type='invalid'></Form.Control.Feedback>
                 </Form.Group>
@@ -22,6 +204,8 @@ export const SettingProfileComponent = () => {
                         type="text"
                         className="input-sm"
                         placeholder="名"
+                        value={lastName}
+                        onChange={handleLastNameChange}
                     />
                     <Form.Control.Feedback type='invalid'></Form.Control.Feedback>
                 </Form.Group>
@@ -35,9 +219,19 @@ export const SettingProfileComponent = () => {
                         name="Content"
                         required={true}
                         rows={10}
+                        value={introduction}
+                        onChange={handleIntroductionChange}
                     />
                 </Form.Group>
             </div>
+            <Button
+                color='primary'
+                variant='outlined'
+                className="col-3 my-2"
+                onClick={handleUpdateProfile}
+            >
+                更新
+            </Button>
         </Fragment>
     )
 }
