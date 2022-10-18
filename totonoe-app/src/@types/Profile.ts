@@ -7,4 +7,6 @@ export type Profile = {
     is_me: boolean
     is_following: boolean
     introduction: string
+    family_name: string
+    last_name: string
 }
