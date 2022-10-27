@@ -30,6 +30,13 @@ type userParams struct {
 	FollowingID string `json:"following_id"`
 }
 
+type profileUpdateParams struct {
+	UserID       string `json:"user_id"`
+	FamilyName   string `json:"family_name"`
+	LastName     string `json:"last_name"`
+	Introduction string `json:"introduction"`
+}
+
 const (
 	// get profile
 	PARAMS_TYPE1 = "1"
@@ -41,6 +48,41 @@ func NewUserRepository(conn *gorm.DB) port.UserRepository {
 	return &User{
 		conn: conn,
 	}
+}
+
+// UpdateProfile プロフィール更新処理
+func (u *User) UpdateProfile(c *gin.Context) error {
+	conn := u.conn
+
+	updateProfileParams := profileUpdateParams{}
+
+	token := c.Request.Header.Get("User-ID")
+	if token == "" {
+		return errors.New("認証情報がありません")
+	}
+
+	json.NewDecoder(c.Request.Body).Decode(&updateProfileParams)
+
+	if err := conn.Debug().Transaction(func(tx *gorm.DB) error {
+		user := Domain.User{
+			ID: updateProfileParams.UserID,
+		}
+
+		// プロフィール情報更新処理
+		if err := tx.Debug().Model(&user).
+			Updates(Domain.User{
+				FamilyName:   updateProfileParams.FamilyName,
+				LastName:     updateProfileParams.LastName,
+				Introduction: updateProfileParams.Introduction,
+			}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
 }
 
 // GetProfile メールアドレスからユーザを検索し、パスワード照合を行う
@@ -56,7 +98,7 @@ func (u *User) GetProfile(c *gin.Context) (*ValueObject.ProfileVO, error) {
 	profile := ValueObject.ProfileVO{}
 
 	if err := conn.Debug().Table(`"user"`).
-		Select(`"user".id, "user"."name", "user".introduction, count(tbl_following.user_id) AS following_count, count(tbl_followed.following_id) AS followed_count`).
+		Select(`"user".id, "user"."name", "user".introduction, "user".family_name, "user".last_name, count(tbl_following.user_id) AS following_count, count(tbl_followed.following_id) AS followed_count`).
 		Joins(`left join user_relation_ship tbl_following on tbl_following.user_id = "user".id`).
 		Joins(`left join user_relation_ship tbl_followed on tbl_followed.following_id = "user".id`).
 		Where(`"user".id = ?`, params.UserID).
