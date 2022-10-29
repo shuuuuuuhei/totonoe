@@ -2,7 +2,7 @@ import React, { Component, Fragment, useState } from 'react'
 import { Form } from 'react-bootstrap'
 import { ListItemButton, ListItemText } from '@mui/material'
 import { SettingProfileComponent } from '../components/SettingProfileComponent';
-import { AccountSettingComponent } from '../components/AccountSetting';
+import { SettingAccountComponent } from '../components/SettingAccountComponent';
 
 // プロフィール設定用
 const profileActiveMode = 1;
@@ -41,7 +41,7 @@ export const UserSettingPage = () => {
 
                                     case applyAuthActiveMode:
                                         return (
-                                            <AccountSettingComponent />
+                                            <SettingAccountComponent />
                                         )
                                 }
                             })()
