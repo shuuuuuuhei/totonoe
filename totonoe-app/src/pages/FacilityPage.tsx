@@ -14,9 +14,9 @@ export const SaunaPage = () => {
     const [articles, setArticlesState] = useState<[Article]>();
 
     const [activeMode, setActiveMode] = useState("nav-1");
-    const {facilityID} = useParams();
+    const { facilityID } = useParams();
 
-    const handleClick= (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 
         // ボタンを非活性にする
         document.getElementById(activeMode)?.classList.remove("active")
@@ -30,8 +30,8 @@ export const SaunaPage = () => {
     console.log(facilityID)
 
     useEffect(() => {
-        const fetchSauna = async() => {
-            const uri = "http://localhost:4000/facility/"+facilityID;
+        const fetchSauna = async () => {
+            const uri = "http://localhost:4000/facility/" + facilityID;
             const requestOption: RequestInit = {
                 method: "GET",
                 mode: "cors",
@@ -52,12 +52,12 @@ export const SaunaPage = () => {
                     setFacilityState(resData);
                     console.log(facility)
                 })
-            .catch(err => {
-                console.log(err)
-            });
+                .catch(err => {
+                    console.log(err)
+                });
         }
-        const fetchGetArticlesByFacilityID = async() => {
-            const uri = "http://localhost:4000/facilities/"+facilityID+"/articles";
+        const fetchGetArticlesByFacilityID = async () => {
+            const uri = "http://localhost:4000/facilities/" + facilityID + "/articles";
             const requestOption: RequestInit = {
                 method: "GET",
                 mode: "cors",
@@ -78,17 +78,17 @@ export const SaunaPage = () => {
                     setArticlesState(resData);
                     console.log(articles)
                 })
-            .catch(err => {
-                console.log(err)
-            });
+                .catch(err => {
+                    console.log(err)
+                });
         }
         fetchSauna();
         fetchGetArticlesByFacilityID();
     }, []);
 
-    if(!facility) <Fragment>return("ロード中...")</Fragment>
+    if (!facility) <Fragment>return("ロード中...")</Fragment>
 
-    return(
+    return (
         <Fragment>
             <div className="container py-5 px-5">
                 <div className="row align-items-center py-2 text-center">
@@ -98,7 +98,7 @@ export const SaunaPage = () => {
                 </div>
                 <div className="facility-action text-end">
                     {/* 投稿ページのリンク */}
-                    <Link to={`/saunas/${facility?.id}/articles/new`} ><HiOutlinePencilAlt size={40}/></Link>
+                    <Link to={`/saunas/${facility?.id}/articles/new`} ><HiOutlinePencilAlt size={40} /></Link>
                     {/* お気に入り登録(未着手) */}
                     <BsHeart size={35} />
                 </div>
@@ -109,9 +109,8 @@ export const SaunaPage = () => {
                 <div className="sauna-contents">
                     {
                         (() => {
-                            if(activeMode == 'nav-1') return( <SaunaDetail facility={facility}/> )
-                            if(activeMode == 'nav-2') return( !articles ? <>記事情報なし</> : <ArticleList articles={articles} />)
-                            if(activeMode == 'nav-3') return( < Valuation/> )
+                            if (activeMode == 'nav-1') return (<SaunaDetail facility={facility} />)
+                            if (activeMode == 'nav-2') return (!articles ? <>記事情報なし</> : <ArticleList articles={articles} />)
                         })()
                     }
                 </div>
