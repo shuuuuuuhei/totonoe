@@ -4,53 +4,34 @@ import { Button } from '@mui/material'
 import { useAuth0 } from '@auth0/auth0-react';
 import { useCookies } from 'react-cookie';
 import { toast } from 'react-toastify';
+import { AuthState } from '../@types/Authorization';
+import { APPLY_AUTH_KB, ADMIN_AUTH_KB, AUTH_REQUESTED_STATE } from '../utils/constants';
+import { isAdminUser, isAppliedUser, isApplyingUser, IsNullOrUndefinedOrEmpty, isUnAuthorizedUser, isGeneralUser } from '../common/Check';
 
-/**
- * 権限区分：1 (投稿可能)
- */
-const APPLY_AUTH_KB = '1';
-
-/**
- * 権限区分：999 (管理者権限)
- */
-const ADMIN_AUTH_KB = '999';
-
-/**
- * 権限申請状態：1 (申請中)
- */
-const AUTH_REQUESTED_STATE = '1';
-/**
- * 権限申請状態：2 (承認済み)
- */
-const AUTH_AUTHORIZED_STATE = '2';
-
-/**
- * 権限申請状態：3 (承認棄却)
- */
-const AUTH_UNAUTHORIZED_STATE = '3';
-
-type authState = {
-    authKB: string,
-    requestState: string,
-}
-
-export const AccountSettingComponent = () => {
+// ButtonState
+const generalState = 0;
+const adminState = 1;
+const appliedState = 2;
+const applyingState = 3;
+const unApplied = 4;
+export const SettingAccountComponent = () => {
     const { getAccessTokenSilently } = useAuth0();
     const [cookies, setCookie, removeCookie] = useCookies();
-    const [authState, setAuthState] = useState<authState>();
+    const [authState, setAuthState] = useState<AuthState>();
 
     useEffect(() => {
 
         // 権限情報取得
-        getAuthKB();
+        getAuthorization();
+
     }, []);
 
     /**
-     * 権限状態取得
+     * 権限情報取得
      */
-    const getAuthKB = async () => {
+    const getAuthorization = async () => {
         const userID = cookies.userID;
-        const uri = "http://localhost:4000/authorization" + userID;
+        const uri = "http://localhost:4000/authorization";
         const accessToken = await getAccessTokenSilently({
             audience: 'https://totonoe-app.com',
             scope: 'read:posts',
@@ -61,13 +42,14 @@ export const AccountSettingComponent = () => {
         }
 
         const requestOption: RequestInit = {
-            method: "GET",
+            method: "POST",
             mode: "cors",
             headers: {
                 Authorization: `Bearer ${accessToken}`,
                 "Content-Type": "application/json",
                 "User-ID": userID,
             },
+            body: JSON.stringify({ 'user_id': userID, })
         };
         await fetch(uri, requestOption)
             .then((response) => {
@@ -78,7 +60,7 @@ export const AccountSettingComponent = () => {
                 }
                 return response.json();
             })
-            .then((resData: authState) => {
+            .then((resData: AuthState) => {
                 setAuthState(resData)
             })
             .catch(err => {
@@ -131,23 +113,15 @@ export const AccountSettingComponent = () => {
             });
     }
 
-
-    console.log("test:", authState)
-    /**
-     * 投稿権限承認済み
-     */
-    const isAuthorized = () => {
-
-        // 管理者権限
-        if (authState.authKB === ADMIN_AUTH_KB) {
-            return true;
-        }
-
-        // 権限状態が存在かつ、申請状態が申請済みである
-        return authState.authKB && authState.requestState === AUTH_AUTHORIZED_STATE;
+    if (IsNullOrUndefinedOrEmpty(authState)) {
+        return (
+            <div>
+                権限情報取得中
+            </div>
+        )
     }
+    console.log(authState);
 
-    console.log("isAuthorized", isAuthorized);
     return (
         <Fragment>
             <div className="row">
@@ -186,19 +160,22 @@ export const AccountSettingComponent = () => {
                             施設登録ユーザになってTotonoeアプリを盛り上げましょう！
                         </p>
                     </div>
-                    {
-                        isAuthorized ?
-                            "a"
-                            :
-                            <Button
-                                color='primary'
-                                variant='outlined'
-                                className="col-3"
-                                onClick={handleSubmitApply}
-                            >
-                                施設投稿権限を申請する
+                    {isAdminUser(authState) && "管理者"}
+                    {isAppliedUser(authState) && "申請済"}
+                    {isApplyingUser(authState) && "申請中"}
+                    {isUnAuthorizedUser(authState) && "申請が棄却されました"}
+                    {isGeneralUser(authState)
+                        &&
+                        <Button
+                            color='primary'
+                            variant='outlined'
+                            className="col-3"
+                            onClick={handleSubmitApply}
+                        >
+                            施設投稿権限を申請する
                             </Button>
                     }
+
                 </div>
             </div>
             <div className="row apply-auth py-3">
