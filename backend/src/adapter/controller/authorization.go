@@ -23,6 +23,11 @@ func (a *Authorization) CertificationAuth(c *gin.Context) {
 	inputPort.CertificationAuth(c)
 }
 
+func (a *Authorization) GetAuthorization(c *gin.Context) {
+	inputPort := a.newInputPort(c)
+	inputPort.GetAuthorization(c)
+}
+
 func (a Authorization) newInputPort(c *gin.Context) port.AuthorizationInputPort {
 	output := a.OutputPortFactory(c)
 	repository := a.RepositoryFactory(a.Conn)

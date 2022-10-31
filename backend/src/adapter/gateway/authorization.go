@@ -18,13 +18,13 @@ type Authorization struct {
 }
 
 type authorizationParams struct {
-	userID string
-	authKB string
+	UserID string `json:"user_id,omitempty"`
+	AuthKB string `json:"auth_kb,omitempty"`
 }
 
 type certificationParams struct {
 	userID      string
-	authorizeID string
+	authorizeID uint32
 }
 
 const (
@@ -49,7 +49,36 @@ const (
 	AUTH_KB = "999"
 )
 
-// ApplySubmitFacilityAuth 施設登録権限の申請を登録する
+// GetAuthorization 権限情報取得処理
+func (a *Authorization) GetAuthorization(c *gin.Context) (*Domain.Authorization, error) {
+
+	conn := a.conn
+
+	params := authorizationParams{}
+
+	// パラメータ取得
+	json.NewDecoder(c.Request.Body).Decode(&params)
+
+	if err := checkAuthParams(conn, params); err != nil {
+		return nil, err
+	}
+
+	authorization := Domain.Authorization{}
+	authorization.UserID = params.UserID
+
+	if err := conn.Debug().First(&authorization).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("権限情報が取得できませんでした")
+		}
+		return nil, err
+	}
+
+	return &authorization, nil
+}
+
+/*
+	ApplySubmitFacilityAuth 施設登録権限の申請を登録する
+*/
 func (a *Authorization) ApplySubmitFacilityAuth(c *gin.Context) error {
 
 	conn := a.conn
@@ -70,8 +99,8 @@ func (a *Authorization) ApplySubmitFacilityAuth(c *gin.Context) error {
 
 		// ユーザ権限テーブル項目
 		authorization := Domain.Authorization{
-			UserID:         params.userID,
-			AuthKB:         params.authKB,
+			UserID:         params.UserID,
+			AuthKB:         params.AuthKB,
 			RequestStateKB: INITIAL_AUTH_STATE,
 			RequestDate:    time.Now(),
 		}
@@ -82,14 +111,14 @@ func (a *Authorization) ApplySubmitFacilityAuth(c *gin.Context) error {
 		}
 
 		// 申請者にメールを送信する。
-		if err := sendMailOfApplied(params.userID, tx); err != nil {
-			return err
-		}
+		// if err := sendMailOfApplied(params.UserID, tx); err != nil {
+		// return err
+		// }
 
 		// 管理者にメールを送信する。
-		if err := sendMailToAdministrator(authorization, tx); err != nil {
-			return err
-		}
+		// if err := sendMailToAdministrator(authorization, tx); err != nil {
+		// return err
+		// }
 		return nil
 	})
 
@@ -113,16 +142,32 @@ func sendMailOfApplied(userID string, conn *gorm.DB) error {
 		return fmt.Errorf("ユーザIDがありません")
 	}
 
-	sendEmail := Domain.User{}
-	if err := conn.Debug().Table("user").Select(`"user".address, "user"."name"`).Where("user_id=?", userID).Find(&sendEmail).Error; err != nil {
+	// ユーザ情報取得
+	user := Domain.User{}
+	if err := conn.Debug().Table("user").Select(`"user".email, "user"."name"`).Where("id=?", userID).Find(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return fmt.Errorf("送信するメールアドレスが登録されていません。")
 		}
 		return err
 	}
 
-	// メールを送信する。
-	//message := ""
+	// メールを送信する
+	message := ""
+
+	// 送信メールの設定を行う
+	mail := &common.Mail{
+		From:     user.Email,
+		UserName: user.Name,
+		Password: "test",
+		To:       "test",
+		Sub:      "test",
+		Message:  message,
+	}
+
+	// ユーザにメールを送信する
+	if err := mail.SendMailToUser(); err != nil {
+		return err
+	}
 
 	// 送信成功
 	return nil
@@ -131,8 +176,13 @@ func sendMailOfApplied(userID string, conn *gorm.DB) error {
 // パラメータチェック処理
 func checkAuthParams(conn *gorm.DB, params authorizationParams) error {
 
+	// ユーザIDが空の場合はエラーを返す
+	if params.UserID == "" {
+		return fmt.Errorf("ユーザIDを指定してください")
+	}
+
 	// ユーザIDチェック処理
-	err := common.CheckUserByID(params.userID, conn)
+	err := common.CheckUserByID(params.UserID, conn)
 	if err != nil {
 		return err
 	}
@@ -205,11 +255,26 @@ func sendMailOfCertificated(authorization Domain.Authorization, conn *gorm.DB) e
 		return err
 	}
 
-	// email := user.Email
-	// メールアドレスに申請承認済メールを送信する
+	// メールの設定を行う
+	mail := &common.Mail{
+		From:     "",
+		UserName: "",
+		Password: "",
+		To:       "",
+		Sub:      "",
+		Message:  "",
+	}
+
+	// メール送信処理
+	if err := mail.SendMailToUser(); err != nil {
+		return err
+	}
 	return nil
 }
 
+/*
+	申請承認処理パラメータチェック処理
+*/
 func checkCertificationParams(conn *gorm.DB, params certificationParams) error {
 	if params.userID == "" {
 		return fmt.Errorf("管理者ユーザIDが不足しています")

@@ -90,6 +90,7 @@ func (r *Routing) setRouting() {
 		InputPortFactory:  interactor.NewAuthorizationInputPort,
 		OutputPortFactory: presenter.NewAuthorizationOutputPort,
 		RepositoryFactory: gateway.NewAuthorizationRepository,
+		Conn:              r.DB.Connection,
 	}
 
 	r.Gin.Use(corsMiddleware())
@@ -154,6 +155,9 @@ func (r *Routing) setRouting() {
 
 	// 申請処理
 	r.Gin.POST("/authorization/certification", authorizationController.CertificationAuth)
+
+	// 権限情報取得
+	r.Gin.POST("/authorization", authorizationController.GetAuthorization)
 }
 
 // corsMiddleware CORSの設定
