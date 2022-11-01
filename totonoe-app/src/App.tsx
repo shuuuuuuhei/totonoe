@@ -14,6 +14,7 @@ import { SearchResultPage } from './pages/SearchResultPage';
 import { SignUpPage } from './pages/SignUpPage';
 import { toast } from 'react-toastify'
 import { UserSettingPage } from './pages/UserSettingPage';
+import { AdminPage } from './pages/AdminPage';
 
 function App() {
   const { user, getIdTokenClaims, getAccessTokenWithPopup, isAuthenticated } = useAuth0();
@@ -94,13 +95,12 @@ function App() {
 
     // ログイン回数が初回の場合はユーザ新規登録を行う
     if (user?.loginCount === 1 && !isSignUpped) {
-      // サインアップ
-      fetchSubmitUser().then(() => {
-        console.log("success sign up!");
-      })
-        .catch(() => {
-          console.log("失敗")
-        })
+      try {
+        // サインアップ
+        fetchSubmitUser();
+      } catch{
+        console.log("ユーザ登録失敗");
+      }
     } else if (isAuthenticated) {
       toast.success('おかえりなさい！');
     }
@@ -122,6 +122,7 @@ function App() {
           <Route path="/map" element={<SearchMapPage />}></Route>
           <Route path="/signup" element={<SignUpPage />}></Route>
           <Route path="/setting/profile" element={<UserSettingPage />}></Route>
+          <Route path="/admin" element={<AdminPage />}></Route>
         </Routes>
       </div>
     </BrowserRouter>
