@@ -10,6 +10,7 @@ import (
 	"gorm.io/gorm"
 	"main.go/adapter/gateway/common"
 	"main.go/model/Domain"
+	"main.go/model/ValueObject"
 	"main.go/usecase/port"
 )
 
@@ -45,9 +46,58 @@ const (
 		Auth区分値
 	*/
 
+	// 一般ユーザー
+	GENERAL_AUTH_KB = "0"
+
 	// 管理者
-	AUTH_KB = "999"
+	ADMIN_AUTH_KB = "999"
 )
+
+// GetApplyingAuthorization 申請中情報取得
+func (a *Authorization) GetApplyingAuthorization(c *gin.Context) (*[]ValueObject.ApplyingUser, error) {
+	conn := a.conn
+
+	params := authorizationParams{}
+
+	//　パラメータ取得
+	json.NewDecoder(c.Request.Body).Decode(&params)
+
+	// 管理者ユーザーかどうかチェックを行う
+	if err := isAdminUser(params.UserID, conn); err != nil {
+		return nil, err
+	}
+
+	applyingAuthorizationList := []ValueObject.ApplyingUser{}
+
+	if err := conn.Debug().
+		Table("authorization").
+		Select(`"authorization".id, "authorization".user_id, "authorization".auth_kb, to_char("authorization".request_date, 'YYYY-MM-DD') as request_date, "user".name as user_name`).
+		Joins(`left join "user" on "user".id = "authorization".user_id`).
+		Where(`"authorization".auth_kb=? and "authorization".request_state_kb=?`, GENERAL_AUTH_KB, INITIAL_AUTH_STATE).Order(`"authorization".request_date, "user".name`).
+		Scan(&applyingAuthorizationList).Error; err != nil {
+		return nil, err
+	}
+
+	return &applyingAuthorizationList, nil
+}
+
+// 管理者ユーザーかチェックを行う。管理者ユーザでなければエラーを返す。
+func isAdminUser(userID string, conn *gorm.DB) error {
+
+	authorization := Domain.Authorization{
+		UserID: userID,
+		AuthKB: ADMIN_AUTH_KB,
+	}
+
+	if err := conn.Debug().First(&authorization).Error; err != nil {
+		// 管理者ユーザーではない場合はerrを返す。
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("管理者ユーザーでアクセスしてください")
+		}
+		return err
+	}
+	return nil
+}
 
 // GetAuthorization 権限情報取得処理
 func (a *Authorization) GetAuthorization(c *gin.Context) (*Domain.Authorization, error) {
@@ -67,8 +117,9 @@ func (a *Authorization) GetAuthorization(c *gin.Context) (*Domain.Authorization,
 	authorization.UserID = params.UserID
 
 	if err := conn.Debug().First(&authorization).Error; err != nil {
+		// 権限情報を登録していない場合はnilで返す。
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, fmt.Errorf("権限情報が取得できませんでした")
+			return nil, nil
 		}
 		return nil, err
 	}
@@ -286,7 +337,7 @@ func checkCertificationParams(conn *gorm.DB, params certificationParams) error {
 	if err := conn.Table("user").
 		Select("count(*) > 0").
 		Joins(`left join authorization on authorization.user_id = "user".id`).
-		Where(`"user".id=? AND authorization.auth_kb=?`, params.userID, AUTH_KB).
+		Where(`"user".id=? AND authorization.auth_kb=?`, params.userID, ADMIN_AUTH_KB).
 		Find(&isAdministrator).Error; err != nil {
 		return err
 	}

@@ -28,6 +28,11 @@ func (a *Authorization) GetAuthorization(c *gin.Context) {
 	inputPort.GetAuthorization(c)
 }
 
+func (a *Authorization) GetApplyingAuthorization(c *gin.Context) {
+	inputPort := a.newInputPort(c)
+	inputPort.GetApplyingAuthorization(c)
+}
+
 func (a Authorization) newInputPort(c *gin.Context) port.AuthorizationInputPort {
 	output := a.OutputPortFactory(c)
 	repository := a.RepositoryFactory(a.Conn)
