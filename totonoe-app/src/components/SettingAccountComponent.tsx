@@ -1,6 +1,6 @@
 import React, { Component, Fragment, useState, useEffect } from 'react'
 import { Form } from 'react-bootstrap'
-import { Button } from '@mui/material'
+import { Button, Chip } from '@mui/material'
 import { useAuth0 } from '@auth0/auth0-react';
 import { useCookies } from 'react-cookie';
 import { toast } from 'react-toastify';
@@ -137,7 +137,7 @@ export const SettingAccountComponent = () => {
                     />
                     <Form.Control.Feedback type='invalid'></Form.Control.Feedback>
                     <Button
-                        color='primary'
+                        color='warning'
                         variant='outlined'
                         className="col-3 my-2"
                         size="small"
@@ -160,21 +160,53 @@ export const SettingAccountComponent = () => {
                             施設登録ユーザになってTotonoeアプリを盛り上げましょう！
                         </p>
                     </div>
-                    {isAdminUser(authState) && "管理者"}
-                    {isAppliedUser(authState) && "申請済"}
-                    {isApplyingUser(authState) && "申請中"}
-                    {isUnAuthorizedUser(authState) && "申請が棄却されました"}
-                    {isGeneralUser(authState)
-                        &&
-                        <Button
-                            color='primary'
-                            variant='outlined'
-                            className="col-3"
-                            onClick={handleSubmitApply}
-                        >
-                            施設投稿権限を申請する
+                    <div className="col-3">
+                        {/* 管理者表示 */}
+                        {isAdminUser(authState) &&
+                            <Chip
+                                label="管理者"
+                                color="warning"
+                            />
+                        }
+                        {isAppliedUser(authState) &&
+                            <Chip
+                                label="申請済"
+                                color="warning"
+                            />
+                        }
+                        {isApplyingUser(authState) &&
+                            <Chip
+                                label="申請中"
+                                color="warning"
+                            />
+                        }
+                        {isUnAuthorizedUser(authState) &&
+                            <>
+                                <Chip
+                                    label="申請が棄却されました"
+                                    color="warning"
+                                />
+                                <Button
+                                    color='warning'
+                                    variant='outlined'
+                                    className="col-3"
+                                    onClick={handleSubmitApply}
+                                >
+                                    施設投稿権限を申請する
+                                </Button>
+                            </>
+                        }
+                        {isGeneralUser(authState)
+                            &&
+                            <Button
+                                color='warning'
+                                variant='outlined'
+                                onClick={handleSubmitApply}
+                            >
+                                施設投稿権限を申請する
                             </Button>
-                    }
+                        }
+                    </div>
 
                 </div>
             </div>
@@ -184,7 +216,7 @@ export const SettingAccountComponent = () => {
                         アカウント削除
                     </div>
                     <Button
-                        color='warning'
+                        color='error'
                         size='small'
                         className="col-3"
                         variant='outlined'>
