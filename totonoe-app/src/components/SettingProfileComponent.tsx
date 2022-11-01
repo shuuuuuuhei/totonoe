@@ -6,6 +6,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { useCookies } from 'react-cookie';
 import { Button } from '@mui/material';
 import { IsNullOrUndefinedOrEmpty } from '../common/Check';
+import { toast } from 'react-toastify';
 
 export const SettingProfileComponent = () => {
     const [introduction, setIntroduction] = useState("");
@@ -172,10 +173,8 @@ export const SettingProfileComponent = () => {
                 return response.json();
             })
             .then((resData: Profile) => {
-                setFamilyName(resData.family_name)
-                setLastName(resData.last_name)
-                setIntroduction(resData.introduction)
-                console.log(resData);
+                toast.success('プロフィールを更新しました！');
+
             })
             .catch(err => {
                 console.log(err)
