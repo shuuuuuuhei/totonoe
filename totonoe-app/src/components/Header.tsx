@@ -1,5 +1,5 @@
 import { useAuth0 } from '@auth0/auth0-react';
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import { Button } from "react-bootstrap";
 import { useCookies } from 'react-cookie';
 import { IconContext } from 'react-icons';
@@ -12,10 +12,20 @@ import 'react-toastify/dist/ReactToastify.css';
 import "../style/Header.css";
 import { MdOutlineLogin } from 'react-icons/md';
 import { toast } from 'react-toastify'
+import { AuthState } from '../@types/Authorization';
+import { isAdminUser } from '../common/Check';
+import { Chip } from '@mui/material';
 export const Header = () => {
+    const { getAccessTokenSilently } = useAuth0();
     const { loginWithRedirect, isAuthenticated, logout, user } = useAuth0();
     const [cookies, setCookie, removeCookie] = useCookies();
     const [isShowedUserContents, setIsShowedUserContents] = useState(false);
+    const [authState, setAuthState] = useState<AuthState>();
+
+    useEffect(() => {
+        // 権限情報取得
+        getAuthorization();
+    }, [])
 
     /**
      * ユーザ認証機能
@@ -40,6 +50,51 @@ export const Header = () => {
             console.log(err)
         }
     }
+
+    /**
+     * 権限情報取得
+     */
+    const getAuthorization = async () => {
+        const userID = cookies.userID;
+        const uri = "http://localhost:4000/authorization";
+        const accessToken = await getAccessTokenSilently({
+            audience: 'https://totonoe-app.com',
+            scope: 'read:posts',
+        });
+
+        if (!accessToken) {
+            throw Error("アクセストークンがありません。");
+        }
+
+        const requestOption: RequestInit = {
+            method: "POST",
+            mode: "cors",
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+                "User-ID": userID,
+            },
+            body: JSON.stringify({ 'user_id': userID, })
+        };
+        await fetch(uri, requestOption)
+            .then((response) => {
+                if (!response.ok) {
+                    const err = new Error;
+                    err.message = "権限情報が取得できませんでした" + response.text + response.status;
+                    throw err;
+                }
+                return response.json();
+            })
+            .then((resData: AuthState) => {
+                setAuthState(resData)
+            })
+            .catch(err => {
+                console.log(err)
+            });
+    }
+
+    console.log(authState);
+
 
     return (
         <Fragment>
@@ -68,6 +123,7 @@ export const Header = () => {
                                     {
                                         // ログイン済み
                                         isShowedUserContents &&
+
                                         <div className="row border py-3 px-4 text-center" style={{ position: "absolute", right: "20px", width: "250px", backgroundColor: "white" }} onClick={() => setIsShowedUserContents(!isShowedUserContents)}>
                                             <div className="row p-0">
                                                 <div className="col-4 text-center">
@@ -78,10 +134,11 @@ export const Header = () => {
                                                     <p className="overflow-hidden" style={{ fontSize: "12px" }}>{user.name}</p>
                                                 </div>
                                             </div>
-                                            <Link to={"profile/" + cookies.userID} className="my-2 p-0">
+                                            <Link to={"profile/" + cookies.userID}>
                                                 <Button
                                                     variant="outline-warning"
-                                                    className="px-4"
+                                                    className="my-2"
+                                                    style={{ width: "150px" }}
                                                 >
                                                     マイページ
                                             </Button>
@@ -89,18 +146,33 @@ export const Header = () => {
                                             <Link to={"setting/profile"}>
                                                 <Button
                                                     variant="outline-warning"
-                                                    className="my-2 px-4"
+                                                    className="my-2"
+                                                    style={{ width: "150px" }}
                                                 >
                                                     設定
                                                 </Button>
                                             </Link>
-                                            <Button
-                                                onClick={logoutUser}
-                                                variant="outline-warning"
-                                                className="my-2"
-                                            >
-                                                ログアウト
-                                        </Button>
+                                            {isAdminUser(authState) &&
+                                                <Link to={"admin/"}>
+                                                    <Button
+                                                        variant="outline-warning"
+                                                        className="my-2"
+                                                        style={{ width: "150px" }}
+                                                    >
+                                                        管理者用ページ
+                                                    </Button>
+                                                </Link>
+                                            }
+                                            <div className="row text-center mx-0 px-4">
+                                                <Button
+                                                    onClick={logoutUser}
+                                                    variant="outline-warning"
+                                                    className="my-2"
+                                                    style={{ width: "150px" }}
+                                                >
+                                                    ログアウト
+                                                </Button>
+                                            </div>
                                         </div>
                                     }
                                 </div>
