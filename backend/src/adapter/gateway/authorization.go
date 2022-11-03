@@ -24,8 +24,8 @@ type authorizationParams struct {
 }
 
 type certificationParams struct {
-	userID      string
-	authorizeID uint32
+	AdminUserID     string   `json:"admin_user_id,omitempty"`
+	AuthorizeIDList []uint32 `json:"authorize_id_list,omitempty"`
 }
 
 const (
@@ -258,34 +258,38 @@ func (a *Authorization) CertificationAuth(c *gin.Context) error {
 		return err
 	}
 
-	authorization := Domain.Authorization{
-		ID: params.authorizeID,
-	}
+	// 取得した権限テーブルIDリスト分、申請状態の更新を行う
+	for index := 0; index < len(params.AuthorizeIDList); index++ {
 
-	// 権限申請データ取得
-	if err := conn.Debug().First(&authorization).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return fmt.Errorf("権限申請データが見つかりませんでした")
+		authorization := Domain.Authorization{
+			ID: params.AuthorizeIDList[index],
 		}
-		return err
-	}
 
-	// 権限申請状態を更新する
-	if err := conn.Debug().Transaction(func(tx *gorm.DB) error {
-		authorization.RequestStateKB = AUTHORIZED_STATE
-		authorization.AppliedDate = time.Now()
-		if err := tx.Debug().Save(&authorization).Error; err != nil {
+		// 権限申請データ取得
+		if err := conn.Debug().First(&authorization).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return fmt.Errorf("権限申請データが見つかりませんでした")
+			}
 			return err
 		}
 
-		return nil
-	}); err != nil {
-		return err
-	}
+		// 権限申請状態を更新する
+		if err := conn.Debug().Transaction(func(tx *gorm.DB) error {
+			authorization.RequestStateKB = AUTHORIZED_STATE
+			authorization.AppliedDate = time.Now()
+			if err := tx.Debug().Save(&authorization).Error; err != nil {
+				return err
+			}
 
-	// 施設投稿権限付与完了メールを送信する
-	if err := sendMailOfCertificated(authorization, conn); err != nil {
-		return err
+			return nil
+		}); err != nil {
+			return err
+		}
+
+		// 施設投稿権限付与完了メールを送信する
+		// if err := sendMailOfCertificated(authorization, conn); err != nil {
+		// 	return err
+		// }
 	}
 
 	return nil
@@ -327,23 +331,12 @@ func sendMailOfCertificated(authorization Domain.Authorization, conn *gorm.DB) e
 	申請承認処理パラメータチェック処理
 */
 func checkCertificationParams(conn *gorm.DB, params certificationParams) error {
-	if params.userID == "" {
+	if params.AdminUserID == "" {
 		return fmt.Errorf("管理者ユーザIDが不足しています")
 	}
 
-	isAdministrator := false
-
-	// 管理者権限チェックを行う
-	if err := conn.Table("user").
-		Select("count(*) > 0").
-		Joins(`left join authorization on authorization.user_id = "user".id`).
-		Where(`"user".id=? AND authorization.auth_kb=?`, params.userID, ADMIN_AUTH_KB).
-		Find(&isAdministrator).Error; err != nil {
+	if err := isAdminUser(params.AdminUserID, conn); err != nil {
 		return err
-	}
-
-	if !isAdministrator {
-		return fmt.Errorf("管理者権限がありません")
 	}
 
 	return nil

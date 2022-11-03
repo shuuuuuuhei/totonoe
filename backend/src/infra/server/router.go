@@ -153,7 +153,7 @@ func (r *Routing) setRouting() {
 	// 施設投稿権限申請登録処理
 	r.Gin.POST("/authorization/post/facilities", authorizationController.ApplySubmitFacilityAuth)
 
-	// 申請処理
+	// 複数申請一括承認処理
 	r.Gin.POST("/authorization/certification", authorizationController.CertificationAuth)
 
 	// 権限情報取得

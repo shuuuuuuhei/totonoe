@@ -10,7 +10,7 @@ type Authorization struct {
 	Repository port.AuthorizationRepository
 }
 
-// GetApplyingAuthorization implements port.AuthorizationInputPort
+// GetApplyingAuthorization 権限申請中情報取得
 func (a *Authorization) GetApplyingAuthorization(c *gin.Context) {
 	applyingAuthorizationList, err := a.Repository.GetApplyingAuthorization(c)
 
@@ -41,7 +41,7 @@ func (a *Authorization) GetAuthorization(c *gin.Context) {
 	a.Outputport.RenderAuthorization(authorization)
 }
 
-// ApplySubmitFacilityAuth implements port.AuthorizationInputPort
+// ApplySubmitFacilityAuth 権限申請を登録
 func (a *Authorization) ApplySubmitFacilityAuth(c *gin.Context) {
 	err := a.Repository.ApplySubmitFacilityAuth(c)
 	if err != nil {
@@ -51,7 +51,7 @@ func (a *Authorization) ApplySubmitFacilityAuth(c *gin.Context) {
 	a.Outputport.RenderOK()
 }
 
-// CertificationAuth implements port.AuthorizationInputPort
+// CertificationAuth 複数ユーザーの権限申請の一括承認を行う
 func (a *Authorization) CertificationAuth(c *gin.Context) {
 	err := a.Repository.CertificationAuth(c)
 	if err != nil {
