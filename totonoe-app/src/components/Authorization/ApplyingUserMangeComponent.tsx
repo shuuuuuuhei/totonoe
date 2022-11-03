@@ -4,6 +4,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { useCookies } from 'react-cookie';
 import { ApplyingUser } from '../../@types/ApplyingUser';
 import { TableHead, TableRow, TableCell, Checkbox, TableSortLabel, Button } from '@mui/material';
+import { toast } from 'react-toastify';
 
 export const ApplyingUserMangeComponent = () => {
     const [applyingUserList, setApplyingUser] = useState<ApplyingUser[]>();
@@ -70,9 +71,54 @@ export const ApplyingUserMangeComponent = () => {
         setSelectedAuthID(rowIDs)
     }
 
-    const handleCertificate = () => {
-        console.log(selectedAuthIDs);
+    // 投稿権限一括承認処理
+    const handleCertificate = async () => {
+        const uri = "http://localhost:4000/authorization/certification";
+        const accessToken = await getAccessTokenSilently({
+            audience: 'https://totonoe-app.com',
+            scope: 'read:posts',
+        });
+        const userID = cookies.userID;
 
+        if (!userID) {
+            toast.warning("ユーザーIDが不正です。");
+            throw Error("ユーザーIDが不正です。");
+        }
+
+        if (!accessToken) {
+            throw Error("アクセストークンがありません。");
+        }
+
+        const requestOption: RequestInit = {
+            method: "POST",
+            mode: "cors",
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+                "User-ID": cookies.userID,
+            },
+            body: JSON.stringify({
+                admin_user_id: cookies.userID,
+                authorize_id_list: selectedAuthIDs,
+            })
+        };
+        await fetch(uri, requestOption)
+            .then((response) => {
+                if (!response.ok) {
+                    const err = new Error;
+                    err.message = "投稿権限承認に失敗しました" + response.status + response.text.toString();
+                    throw err;
+                }
+                return response.json();
+            })
+            .then(() => {
+                toast.success("権限の承認が完了しました。");
+                getApplyingAuthList();
+            })
+            .catch(err => {
+                console.log(err)
+                toast.warn("権限更新に失敗しました。");
+            });
     }
 
     if (applyingUserList) {
