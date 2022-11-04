@@ -93,8 +93,47 @@ export const Header = () => {
             });
     }
 
-    console.log(authState);
+    /**
+     * ユーザー名取得
+     */
+    const getUserName = async () => {
+        const userID = cookies.userID;
+        const uri = "http://localhost:4000/authorization";
+        const accessToken = await getAccessTokenSilently({
+            audience: 'https://totonoe-app.com',
+            scope: 'read:posts',
+        });
 
+        if (!accessToken) {
+            throw Error("アクセストークンがありません。");
+        }
+
+        const requestOption: RequestInit = {
+            method: "POST",
+            mode: "cors",
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+                "User-ID": userID,
+            },
+            body: JSON.stringify({ 'user_id': userID, })
+        };
+        await fetch(uri, requestOption)
+            .then((response) => {
+                if (!response.ok) {
+                    const err = new Error;
+                    err.message = "権限情報が取得できませんでした" + response.text + response.status;
+                    throw err;
+                }
+                return response.json();
+            })
+            .then((resData: AuthState) => {
+                setAuthState(resData)
+            })
+            .catch(err => {
+                console.log(err)
+            });
+    }
 
     return (
         <Fragment>
@@ -131,7 +170,7 @@ export const Header = () => {
                                                 </div>
                                                 <div className="col-8 text-start py-2 px-0">
                                                     {/* ↓今はauth0のユーザ名を表示している */}
-                                                    <p className="overflow-hidden" style={{ fontSize: "12px" }}>{user.name}</p>
+                                                    <p className="overflow-hidden" style={{ fontSize: "12px" }}></p>
                                                 </div>
                                             </div>
                                             <Link to={"profile/" + cookies.userID}>
