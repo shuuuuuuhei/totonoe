@@ -13,17 +13,20 @@ export const IsNullOrUndefinedOrEmpty = (val: any) => {
  * 管理ユーザーチェック
  * @param authorization
  */
-export const isAdminUser = (authorization: AuthState) => {
-    console.log(authorization);
+export const isAdminUser = (authorization: AuthState | undefined) => {
 
-    return authorization.auth_kb === ADMIN_AUTH_KB
+    if (IsNullOrUndefinedOrEmpty(authorization)) {
+        return false;
+    }
+
+    return authorization.auth_kb === ADMIN_AUTH_KB;
 }
 
 /**
  * 投稿可能ユーザーチェック
  * @param authorization 
  */
-export const isAppliedUser = (authorization: AuthState) => {
+export const isAppliedUser = (authorization: AuthState | undefined) => {
     return authorization.auth_kb === APPLY_AUTH_KB && authorization.request_state_kb === AUTH_AUTHORIZED_STATE
 }
 
@@ -31,7 +34,7 @@ export const isAppliedUser = (authorization: AuthState) => {
  * 申請中ユーザーチェック
  * @param authorization 
  */
-export const isApplyingUser = (authorization: AuthState) => {
+export const isApplyingUser = (authorization: AuthState | undefined) => {
     return authorization.request_state_kb === AUTH_REQUESTED_STATE
 }
 
@@ -39,7 +42,7 @@ export const isApplyingUser = (authorization: AuthState) => {
  * 申請棄却ユーザーチェック
  * @param authorization 
  */
-export const isUnAuthorizedUser = (authorization: AuthState) => {
+export const isUnAuthorizedUser = (authorization: AuthState | undefined) => {
     return authorization.request_state_kb === AUTH_UNAUTHORIZED_STATE
 }
 
@@ -47,6 +50,6 @@ export const isUnAuthorizedUser = (authorization: AuthState) => {
  * 一般ユーザー
  * @param authorization 
  */
-export const isGeneralUser = (authorization: AuthState) => {
+export const isGeneralUser = (authorization: AuthState | undefined) => {
     return authorization.auth_kb === GENERAL_USER && authorization.request_state_kb === UNAPPLIED_STATE
 }
