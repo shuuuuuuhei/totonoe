@@ -62,7 +62,7 @@ export type FacilityMapInfo = {
     },
     article_count: number,
     location_index: number,
-    lat: number;
-    lng: number;
+    latitude: number;
+    longitude: number;
     showInfoWindow: boolean,
 }
