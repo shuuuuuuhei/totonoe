@@ -258,11 +258,20 @@ export const MapComponent = () => {
                                     {facilityMapInfoList?.map((facility, index) => {
                                         return (
                                             <>
-                                                <Marker position={{ lat: facility.lat, lng: facility.lng }} label={markerStyle(index)} onClick={() => handleToShowedInfoWindow(index)} />
-                                                {facility.showInfoWindow && infoStyle && <InfoWindow position={{ lat: facility.lat, lng: facility.lng }} options={{ pixelOffset: infoStyle }}>
+                                                <Marker position={{ lat: facility.latitude, lng: facility.longitude }} label={markerStyle(index)} onClick={() => handleToShowedInfoWindow(index)} />
+                                                {facility.showInfoWindow && infoStyle && <InfoWindow position={{ lat: facility.latitude, lng: facility.longitude }} options={{ pixelOffset: infoStyle }}>
                                                     <div>
                                                         <p>{facility.name}</p>
-                                                        {facility.id ? <Link to={`/saunas/${facility.id}`}><p>施設情報を確認する</p></Link> : <p>施設情報なし</p>}
+                                                        {facility.id ? <Link to={`/saunas/${facility.id}`}><p>施設情報を確認する</p></Link>
+                                                            :
+                                                            <>
+                                                                <p>施設情報なし</p>
+                                                                <Link
+                                                                    to={`/saunas/new`}
+                                                                    state={{ map_name: facility.name, map_lat: facility.latitude, map_lng: facility.longitude }}
+                                                                >施設を登録する</Link>
+                                                            </>
+                                                        }
                                                     </div>
                                                 </InfoWindow>
                                                 }
