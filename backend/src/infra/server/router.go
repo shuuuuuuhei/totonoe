@@ -161,6 +161,9 @@ func (r *Routing) setRouting() {
 
 	// 権限申請中ユーザ情報取得
 	r.Gin.POST("/authorization/applying", authorizationController.GetApplyingAuthorization)
+
+	// 権限承認済ユーザー情報取得
+	r.Gin.POST("/authorization/applied", authorizationController.GetAppliedAuthorization)
 }
 
 // corsMiddleware CORSの設定

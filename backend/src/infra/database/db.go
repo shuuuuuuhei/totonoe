@@ -107,6 +107,48 @@ func (d *DB) CreateData() {
 		return
 	}
 
+	authorization := Domain.Authorization{
+		UserID:         user.ID,
+		AuthKB:         "999",
+		RequestStateKB: "0",
+		RequestDate:    time.Time{},
+		AppliedDate:    time.Time{},
+		CreatedAt:      time.Time{},
+		UpdatedAt:      time.Time{},
+	}
+
+	if err := d.Connection.Create(&authorization).Error; err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	for i := 0; i < 100; i++ {
+		user := Domain.User{}
+		user.Email = "aaa@test.com"
+		user.Name = "test" + strconv.Itoa(i)
+		user.ID = strconv.Itoa(i)
+		user.Introduction = "サウナは月20回いきます！"
+		if err := d.Connection.Create(&user).Error; err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		authorization := Domain.Authorization{
+			UserID:         user.ID,
+			AuthKB:         "0",
+			RequestStateKB: "1",
+			RequestDate:    time.Now(),
+			AppliedDate:    time.Time{},
+			CreatedAt:      time.Time{},
+			UpdatedAt:      time.Time{},
+		}
+
+		if err := d.Connection.Create(&authorization).Error; err != nil {
+			fmt.Println(err)
+			return
+		}
+	}
+
 	cityList := []Domain.City{}
 	d.Connection.Debug().Table("prefecture").Select("prefecture.id AS prefecture_id, city.id AS ID").Joins("left join city on city.prefecture_id = prefecture.id").Scan(&cityList)
 

@@ -11,9 +11,14 @@ type Authorization struct {
 	c *gin.Context
 }
 
-// RenderApplyingUserList implements port.AuthorizationOutputPort
-func (a *Authorization) RenderApplyingUserList(applyingUserList *[]ValueObject.ApplyingUser) {
-	a.c.JSON(200, applyingUserList)
+// RenderApplyiedUserList implements port.AuthorizationOutputPort
+func (a *Authorization) RenderApplyiedAuthorizationList(appliedAuthorizationList *[]ValueObject.AppliedAuthorization) {
+	a.c.JSON(200, appliedAuthorizationList)
+}
+
+// RenderApplyingAuthorizationList implements port.AuthorizationOutputPort
+func (a *Authorization) RenderApplyingAuthorizationList(applyingAuthorizationList *[]ValueObject.ApplyingAuthorization) {
+	a.c.JSON(200, applyingAuthorizationList)
 }
 
 // RenderAuthorization implements port.AuthorizationOutputPort

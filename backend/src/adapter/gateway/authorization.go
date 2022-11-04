@@ -49,12 +49,15 @@ const (
 	// 一般ユーザー
 	GENERAL_AUTH_KB = "0"
 
+	// 施設投稿可能ユーザー
+	FACILITY_POST_AUTH_KB = "1"
+
 	// 管理者
 	ADMIN_AUTH_KB = "999"
 )
 
 // GetApplyingAuthorization 申請中情報取得
-func (a *Authorization) GetApplyingAuthorization(c *gin.Context) (*[]ValueObject.ApplyingUser, error) {
+func (a *Authorization) GetApplyingAuthorization(c *gin.Context) (*[]ValueObject.ApplyingAuthorization, error) {
 	conn := a.conn
 
 	params := authorizationParams{}
@@ -67,7 +70,7 @@ func (a *Authorization) GetApplyingAuthorization(c *gin.Context) (*[]ValueObject
 		return nil, err
 	}
 
-	applyingAuthorizationList := []ValueObject.ApplyingUser{}
+	applyingAuthorizationList := []ValueObject.ApplyingAuthorization{}
 
 	if err := conn.Debug().
 		Table("authorization").
@@ -97,6 +100,37 @@ func isAdminUser(userID string, conn *gorm.DB) error {
 		return err
 	}
 	return nil
+}
+
+// GetAppliedAuthorization 承認済権限取得
+func (a *Authorization) GetAppliedAuthorization(c *gin.Context) (*[]ValueObject.AppliedAuthorization, error) {
+
+	conn := a.conn
+	params := authorizationParams{}
+
+	//　パラメータ取得
+	json.NewDecoder(c.Request.Body).Decode(&params)
+
+	// 管理者ユーザーかどうかチェックを行う
+	if err := isAdminUser(params.UserID, conn); err != nil {
+		return nil, err
+	}
+
+	appliedAuthorizationList := []ValueObject.AppliedAuthorization{}
+
+	// 投稿可能権限を取得する
+	if err := conn.Debug().
+		Table("authorization").
+		Select(`"authorization".id, "authorization".user_id, "authorization".auth_kb, to_char("authorization".applied_date, 'YYYY-MM-DD') as applied_date, "user".name as user_name`).
+		Joins(`left join "user" on "user".id = "authorization".user_id`).
+		Where(`"authorization".auth_kb=? and "authorization".request_state_kb=?`, FACILITY_POST_AUTH_KB, AUTHORIZED_STATE).
+		Order(`"authorization".applied_date, "user".name`).
+		Scan(&appliedAuthorizationList).Error; err != nil {
+		return nil, err
+	}
+
+	return &appliedAuthorizationList, nil
+
 }
 
 // GetAuthorization 権限情報取得処理
@@ -275,6 +309,8 @@ func (a *Authorization) CertificationAuth(c *gin.Context) error {
 
 		// 権限申請状態を更新する
 		if err := conn.Debug().Transaction(func(tx *gorm.DB) error {
+			// 施設投稿可能権限の設定を行う
+			authorization.AuthKB = FACILITY_POST_AUTH_KB
 			authorization.RequestStateKB = AUTHORIZED_STATE
 			authorization.AppliedDate = time.Now()
 			if err := tx.Debug().Save(&authorization).Error; err != nil {
