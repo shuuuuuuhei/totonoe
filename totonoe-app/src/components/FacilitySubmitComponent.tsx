@@ -1,4 +1,4 @@
-import React, { Component, Fragment, useState, useEffect } from 'react'
+import React, { Component, Fragment, useState, useEffect, createContext } from 'react'
 import { DropdownButton, Dropdown, ButtonGroup, Button, Form, Col, Alert } from 'react-bootstrap'
 import '../style/QuantityInput.css'
 import { SaunaSubmitComponent } from './SaunaSubmitComponent'
@@ -11,22 +11,64 @@ import { IsRequiredCheckFacilitySubmitForm } from '../@types/Form'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { IsNullOrUndefinedOrEmpty } from '../common/Check'
-import { prefectureList } from '../utils/constants'
 import { WaterBath } from '../@types/sauna/Waterbath'
-import { NewFacility, Facility } from '../@types/sauna/Facility'
+import { NewFacility, Facility, Address, City } from '../@types/sauna/Facility'
 import { NewSauna } from '../@types/sauna/Sauna'
+import { ConvertPrefectureNameToIndex } from '../common/Convert'
 const MinPrice = 1;
 interface MapInfo {
     map_name: string | null,
     map_lat: number | null,
     map_lng: number | null,
 }
+/**
+ * 住所コンテキスト
+ */
+type AddressContext = {
+    address: Address,
+    setAddress: React.Dispatch<React.SetStateAction<Address>>,
+};
+
+/**
+ * 市区町村コンテキスト
+ */
+type CityListContext = {
+    cityList: City[],
+    setCityList: React.Dispatch<React.SetStateAction<City[]>>,
+}
+
+const initialAddressState: Address = {
+    prefecture_id: 0,
+    city_id: 0,
+    city_name: "",
+    street_name: "",
+    latitude: 0,
+    longitude: 0,
+}
+/**
+ * 住所Stateコンテキスト
+ */
+export const AddressState = createContext<AddressContext>({
+    address: initialAddressState,
+    setAddress: () => { }
+});
+
+/**
+ * 市区町村リストStateコンテキスト
+ */
+export const CityListState = createContext<CityListContext>({
+    cityList: [],
+    setCityList: () => { }
+})
+
 export const FacilitySubmitComponent = () => {
     const navigate = useNavigate();
     const { getAccessTokenSilently, isAuthenticated, loginWithRedirect } = useAuth0();
     const [cookies, setCookie, removeCookie] = useCookies();
     const [validated, setValidated] = useState(false);
     const [errors, setErrors] = useState<IsRequiredCheckFacilitySubmitForm>();
+    const location = useLocation();
+    const { map_name, map_lat, map_lng } = location?.state as MapInfo || {};
 
     // サウナState
     const [saunas, setSaunas] = useState<NewSauna[]>([
@@ -54,12 +96,16 @@ export const FacilitySubmitComponent = () => {
     // 施設State
     const [facility, setFacilityState] = useState<NewFacility>({
         id: "",
-        name: "",
+        // マップから登録の場合は自動入力
+        name: map_name ? map_name : "",
         price: 0,
         address: {
             prefecture_id: 0,
             city_id: 0,
+            city_name: "",
             street_name: "",
+            latitude: 0,
+            longitude: 0,
         },
         eigyo_start: "",
         eigyo_end: "",
@@ -79,23 +125,30 @@ export const FacilitySubmitComponent = () => {
     });
 
     // SelectAddressコンポーネントで変更があれば更新を行う
-    const [address, setAddress] = useState({
+    const [address, setAddress] = useState<Address>({
         prefecture_id: 0,
         city_id: 0,
+        city_name: "",
         street_name: "",
+        latitude: 0,
+        longitude: 0,
     });
 
     const [terms, setTerms] = useState<{ id: string; name: string; }[]>();
 
-    // ログイン認証前であればログイン画面に遷移
-    if (!isAuthenticated) {
-        loginWithRedirect();
-    }
+    // 初回ロード時
+    useEffect(() => {
+
+        // ログイン認証前であればログイン画面に遷移
+        if (!isAuthenticated && IsNullOrUndefinedOrEmpty(cookies.userID)) {
+            loginWithRedirect();
+        }
+
+        getAddressByLatLng();
+    }, []);
 
     // 登録前にfacilityの更新を行うと最新のfacilityを登録できないので、useEffect内で該当の要素に変更があればfacilityの更新を行うようにする
     useEffect(() => {
-        //getAddressByLatLng();
-
         setFacilityState((prevState) => ({
             ...prevState,
             address: address,
@@ -112,6 +165,69 @@ export const FacilitySubmitComponent = () => {
 
     }, [address, saunas, waterBaths, terms])
 
+    /**
+     * 経度緯度情報から住所情報取得(マップから遷移)
+     */
+    const getAddressByLatLng = () => {
+
+        // 経度緯度情報がなければ処理を終了する
+        if (IsNullOrUndefinedOrEmpty(map_lat) || IsNullOrUndefinedOrEmpty(map_lng)) {
+            return
+        }
+
+        try {
+            // Geocode情報を取得
+            const geocoder = new google.maps.Geocoder();
+
+            geocoder.geocode({ location: { lat: map_lat, lng: map_lng } }, (results, status) => {
+                if (status === 'OK' && results) {
+                    console.log(results[0])
+
+                    const addressInformationList = results[0].address_components;
+                    const lastIndex = addressInformationList.length - 1;
+                    const prefectureName = addressInformationList[lastIndex - 2].long_name;
+                    const cityName = addressInformationList[lastIndex - 3].long_name;
+                    let streetName = "";
+
+                    // lastIndexから4を引いたindexから町村以下の情報になるのでindexが0になるまでループを行い、文字列を連結する
+                    for (let i = lastIndex - 4; i >= 0; i--) {
+                        streetName += addressInformationList[i].long_name;
+                    }
+
+                    const prefectureIndex = ConvertPrefectureNameToIndex(prefectureName);
+
+                    // 都道府県IDと市区町村名から市区町村情報を取得
+                    fetchCityInfo(prefectureIndex + 1, cityName)
+                        .then((city: City) => {
+                            console.log("fetch;", city)
+                            setAddress({
+                                ...address,
+                                prefecture_id: prefectureIndex,
+                                city_id: city.id,
+                                city_name: city.name,
+                                street_name: streetName,
+                                latitude: map_lat,
+                                longitude: map_lng,
+                            });
+                        })
+                        .catch((error) => {
+                            console.log(error)
+                            setAddress({
+                                ...address,
+                                prefecture_id: prefectureIndex,
+                                street_name: streetName,
+                                latitude: map_lat,
+                                longitude: map_lng,
+                            });
+                            toast.warning("市区町村情報が取得できなかったため、入力してください。")
+                        })
+
+                }
+            })
+        } catch (error) {
+            toast.warning("住所情報が取得できなかったので手入力してください")
+        }
+    }
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const name = event.target.name;
         const value = event.target.value;
@@ -244,23 +360,6 @@ export const FacilitySubmitComponent = () => {
         })
     }
 
-    const getLatLngLiteral = () => {
-        const geocoder = new google.maps.Geocoder();
-
-        // geocoder.geocode({address: address}, function(results, status) {
-        //     if(status === 'OK' && results !== null) {
-        //         const latlngLiteral = {
-        //             lat: results[0].geometry.location.lat(),
-        //             lng: results[0].geometry.location.lng(),
-        //         }
-
-        //         return latlngLiteral
-        //     }
-        // })
-    }
-
-    console.log()
-
     /**
      * 登録ボタン押下時に発火
      */
@@ -317,6 +416,37 @@ export const FacilitySubmitComponent = () => {
         }
     }
 
+    /**
+     *  都道府県と市区町村名から市区町村IDを取得する
+     * */
+    const fetchCityInfo = async (prefectureID: number, cityName: string) => {
+        try {
+            const uri = "http://localhost:4000/prefecture/" + prefectureID + "/cities/" + cityName;
+            console.log(uri)
+            const requestOption: RequestInit = {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+            const city = await fetch(uri, requestOption)
+                .then((response) => {
+                    if (!response.ok) {
+                        throw (new Error("市町村情報の取得に失敗しました。" + response.status));
+                    }
+                    return response.json();
+                })
+                .then((cityData: City) => {
+                    // 取得した市区町村リストを設定する
+                    return cityData;
+                })
+            return city;
+        }
+        catch (err) {
+            return err;
+        }
+    }
+
     return (
         <Fragment>
             <div className="container p-5">
@@ -340,12 +470,9 @@ export const FacilitySubmitComponent = () => {
                             <Form.Control.Feedback type='invalid'>{errors?.name}</Form.Control.Feedback>
                         </Form.Group>
                         <Form.Label htmlFor="">住所</Form.Label>
-                        <SelectAddress
-                            address={address}
-                            setAddress={setAddress}
-                            error={{ prefecture: errors?.prefecture, city: errors?.city, street: errors?.street }}
-                            handleSetAddressErrorNull={handleSetAddressErrorNull}
-                        />
+                        <AddressState.Provider value={{ address, setAddress }}>
+                            <SelectAddress />
+                        </AddressState.Provider>
                         <Form.Label htmlFor="">営業時間</Form.Label>
                         <div className="eigyo-time row">
                             <div className="col-5">
