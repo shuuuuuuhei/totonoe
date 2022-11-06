@@ -6,6 +6,6 @@ type Address struct {
 	CityID       uint32  `gorm:"primaryKey" json:"city_id,omitempty"`
 	PrefectureID uint32  `gorm:"primaryKey" json:"prefecture_id,omitempty"`
 	StreetName   string  `gorm:"not null" json:"street_name,omitempty"`
-	Latitude     float64 `gorm:"type:decimal not null"`
-	Longitude    float64 `gorm:"type:decimal not null"`
+	Latitude     float64 `gorm:"type:decimal not null" json:"latitude,omitempty"`
+	Longitude    float64 `gorm:"type:decimal not null" json:"longitude,omitempty"`
 }

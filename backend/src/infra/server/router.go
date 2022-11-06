@@ -106,6 +106,9 @@ func (r *Routing) setRouting() {
 	// 市町村取得
 	r.Gin.GET("/prefecture/:prefectureID/cities", cityController.GetCitiesByPrefectureID)
 
+	// 都道府県IDと市町村名称からIDを取得
+	r.Gin.GET("/prefecture/:prefectureID/cities/:cityName", cityController.GetCityIDByPrefectureIDCityName)
+
 	// 施設情報取得
 	r.Gin.GET("/facility/:facilityID", facilityController.GetFacilityByID)
 
