@@ -25,15 +25,19 @@ export type Facility = {
     full_count: number,
 }
 
+export type Address = {
+    prefecture_id: number,
+    city_id: number,
+    city_name: string,
+    street_name: string,
+    latitude: number;
+    longitude: number;
+}
 export type NewFacility = {
     id: string,
     name: string,
     price: number,
-    address: {
-        prefecture_id: number,
-        city_id: number,
-        street_name: string,
-    },
+    address: Address,
     eigyo_start: string,
     eigyo_end: string,
     access: string,
@@ -50,7 +54,6 @@ export type NewFacility = {
     water_baths: WaterBath[],
     amenities: Amenity[],
 }
-
 export type FacilityMapInfo = {
     id: string,
     name: string,
@@ -65,4 +68,9 @@ export type FacilityMapInfo = {
     latitude: number;
     longitude: number;
     showInfoWindow: boolean,
+}
+
+export type City = {
+    id: number,
+    name: string,
 }
