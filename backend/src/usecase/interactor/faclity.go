@@ -42,12 +42,12 @@ func (f *Facility) GetFacilities(c *gin.Context) {
 
 // CreateFacility
 func (f *Facility) CreateFacility(c *gin.Context) {
-	err := f.FacilityRepo.CreateFacility(c)
+	postFacility, err := f.FacilityRepo.CreateFacility(c)
 	if err != nil {
 		f.OutputPort.RenderError(err)
 		return
 	}
-	f.OutputPort.RenderOK()
+	f.OutputPort.RenderPostFacility(postFacility)
 }
 
 func (f Facility) GetFacilityByID(c *gin.Context) {

@@ -8,6 +8,8 @@ import (
 type ProfileVO struct {
 	ID             string    `json:"id,omitempty"`
 	Name           string    `json:"name,omitempty"`
+	FamilyName     string    `json:"family_name,omitempty"`
+	LastName       string    `json:"last_name,omitempty"`
 	Introduction   string    `json:"introduction,omitempty"`
 	CreatedAt      time.Time `json:"created_at,omitempty"`
 	UpdatedAt      time.Time `json:"updated_at,omitempty"`

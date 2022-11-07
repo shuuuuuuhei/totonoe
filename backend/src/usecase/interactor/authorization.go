@@ -10,6 +10,18 @@ type Authorization struct {
 	Repository port.AuthorizationRepository
 }
 
+// GetAppliedAuthorization implements port.AuthorizationInputPort
+func (a *Authorization) GetAppliedAuthorization(c *gin.Context) {
+	appliedAuthorizationList, err := a.Repository.GetAppliedAuthorization(c)
+
+	if err != nil {
+		a.Outputport.RenderError(err)
+		return
+	}
+
+	a.Outputport.RenderApplyiedAuthorizationList(appliedAuthorizationList)
+}
+
 // GetApplyingAuthorization 権限申請中情報取得
 func (a *Authorization) GetApplyingAuthorization(c *gin.Context) {
 	applyingAuthorizationList, err := a.Repository.GetApplyingAuthorization(c)
@@ -19,7 +31,7 @@ func (a *Authorization) GetApplyingAuthorization(c *gin.Context) {
 		return
 	}
 
-	a.Outputport.RenderApplyingUserList(applyingAuthorizationList)
+	a.Outputport.RenderApplyingAuthorizationList(applyingAuthorizationList)
 }
 
 // GetAuthorization 権限情報取得

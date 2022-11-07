@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"log"
 	"net/url"
+	"os"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/shopspring/decimal"
+	"github.com/joho/godotenv"
+	"googlemaps.github.io/maps"
 	"gorm.io/gorm"
 	"main.go/model/Domain"
 	"main.go/model/ValueObject"
@@ -32,18 +34,20 @@ type facilityParams struct {
 
 type mapInfo struct {
 	LatLngLiteral struct {
-		Lat decimal.Decimal `json:"lat"`
-		Lng decimal.Decimal `json:"lng"`
+		Lat float64 `json:"lat"`
+		Lng float64 `json:"lng"`
 	} `json:"latlng_literal"`
 	Name string `json:"name"`
 }
 
-// latlng_literal: google.maps.LatLngLiteral,
-// showInfoWindow: boolean,
-
 type mapInfoListParams struct {
 	MapInfoList []mapInfo `json:"map_info_list,omitempty"`
 }
+
+// 経度緯度初期値(設定なし)
+const (
+	DEFAULT_LATLNG = 0
+)
 
 // GetFacilityNameByID 施設IDから施設名を取得
 func (f *Facility) GetFacilityNameByID(c *gin.Context) (*ValueObject.FacilityVO, error) {
@@ -84,17 +88,17 @@ func (f *Facility) GetFacilitiesByMapInfomation(c *gin.Context) (*[]ValueObject.
 				fmt.Println("施設情報が見つかりませんでした。 user_id =", params.MapInfoList[i].Name)
 
 				facilities = append(facilities, ValueObject.FacilityVO{
-					Name: params.MapInfoList[i].Name,
-					Lat:  params.MapInfoList[i].LatLngLiteral.Lat,
-					Lng:  params.MapInfoList[i].LatLngLiteral.Lng,
+					Name:      params.MapInfoList[i].Name,
+					Latitude:  params.MapInfoList[i].LatLngLiteral.Lat,
+					Longitude: params.MapInfoList[i].LatLngLiteral.Lng,
 				})
 				continue
 			}
 			log.Println(err)
 			return nil, errors.New("Internal Server Error. 施設情報取得に失敗しました。")
 		}
-		facility.Lat = params.MapInfoList[i].LatLngLiteral.Lat
-		facility.Lng = params.MapInfoList[i].LatLngLiteral.Lng
+		facility.Latitude = params.MapInfoList[i].LatLngLiteral.Lat
+		facility.Longitude = params.MapInfoList[i].LatLngLiteral.Lng
 		facilities = append(facilities, facility)
 	}
 	return &facilities, nil
@@ -124,17 +128,93 @@ func (f *Facility) GetFacilities(c *gin.Context) (*[]ValueObject.FacilityVO, err
 	return &facilities, nil
 }
 
-// CreateFacility implements port.FacilityRepository
-func (f *Facility) CreateFacility(c *gin.Context) error {
+// CreateFacility 施設登録処理
+func (f *Facility) CreateFacility(c *gin.Context) (*Domain.Facility, error) {
 	conn := f.conn
 	params := facilityParams{}
 	json.NewDecoder(c.Request.Body).Decode(&params)
 
-	if err := conn.Debug().Create(&params.Facility).Error; err != nil {
+	err := conn.Debug().Transaction(func(tx *gorm.DB) error {
+
+		// 経度緯度情報がなければ住所情報から経度緯度情報を取得する
+		if params.Facility.Address.Latitude == DEFAULT_LATLNG || params.Facility.Address.Longitude == DEFAULT_LATLNG {
+
+			// 経度緯度取得
+			if err := getLatLng(c, conn, &params); err != nil {
+				return err
+			}
+
+		}
+
+		// 施設登録処理ar
+		if err := tx.Create(&params.Facility).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &params.Facility, nil
+}
+
+// 住所から経度緯度情報取得
+func getLatLng(c *gin.Context, conn *gorm.DB, params *facilityParams) error {
+	// 住所を受け取る
+	addressStr := getAddress(conn, params.Facility.Address)
+
+	if addressStr == "" {
+		return fmt.Errorf("住所名称が取得できませんでした。")
+	}
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		return fmt.Errorf("GoogleAPIキーが取得できませんでした")
+	}
+
+	// GoogleMapsAPIキーを取得
+	client, err := maps.NewClient(maps.WithAPIKey(os.Getenv("GOOGLE_MAPS_API_KEY")))
+
+	if err != nil {
+		return fmt.Errorf("GoogleMapsApiキーが不正です" + err.Error())
+	}
+
+	request := &maps.GeocodingRequest{
+		Address: addressStr,
+	}
+
+	results, err := client.Geocode(c, request)
+
+	if err != nil {
 		return err
 	}
 
+	latlng := results[0].Geometry.Location
+
+	fmt.Println(latlng.Lat)
+	fmt.Println(latlng.Lng)
+
+	params.Facility.Address.Latitude = latlng.Lat
+	params.Facility.Address.Longitude = latlng.Lng
+
 	return nil
+}
+
+// getAddress 住所正式名称を取得
+func getAddress(conn *gorm.DB, address Domain.Address) string {
+
+	cityNameWithPrefecture := ""
+	// 市区町村を取得
+	conn.Debug().Table("prefecture").Select("prefecture.name || city.name as cityNameWithPrefecture").
+		Joins("inner join city on city.prefecture_id = prefecture.id").
+		Where("prefecture.id=? and city.id=?", address.PrefectureID, address.CityID).
+		Scan(&cityNameWithPrefecture)
+
+	// 取得した市区町村と番地を結合する
+	addressStr := cityNameWithPrefecture + address.StreetName
+	return addressStr
 }
 
 // GetFacilityByID implements port.FacilityRepository
@@ -145,7 +225,7 @@ func (f *Facility) GetFacilityByID(c *gin.Context) (*ValueObject.FacilityVO, err
 	facility := ValueObject.FacilityVO{}
 
 	query := conn.Debug().Table("facility").
-		Select("facility.id,facility.name,prefecture.name || city.name || address.street_name AS address,facility.tel,facility.eigyo_start,facility.eigyo_end,facility.price,facility.lodging_flg,facility.restaurant_flg,facility.working_space_flg,facility.books_flg,facility.heat_wave_flg,facility.air_bath_flg,facility.break_space_flg, sauna.sauna_type, sauna.temperature, sauna.capacity, sauna.rouryu_flg, sauna.sauna_mat_flg, sauna.tv_flg, sauna.bgm_flg").
+		Select("facility.id,facility.name,prefecture.name || city.name || address.street_name AS address,address.latitude,address.longitude,facility.tel,facility.eigyo_start,facility.eigyo_end,facility.price,facility.lodging_flg,facility.restaurant_flg,facility.working_space_flg,facility.books_flg,facility.heat_wave_flg,facility.air_bath_flg,facility.break_space_flg, sauna.sauna_type, sauna.temperature, sauna.capacity, sauna.rouryu_flg, sauna.sauna_mat_flg, sauna.tv_flg, sauna.bgm_flg").
 		Joins("left join sauna on sauna.facility_id = facility.id").
 		Joins("left join address on address.facility_id = facility.id").
 		Joins("left join prefecture on prefecture.id = address.prefecture_id").
