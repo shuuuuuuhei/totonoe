@@ -244,7 +244,7 @@ export const SearchResultPage = () => {
                                 <p className="border-bottom" style={{ cursor: 'pointer', fontWeight: 'bold' }}>{areaParams === '' ? "全国" : areaParams}</p>
                                 {show && <AreaDetail />}
                             </div>
-                            <button><Link to={`/map?lang=jp&area=${areaParams}`}>GoogleMapで探す</Link></button>
+                            {areaParams ? <button><Link to={`/map?lang=jp&area=${areaParams}`}>GoogleMapで探す</Link></button> : <></>}
                         </div>
                         <SearchOption handleSearch={handleSearch} />
                     </div>
