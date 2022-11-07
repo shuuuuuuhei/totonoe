@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react'
+import React, { Fragment } from 'react'
 import { MapComponent } from '../components/MapComponent'
 
 export const SearchMapPage = () => {

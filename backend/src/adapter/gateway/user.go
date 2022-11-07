@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+
 	"main.go/model/Domain"
 	"main.go/model/ValueObject"
 
@@ -24,9 +25,16 @@ type User struct {
 // Params クライアントパラメータ
 type userParams struct {
 	UserID      string `json:"user_id"`
-	FollowingID string `json:"following_id"`
+	Name        string `json:"name"`
 	Email       string `json:"email"`
-	NickName    string `json:"nickname"`
+	FollowingID string `json:"following_id"`
+}
+
+type profileUpdateParams struct {
+	UserID       string `json:"user_id"`
+	FamilyName   string `json:"family_name"`
+	LastName     string `json:"last_name"`
+	Introduction string `json:"introduction"`
 }
 
 const (
@@ -42,6 +50,41 @@ func NewUserRepository(conn *gorm.DB) port.UserRepository {
 	}
 }
 
+// UpdateProfile プロフィール更新処理
+func (u *User) UpdateProfile(c *gin.Context) error {
+	conn := u.conn
+
+	updateProfileParams := profileUpdateParams{}
+
+	token := c.Request.Header.Get("User-ID")
+	if token == "" {
+		return errors.New("認証情報がありません")
+	}
+
+	json.NewDecoder(c.Request.Body).Decode(&updateProfileParams)
+
+	if err := conn.Debug().Transaction(func(tx *gorm.DB) error {
+		user := Domain.User{
+			ID: updateProfileParams.UserID,
+		}
+
+		// プロフィール情報更新処理
+		if err := tx.Debug().Model(&user).
+			Updates(Domain.User{
+				FamilyName:   updateProfileParams.FamilyName,
+				LastName:     updateProfileParams.LastName,
+				Introduction: updateProfileParams.Introduction,
+			}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
 // GetProfile メールアドレスからユーザを検索し、パスワード照合を行う
 func (u *User) GetProfile(c *gin.Context) (*ValueObject.ProfileVO, error) {
 	conn := u.conn
@@ -54,12 +97,12 @@ func (u *User) GetProfile(c *gin.Context) (*ValueObject.ProfileVO, error) {
 
 	profile := ValueObject.ProfileVO{}
 
-	if err := conn.Debug().Table(`"profile"`).
-		Select(`profile.id, profile.user_id, profile.nick_name, profile.introduction, count(tbl_following.user_id) AS following_count, count(tbl_followed.following_id) AS followed_count`).
-		Joins(`left join user_relation_ship tbl_following on tbl_following.user_id = profile.user_id`).
-		Joins(`left join user_relation_ship tbl_followed on tbl_followed.following_id = profile.user_id`).
-		Where(`profile.user_id = ?`, params.UserID).
-		Group(`profile.id, profile.user_id, profile.nick_name, profile.introduction`).
+	if err := conn.Debug().Table(`"user"`).
+		Select(`"user".id, "user"."name", "user".introduction, "user".family_name, "user".last_name, count(tbl_following.user_id) AS following_count, count(tbl_followed.following_id) AS followed_count`).
+		Joins(`left join user_relation_ship tbl_following on tbl_following.user_id = "user".id`).
+		Joins(`left join user_relation_ship tbl_followed on tbl_followed.following_id = "user".id`).
+		Where(`"user".id = ?`, params.UserID).
+		Group(`"user".id, "user"."name", "user".introduction`).
 		Scan(&profile).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("プロフィールが見つかりませんでした。 user_id = %s", params.UserID)
@@ -69,7 +112,7 @@ func (u *User) GetProfile(c *gin.Context) (*ValueObject.ProfileVO, error) {
 	}
 
 	// Me?
-	profile.IsMe = common.IsMe(profile.UserID, token)
+	profile.IsMe = common.IsMe(profile.ID, token)
 
 	// フォローチェック
 	if !profile.IsMe {
@@ -159,22 +202,34 @@ func (u *User) Unfollow(c *gin.Context) error {
 	return nil
 }
 
-func (u *User) SignUp(c *gin.Context) (*Domain.User, error) {
+// ユーザ情報をDBに登録する
+func (u *User) SignUp(c *gin.Context) error {
 	conn := u.conn
 	var params userParams
+	var isExists bool
 	json.NewDecoder(c.Request.Body).Decode(&params)
 
+	// リクエスト情報から登録ユーザを作成
 	user, err := newUserByParams(params)
-
 	if err != nil {
-		return nil, fmt.Errorf("パラメータに不備がありました。パラメータ：%w", err)
+		return fmt.Errorf("パラメータに不備がありました。パラメータ：%w", err)
 	}
 
-	if err = conn.Select("user_id", "email", "name").Create(&user).Error; err != nil {
-		return nil, err
+	// ユーザが登録済かどうかチェックを行う
+	if err = conn.Table("user").Select("count(*) > 0").Where("id=?", user.ID).Find(&isExists).Error; err != nil {
+		return err
 	}
 
-	return user, nil
+	if isExists {
+		return fmt.Errorf("ユーザIDが登録済みです。%s", user.ID)
+	}
+
+	// ユーザ登録
+	if err = conn.Debug().Create(&user).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func newUserByParams(p userParams) (*Domain.User, error) {
@@ -187,26 +242,24 @@ func newUserByParams(p userParams) (*Domain.User, error) {
 	}
 
 	return &Domain.User{
-		ID:    "",
-		Name:  p.NickName,
+		ID:    p.UserID,
+		Name:  p.Name,
 		Email: p.Email,
 	}, nil
 }
 
-// タイプ別パラメータ存在チェック
+// パラメータ存在チェック
 func checkParams(p userParams) error {
 
-	// switch p.ParamsType {
-	// case SIGN_UP:
-	// 	if p.ID == "" {
-	// 		return errors.New("ID(パラメータ)がありません")
-	// 	}
-	// 	if p.Name == "" {
-	// 		return errors.New("Name(パラメータ)がありません")
-	// 	}
-	// 	if p.Email == "" {
-	// 		return errors.New("Email(パラメータ)がありません")
-	// 	}
-	// }
+	if p.UserID == "" {
+		return errors.New("ID(パラメータ)がありません")
+	}
+	if p.Name == "" {
+		return errors.New("Name(パラメータ)がありません")
+	}
+	if p.Email == "" {
+		return errors.New("Email(パラメータ)がありません")
+	}
+
 	return nil
 }

@@ -6,9 +6,10 @@ import (
 
 // Profile プロフィールモデル(DB同様)
 type ProfileVO struct {
-	ID             uint32    `json:"id,omitempty"`
-	UserID         string    `json:"user_id,omitempty"`
-	NickName       string    `json:"nick_name,omitempty"`
+	ID             string    `json:"id,omitempty"`
+	Name           string    `json:"name,omitempty"`
+	FamilyName     string    `json:"family_name,omitempty"`
+	LastName       string    `json:"last_name,omitempty"`
 	Introduction   string    `json:"introduction,omitempty"`
 	CreatedAt      time.Time `json:"created_at,omitempty"`
 	UpdatedAt      time.Time `json:"updated_at,omitempty"`

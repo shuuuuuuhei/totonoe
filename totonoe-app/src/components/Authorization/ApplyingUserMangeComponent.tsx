@@ -1,0 +1,144 @@
+import React, { Component, useState, Fragment, useEffect } from 'react'
+import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
+import { useAuth0 } from '@auth0/auth0-react';
+import { useCookies } from 'react-cookie';
+import { ApplyingUser } from '../../@types/ApplyingUser';
+import { TableHead, TableRow, TableCell, Checkbox, TableSortLabel, Button } from '@mui/material';
+import { toast } from 'react-toastify';
+
+export const ApplyingUserMangeComponent = () => {
+    const [applyingUserList, setApplyingUser] = useState<ApplyingUser[]>();
+    const { getAccessTokenSilently } = useAuth0();
+    const [cookies, setCookie, removeCookie] = useCookies();
+    const [selectedAuthIDs, setSelectedAuthID] = useState([]);
+
+    useEffect(() => {
+        getApplyingAuthList();
+    }, [])
+
+    const columns: GridColDef[] = [
+        { field: 'id', headerName: 'ID', width: 70 },
+        { field: 'user_id', headerName: 'ユーザーID', width: 130 },
+        { field: 'user_name', headerName: 'ユーザー名', width: 200 },
+        { field: 'request_date', headerName: '申請日', width: 200 },
+    ];
+
+    /**
+     * 投稿権限申請中ユーザーリストを取得する
+     */
+    const getApplyingAuthList = async () => {
+        const uri = "http://localhost:4000/authorization/applying";
+        const accessToken = await getAccessTokenSilently({
+            audience: 'https://totonoe-app.com',
+            scope: 'read:posts',
+        });
+
+        if (!accessToken) {
+            throw Error("アクセストークンがありません。");
+        }
+
+        const requestOption: RequestInit = {
+            method: "POST",
+            mode: "cors",
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+                "User-ID": cookies.userID,
+            },
+            body: JSON.stringify({
+                user_id: cookies.userID,
+            })
+        };
+        await fetch(uri, requestOption)
+            .then((response) => {
+                if (!response.ok) {
+                    const err = new Error;
+                    err.message = "申請中ユーザーリストが取得できませんでした" + response.text + response.status;
+                    throw err;
+                }
+                return response.json();
+            })
+            .then((data: ApplyingUser[]) => {
+                console.log(data)
+                setApplyingUser(data)
+            })
+            .catch(err => {
+                console.log(err)
+            });
+    }
+
+    const handleGridSelectChange = (rowIDs: any) => {
+        setSelectedAuthID(rowIDs)
+    }
+
+    // 投稿権限一括承認処理
+    const handleCertificate = async () => {
+        const uri = "http://localhost:4000/authorization/certification";
+        const accessToken = await getAccessTokenSilently({
+            audience: 'https://totonoe-app.com',
+            scope: 'read:posts',
+        });
+        const userID = cookies.userID;
+
+        if (!userID) {
+            toast.warning("ユーザーIDが不正です。");
+            throw Error("ユーザーIDが不正です。");
+        }
+
+        if (!accessToken) {
+            throw Error("アクセストークンがありません。");
+        }
+
+        const requestOption: RequestInit = {
+            method: "POST",
+            mode: "cors",
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+                "User-ID": cookies.userID,
+            },
+            body: JSON.stringify({
+                admin_user_id: cookies.userID,
+                authorize_id_list: selectedAuthIDs,
+            })
+        };
+        await fetch(uri, requestOption)
+            .then((response) => {
+                if (!response.ok) {
+                    const err = new Error;
+                    err.message = "投稿権限承認に失敗しました" + response.status + response.text.toString();
+                    throw err;
+                }
+                return response.json();
+            })
+            .then(() => {
+                toast.success("権限の承認が完了しました。");
+                getApplyingAuthList();
+            })
+            .catch(err => {
+                console.log(err)
+                toast.warn("権限更新に失敗しました。");
+            });
+    }
+
+    if (applyingUserList) {
+        return (
+            <Fragment>
+                申請中
+                <div style={{ height: 600, width: '100%' }} className="py-3">
+                    <DataGrid
+                        rows={applyingUserList}
+                        columns={columns}
+                        pageSize={20}
+                        rowsPerPageOptions={[5]}
+                        checkboxSelection
+                        onSelectionModelChange={(id) => handleGridSelectChange(id)}
+                    />
+                </div>
+                <Button variant="outlined" onClick={handleCertificate}>
+                    申請を承認する
+                </Button>
+            </Fragment>
+        )
+    }
+}

@@ -1,8 +1,7 @@
-import { Component, Fragment, useEffect, useReducer, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
+import { BsChevronDoubleLeft, BsChevronDoubleRight } from 'react-icons/bs';
 import type { Article } from '../@types/article/Article';
 import { ArticleBox } from './ArticleBox';
-import {BsChevronDoubleLeft, BsChevronDoubleRight} from 'react-icons/bs'
-import React from 'react';
 
 export const ArticlesBox = () => {
     const [articles, setArticles] = useState<[Article]>();

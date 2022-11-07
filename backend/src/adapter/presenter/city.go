@@ -10,12 +10,17 @@ type City struct {
 	c *gin.Context
 }
 
-// RenderCities implements port.CityOutputPort
+// RenderCity 市区町村情報をレスポンスする
+func (c *City) RenderCity(city *ValueObject.CityVO) {
+	c.c.JSON(200, city)
+}
+
+// RenderCities 市区町村リストをレスポンスする
 func (c *City) RenderCities(city *[]ValueObject.CityVO) {
 	c.c.JSON(200, city)
 }
 
-// RenderError implements port.CityOutputPort
+// RenderError エラーをレスポンスする
 func (c *City) RenderError(err error) {
 	c.c.JSON(500, err)
 }

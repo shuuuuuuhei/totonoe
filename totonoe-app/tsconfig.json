@@ -1,32 +1,29 @@
 {
   "compilerOptions": {
-    "target": "es2020",
-    "lib": [
-      "es2020",
-      "dom"
-    ],
-    "module": "esnext",
-    "jsx": "preserve",
-    "outDir": "dist",
+    "module": "commonjs",
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "skipLibCheck": true,
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "allowJs": true,
     "allowSyntheticDefaultImports": true,
-    "isolatedModules": true,
-    "noEmit": true
+    "target": "es6",
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "outDir": "dist",
+    "baseUrl": ".",
+    "paths": {
+      "*": [
+        "node_modules/*",
+        "src/types/*"
+      ]
+    },
+    "jsx": "react",
+    "allowJs": true,
+    "skipLibCheck": true,
+    "noEmitOnError": true,
+    "resolveJsonModule": true,
   },
-  "exclude": [
-    "dist",
-    "node_modules"
-  ],
-  "compileOnSave": false,
   "include": [
-    "src"
-  ]
+    "src/**/*"
+  ],
+  // exclude を明示的に指定
+  "exclude": ["node_modules", "dist"]
 }

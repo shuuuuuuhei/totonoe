@@ -1,12 +1,11 @@
-import React, { Component, Fragment, useState, useEffect } from 'react'
-import { Article } from '../@types/article/Article';
-import { useParams } from 'react-router-dom';
-import { ArticleBox } from '../components/ArticleBox';
-import { DetailArticle } from '../components/Article';
 import { useAuth0 } from '@auth0/auth0-react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
+import { useParams } from 'react-router-dom';
+import { Article } from '../@types/article/Article';
+import { Comment } from '../@types/article/Comment';
+import { DetailArticle } from '../components/Article';
 import { Comments } from '../components/Comment';
-import { Comment } from '../@types/article/Comment'
 
 export const ArticlePage = () => {
     const [article, setArticle] = useState<Article>();

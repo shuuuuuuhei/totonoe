@@ -2,6 +2,7 @@ package gateway
 
 import (
 	"errors"
+	"fmt"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -12,6 +13,27 @@ import (
 
 type City struct {
 	conn *gorm.DB
+}
+
+// GetCityIDByPrefectureIDCityName 都道府県IDと市区町村名から市区町村IDを取得
+func (c *City) GetCityByPrefectureIDCityName(ctx *gin.Context) (*ValueObject.CityVO, error) {
+	conn := c.conn
+
+	prefectureID := ctx.Param("prefectureID")
+	cityName := ctx.Param("cityName")
+
+	city := ValueObject.CityVO{}
+	if err := conn.Debug().Table("prefecture").Select("city.id, city.name").
+		Joins("inner join city on city.prefecture_id = prefecture.id").
+		Where("city.name=? and prefecture.id=?", cityName, prefectureID).
+		First(&city).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("市区町村情報が登録されていません")
+		}
+		return nil, err
+	}
+
+	return &city, nil
 }
 
 // GetCitiesByPrefectureID implements port.CityRepository

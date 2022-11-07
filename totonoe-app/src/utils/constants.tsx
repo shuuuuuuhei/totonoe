@@ -3,7 +3,7 @@ import { RatingProperty } from "../@types/article/Rating";
 /**
 * 都道府県リスト
 */
-export const prefectureList = ["北海道","青森県","岩手県","宮城県","秋田県","山形県","福島県","茨城県","栃木県","群馬県","埼玉県","千葉県","東京都","神奈川県","新潟県","富山県","石川県","福井県","山梨県","長野県","岐阜県","静岡県","愛知県","三重県","滋賀県","京都府","大阪府","兵庫県","奈良県","和歌山県","鳥取県","島根県","岡山県","広島県","山口県","徳島県","香川県","愛媛県","高知県","福岡県","佐賀県","長崎県","熊本県","大分県","宮崎県","鹿児島県","沖縄県"];
+export const prefectureList = ["北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県", "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県", "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県", "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県", "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"];
 
 /**
 * 都道府県リスト(地方別)
@@ -100,7 +100,7 @@ export const MaxScore = 5;
 export const MinScore = 1;
 export const precisionScore = 0.5;
 
-export const ratingList:RatingProperty[]= [
+export const ratingList: RatingProperty[] = [
     {
         name: "ととのい度",
         id: 'totonoi_score',
@@ -122,3 +122,36 @@ export const ratingList:RatingProperty[]= [
         id: 'service_score',
     },
 ]
+
+/**
+ * 権限区分：0 (一般ユーザー)
+ */
+export const GENERAL_USER = '0';
+
+/**
+ * 権限区分：1 (投稿可能)
+ */
+export const APPLY_AUTH_KB = '1';
+
+/**
+ * 権限区分：999 (管理者権限)
+ */
+export const ADMIN_AUTH_KB = '999';
+
+/**
+ * 権限申請状態：0 (未申請)
+ */
+export const UNAPPLIED_STATE = '0'
+/**
+ * 権限申請状態：1 (申請中)
+ */
+export const AUTH_REQUESTED_STATE = '1';
+/**
+ * 権限申請状態：2 (承認済み)
+ */
+export const AUTH_AUTHORIZED_STATE = '2';
+
+/**
+ * 権限申請状態：3 (承認棄却)
+ */
+export const AUTH_UNAUTHORIZED_STATE = '3';

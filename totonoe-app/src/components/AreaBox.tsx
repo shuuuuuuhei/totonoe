@@ -1,6 +1,6 @@
-import React, { Component, Fragment } from 'react'
-import { prefectureList, prefectureListPerArea } from '../utils/constants'
-import { Link } from 'react-router-dom'
+import React, { Fragment } from 'react';
+import { Link } from 'react-router-dom';
+import { prefectureListPerArea } from '../utils/constants';
 
 const searchLink = "/search?lang=jp&page=1&area=";
 

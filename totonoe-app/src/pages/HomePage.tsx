@@ -1,8 +1,7 @@
-import React, { Fragment } from "react"
-import Alert from 'react-bootstrap/Alert';
+import React, { Fragment } from "react";
+import { AreaBox } from "../components/AreaBox";
 import { ArticlesBox } from "../components/ArticlesBox";
 import { SearchBox } from "../components/SearchBox";
-import { AreaBox } from "../components/AreaBox";
 export const Home: React.VFC = () => {
     return (
         <Fragment>

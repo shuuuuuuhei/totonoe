@@ -2,6 +2,7 @@ package presenter
 
 import (
 	"github.com/gin-gonic/gin"
+	"main.go/model/Domain"
 	"main.go/model/ValueObject"
 	"main.go/usecase/port"
 )
@@ -10,10 +11,9 @@ type Facility struct {
 	c *gin.Context
 }
 
-func NewFacilityOutputPort(c *gin.Context) port.FacilityOutputPort {
-	return &Facility{
-		c: c,
-	}
+// RenderPostFacility implements port.FacilityOutputPort
+func (f *Facility) RenderPostFacility(postFacility *Domain.Facility) {
+	f.c.JSON(200, postFacility)
 }
 
 // RenderOK implements port.FacilityOutputPort
@@ -33,4 +33,10 @@ func (f Facility) RenderFacilities(facilities *[]ValueObject.FacilityVO) {
 // RenderFacility implements port.FacilityOutputPort
 func (f Facility) RenderFacility(facility *ValueObject.FacilityVO) {
 	f.c.JSON(200, facility)
+}
+
+func NewFacilityOutputPort(c *gin.Context) port.FacilityOutputPort {
+	return &Facility{
+		c: c,
+	}
 }

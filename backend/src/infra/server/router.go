@@ -82,8 +82,15 @@ func (r *Routing) setRouting() {
 	cityController := controller.City{
 		InputFactory:  interactor.NewCityInputPort,
 		OutputFactory: presenter.NewCityOutputPort,
-		RepoFactory: gateway.NewCityRepository,
-		Conn:       r.DB.Connection,
+		RepoFactory:   gateway.NewCityRepository,
+		Conn:          r.DB.Connection,
+	}
+
+	authorizationController := controller.Authorization{
+		InputPortFactory:  interactor.NewAuthorizationInputPort,
+		OutputPortFactory: presenter.NewAuthorizationOutputPort,
+		RepositoryFactory: gateway.NewAuthorizationRepository,
+		Conn:              r.DB.Connection,
 	}
 
 	r.Gin.Use(corsMiddleware())
@@ -99,9 +106,12 @@ func (r *Routing) setRouting() {
 	// 市町村取得
 	r.Gin.GET("/prefecture/:prefectureID/cities", cityController.GetCitiesByPrefectureID)
 
+	// 都道府県IDと市町村名称からIDを取得
+	r.Gin.GET("/prefecture/:prefectureID/cities/:cityName", cityController.GetCityIDByPrefectureIDCityName)
+
 	// 施設情報取得
 	r.Gin.GET("/facility/:facilityID", facilityController.GetFacilityByID)
-	
+
 	// 施設名取得
 	r.Gin.GET("/facility/:facilityID/facilityName", facilityController.GetFacilityNameyID)
 
@@ -119,7 +129,6 @@ func (r *Routing) setRouting() {
 
 	// サウナ施設
 	r.Gin.POST("/facilities/new", facilityController.CreateFacility)
-	
 
 	// 記事
 	r.Gin.GET("/users/:userID/articles/", articleController.GetArticlesByUserID)
@@ -135,6 +144,8 @@ func (r *Routing) setRouting() {
 	r.Gin.POST("/profile", userController.GetProfile)
 	r.Gin.POST("/follow", userController.Follow)
 	r.Gin.POST("/unfollow", userController.Unfollow)
+	r.Gin.POST("/signup", userController.SingUp)
+	r.Gin.PUT("/profile", userController.UpdateProfile)
 
 	// 記事コメント
 	r.Gin.GET("/articles/:articleID/comments", commentController.GetAllCommentsByArticleID)
@@ -142,6 +153,20 @@ func (r *Routing) setRouting() {
 	r.Gin.POST("/articles/:articleID/comments/new", commentController.CreateComment)
 	r.Gin.DELETE("/articles/:articleID/comment/new", commentController.DeleteComment)
 
+	// 施設投稿権限申請登録処理
+	r.Gin.POST("/authorization/post/facilities", authorizationController.ApplySubmitFacilityAuth)
+
+	// 複数申請一括承認処理
+	r.Gin.POST("/authorization/certification", authorizationController.CertificationAuth)
+
+	// 権限情報取得
+	r.Gin.POST("/authorization", authorizationController.GetAuthorization)
+
+	// 権限申請中ユーザ情報取得
+	r.Gin.POST("/authorization/applying", authorizationController.GetApplyingAuthorization)
+
+	// 権限承認済ユーザー情報取得
+	r.Gin.POST("/authorization/applied", authorizationController.GetAppliedAuthorization)
 }
 
 // corsMiddleware CORSの設定

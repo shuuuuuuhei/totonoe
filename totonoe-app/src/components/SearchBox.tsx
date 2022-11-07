@@ -1,7 +1,7 @@
 import React, { Fragment, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
-import "../style/Search-Box.css"
 import { Link } from 'react-router-dom';
+import "../style/Search-Box.css";
 
 const MinPageCount = 1;
 export const SearchBox = () => {
