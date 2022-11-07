@@ -15,6 +15,7 @@ import { WaterBath } from '../@types/sauna/Waterbath'
 import { NewFacility, Facility, Address, City } from '../@types/sauna/Facility'
 import { NewSauna } from '../@types/sauna/Sauna'
 import { ConvertPrefectureNameToIndex } from '../common/Convert'
+import { AddressTextBox } from './AddressTextBox'
 const MinPrice = 1;
 interface MapInfo {
     map_name: string | null,
@@ -69,6 +70,11 @@ export const FacilitySubmitComponent = () => {
     const [errors, setErrors] = useState<IsRequiredCheckFacilitySubmitForm>();
     const location = useLocation();
     const { map_name, map_lat, map_lng } = location?.state as MapInfo || {};
+
+    /**
+     * 住所情報取得済(マップページから遷移)
+     */
+    const [isMentionedAddress, setIsMentionedAddress] = useState(false);
 
     // サウナState
     const [saunas, setSaunas] = useState<NewSauna[]>([
@@ -204,11 +210,14 @@ export const FacilitySubmitComponent = () => {
                                 ...address,
                                 prefecture_id: prefectureIndex,
                                 city_id: city.id,
-                                city_name: city.name,
+                                city_name: cityName,
                                 street_name: streetName,
                                 latitude: map_lat,
                                 longitude: map_lng,
                             });
+
+                            // 住所情報取得済に更新
+                            setIsMentionedAddress(true);
                         })
                         .catch((error) => {
                             console.log(error)
@@ -410,9 +419,23 @@ export const FacilitySubmitComponent = () => {
         fetchPostFacility();
     }
 
+    /**
+     * 入力エラーを取得
+     */
     const GetErrors = () => {
         if (errors) {
-            return <>・入力に不備があります</>
+            return (
+                <div>
+                    <p>入力に不備があります</p>
+                    {Object.values(errors).map((error) => {
+                        return (
+                            <div className="row">
+                                ・{error}
+                            </div>
+                        )
+                    })}
+                </div>
+            )
         }
     }
 
@@ -469,9 +492,16 @@ export const FacilitySubmitComponent = () => {
                             />
                             <Form.Control.Feedback type='invalid'>{errors?.name}</Form.Control.Feedback>
                         </Form.Group>
-                        <Form.Label htmlFor="">住所</Form.Label>
+                        <Form.Label className="py-2" htmlFor="">住所</Form.Label>
+                        {/* 住所情報取得済(マップページから遷移)の場合は固定にするために入力ボックスとテキストボックスを切り替える */}
                         <AddressState.Provider value={{ address, setAddress }}>
-                            <SelectAddress />
+                            {
+                                isMentionedAddress
+                                    ?
+                                    <AddressTextBox />
+                                    :
+                                    <SelectAddress />
+                            }
                         </AddressState.Provider>
                         <Form.Label htmlFor="">営業時間</Form.Label>
                         <div className="eigyo-time row">
@@ -559,6 +589,6 @@ export const FacilitySubmitComponent = () => {
                     </Form>
                 </div>
             </div>
-        </Fragment>
+        </Fragment >
     )
 }

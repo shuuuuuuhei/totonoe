@@ -21,8 +21,6 @@ export const SelectAddress = () => {
         name: address?.city_name,
     }]);
 
-    console.log(address, cityList);
-
     /**
      * 都道府県変更ハンドラ
      * @param event 
@@ -154,7 +152,7 @@ export const SelectAddress = () => {
                 <label htmlFor="">市区町村</label>
                 <div className="py-1">
                     <Form.Group>
-                        <Form.Select aria-label="Default select example" onChange={handleCity} value={address.city_name}
+                        <Form.Select aria-label="Default select example" onChange={handleCity}
                         // isInvalid={!!props.error?.city}
                         >
                             <option className="d-none" value="">市町村を選択</option>
