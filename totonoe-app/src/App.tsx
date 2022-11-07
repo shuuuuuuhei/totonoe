@@ -20,23 +20,19 @@ function App() {
   const { user, getIdTokenClaims, getAccessTokenWithPopup, isAuthenticated } = useAuth0();
   const [cookies, setCookie, removeCookie] = useCookies();
   const [isSignUpped, setIsSignUpped] = useState(false);
-
-  // 無駄なレンダリングを検知する
-  // if (process.env.NODE_ENV !== 'production') {
-  //   const {whyDidYouUpdate} = require('why-did-you-update')
-  //   whyDidYouUpdate(React)
-  // }
-
+  const userID = user?.sub?.split('|').at(1);
+  
   /**
    * ユーザを新規登録する
    */
   const fetchSubmitUser = async () => {
-
-    const uri = "http://localhost:4000/signup";
+    
     const accessToken = await getAccessTokenWithPopup({
       audience: 'https://totonoe-app.com',
       scope: 'read:current_user',
     });
+
+    const uri = "http://localhost:4000/signup";
 
     if (!accessToken) {
       throw Error("アクセストークンがありません。");
@@ -58,7 +54,8 @@ function App() {
       },
       body: JSON.stringify({ 'user_id': submitUser.id, 'name': submitUser.name, 'email': submitUser.email })
     };
-    fetch(uri, requestOption)
+    
+    await fetch(uri, requestOption)
       .then((response) => {
         if (!response.ok) {
           const err = new Error;
@@ -86,21 +83,22 @@ function App() {
     setCookie("userID", userID, { expires: now, path: '/' });
   }
 
-  const userID = user?.sub?.split('|').at(1);
-  console.log(userID, isAuthenticated)
+  // 画面ロード時
   useEffect(() => {
+
     if (typeof cookies.userID == 'undefined' && isAuthenticated) {
       setUserInfoCookie();
     }
 
     // ログイン回数が初回の場合はユーザ新規登録を行う
     if (user?.loginCount === 1 && !isSignUpped) {
-      try {
-        // サインアップ
-        fetchSubmitUser();
-      } catch{
-        console.log("ユーザ登録失敗");
-      }
+      // サインアップ
+      fetchSubmitUser().then(() => {
+        console.log("success sign up!");
+      })
+        .catch((err) => {
+          console.log("失敗" + err)
+        })
     } else if (isAuthenticated) {
       toast.success('おかえりなさい！');
     }
