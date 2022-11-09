@@ -89,15 +89,11 @@ export const ArticlePostPage = () => {
     }
 
     const [facilityName, setFacilityName] = useState<string>();
-    const [article, setArticle] = useState<NewArticle>({
-        ID: "",
-        Content: ``,
-        UserID: "",
-        SaunaID: "",
-    });
-
     const { getAccessTokenSilently } = useAuth0();
     const [cookies, setCookie, removeCookie] = useCookies();
+    /**
+     * 評価リスト
+     */
     const [rating, setRatingScore] = useState<RatingScore>({
         totonoi_score: defaultScore,
         relax_score: defaultScore,
@@ -106,10 +102,22 @@ export const ArticlePostPage = () => {
         service_score: defaultScore,
     });
 
+    /**
+     * 投稿記事
+     */
+    const [article, setArticle] = useState<NewArticle>({
+        ID: "",
+        Content: ``,
+        UserID: "",
+        SaunaID: "",
+        admission_date: new Date,
+    });
+
     useEffect(() => {
         // 施設名を取得する
         getFacilityName(facilityID);
     }, [])
+
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const name = event.target.name;
@@ -130,7 +138,6 @@ export const ArticlePostPage = () => {
         // facilityIDが空文字もしくはUndefinedなら処理終了
         if (IsNullOrUndefinedOrEmpty(facilityID)) return
 
-        console.log(facilityID)
         try {
             const uri = baseUri + "articles/new";
             const accessToken = await getAccessTokenSilently({
@@ -145,19 +152,26 @@ export const ArticlePostPage = () => {
                 },
                 body: JSON.stringify({ article, 'user_id': cookies.userID, "facility_id": parseInt(UndefinedOrNullConvertToEmpty(facilityID)), "rating": rating })
             }
-            console.log(requestOption)
-            fetch(uri, requestOption)
-                .then((response) => response.json())
+            await fetch(uri, requestOption)
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error("記事投稿に失敗しました。" + response.json() + response.status)
+                    }
+                    return response.json()
+                })
                 .then(data => {
                     toast.success('ととのい日記を投稿しました！');
                     navigate(`/articles/${data.id}`);
                 })
+                .catch(error => {
+                    toast.warning(error);
+                })
         }
         catch (error) {
-            console.log("エラー", error)
+            toast.warning(error);
         }
     }
-    const [startDate, setStartDate] = useState(new Date());
+
     registerLocale('ja', ja);
 
     const RatingForm: React.VFC<RatingOptionProps> = (ratingOptionProps) => {
@@ -189,8 +203,6 @@ export const ArticlePostPage = () => {
         )
     }
 
-    console.log(article)
-
     return (
         <Fragment>
             <div className="container p-5 text-center">
@@ -201,8 +213,8 @@ export const ArticlePostPage = () => {
                     <div className="col-1">訪問日</div>
                     <div className="col-1">
                         <DatePicker
-                            selected={startDate}
-                            onChange={(date: Date) => setStartDate(date)}
+                            selected={article.admission_date}
+                            onChange={(date: Date) => setArticle({ ...article, admission_date: date })}
                             dateFormat="yyyy/MM/dd"
                             locale='ja'
                         />

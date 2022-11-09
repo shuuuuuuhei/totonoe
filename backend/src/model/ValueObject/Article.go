@@ -18,6 +18,7 @@ type ArticleVO struct {
 	LikeCount     int8                `json:"like_count,omitempty"`
 	IsLiked       bool                `json:"is_liked,omitempty"`
 	CommentCount  int8                `json:"comment_count,omitempty"`
+	AdmissionDate time.Time           `json:"admission_date,omitempty"`
 	TotonoiScore  decimal.NullDecimal `gorm:"type:decimal" json:"totonoi_score,omitempty"`
 	RelaxScore    decimal.NullDecimal `gorm:"type:decimal" json:"relax_score,omitempty"`
 	PriceScore    decimal.NullDecimal `gorm:"type:decimal" json:"price_score,omitempty"`

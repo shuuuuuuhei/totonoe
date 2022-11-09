@@ -227,6 +227,7 @@ func (d *DB) CreateData() {
 		article.Content = "content_" + strconv.Itoa(i)
 		article.FacilityID = 1
 		article.UserID = user.ID
+		article.AdmissionDate = time.Date(2022, 5, 20, 23, 59, 59, 0, time.UTC)
 		if err := d.Connection.Create(&article).Error; err != nil {
 			fmt.Println(err)
 			return

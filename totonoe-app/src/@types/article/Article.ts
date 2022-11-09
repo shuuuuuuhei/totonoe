@@ -13,5 +13,6 @@ export type Article = {
     service_score: number,
     ambience_score: number,
     is_liked: boolean,
+    admission_date: string
     created_at: string,
 }

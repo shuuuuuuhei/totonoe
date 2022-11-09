@@ -17,6 +17,7 @@ type Article struct {
 	PriceScore    decimal.NullDecimal `gorm:"type:decimal" json:"price_score,omitempty"`
 	ServiceScore  decimal.NullDecimal `gorm:"type:decimal" json:"service_score,omitempty"`
 	AmbienceScore decimal.NullDecimal `gorm:"type:decimal" json:"ambience_score,omitempty"`
+	AdmissionDate time.Time           `json:"admission_date,omitempty"`
 	ArticleLikes  []ArticleLike
 	Comments      []Comment
 	CreatedAt     time.Time `gorm:"autoCreateTime" json:"created_at"`
