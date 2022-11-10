@@ -100,6 +100,9 @@ export const MaxScore = 5;
 export const MinScore = 1;
 export const precisionScore = 0.5;
 
+/**
+ * 評価項目リスト
+ */
 export const ratingList: RatingProperty[] = [
     {
         name: "ととのい度",
