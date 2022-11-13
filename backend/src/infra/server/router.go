@@ -136,7 +136,6 @@ func (r *Routing) setRouting() {
 	r.Gin.POST("/articles/new", articleController.CreateArticle)
 	r.Gin.POST("/articles/:articleID/like", articleController.LikeArticle)
 	r.Gin.DELETE("/articles/:articleID/like", articleController.DeleteLikedArtile)
-	// ↓まだ試してない
 	r.Gin.DELETE("/articles/:articleID", articleController.DeleteArticleByID)
 	r.Gin.PUT("/articles", articleController.UpdateArticleByID)
 
