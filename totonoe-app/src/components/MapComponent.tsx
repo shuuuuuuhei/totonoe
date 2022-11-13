@@ -1,9 +1,10 @@
 import { GoogleMap, InfoWindow, LoadScript, Marker } from "@react-google-maps/api";
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FacilityMapInfo } from '../@types/sauna/Facility';
 import { UndefinedConvertToZero, UndefinedOrNullConvertToEmpty } from '../common/Convert';
 import "../style/Map.css";
+import { Button } from "@mui/material";
 
 
 type Position = {
@@ -23,15 +24,19 @@ const containerStyle = {
 export const MapComponent = () => {
 
     const [libraries] = useState<Libraries>(['places'])
-
     const { search } = useLocation();
     const queryParams = new URLSearchParams(search);
     const areaParams = UndefinedOrNullConvertToEmpty(queryParams.get("area"));
-
-    const [currentLocation, setCurrentLocation] = useState<google.maps.LatLngLiteral>();
-
     const [facilityMapInfoList, setFacilityMapInfoList] = useState<FacilityMapInfo[]>();
     const [infoStyle, setInfoStyle] = useState<google.maps.Size>();
+    /**
+     * 検索したエリアの経度緯度
+    */
+    const [currentLocation, setCurrentLocation] = useState<google.maps.LatLngLiteral>();
+
+    const mapRef = useRef(null);
+
+    const [isIndicatedResearchMapButton, setIsIndicatedResearchMapButton] = useState(false);
 
     /**
      * @param map 
@@ -213,6 +218,32 @@ export const MapComponent = () => {
         }
     };
 
+    /**
+     * 初回マップ移動時に再検索ボタンを表示する
+     */
+    const indicateMapChangeButton = (e: google.maps.MapMouseEvent) => {
+        // if (!isIndicatedResearchMapButton) {
+        //     setIsIndicatedResearchMapButton(true);
+        // }
+        setCurrentLocation({
+            lat: e.latLng.lat(),
+            lng: e.latLng.lng(),
+        })
+    }
+
+    const handleChangeMap = () => {
+        // if (mapRef.current) {
+        //     const mapBounds = new window.google.maps.LatLngBounds(currentLocation);
+        //     mapRef.current.map_.fitBounds(mapBounds);
+        // }
+
+        const maps = document.getElementById('googleMap')
+        console.log(maps);
+    }
+
+    console.log(currentLocation)
+
+
     return (
         <Fragment>
             {/* <button onClick={fetchMap}>click here!</button> */}
@@ -242,8 +273,10 @@ export const MapComponent = () => {
                     </div>
                     {process.env.REACT_APP_GOOGLE_MAP_API ?
                         <div className="google-map col-8">
-                            <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAP_API} libraries={libraries} >
+                            <Button onClick={handleChangeMap}>再検索</Button>
+                            <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAP_API} libraries={libraries} id='googleMap'>
                                 <GoogleMap
+                                    ref={mapRef}
                                     mapContainerStyle={containerStyle}
                                     center={currentLocation}
                                     zoom={12}
@@ -254,6 +287,7 @@ export const MapComponent = () => {
                                     }}
                                     onLoad={map => onMapLoad(map)}
                                     id="map"
+                                    onMouseDown={indicateMapChangeButton}
                                 >
                                     {facilityMapInfoList?.map((facility, index) => {
                                         return (
