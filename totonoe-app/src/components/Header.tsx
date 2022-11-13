@@ -17,7 +17,7 @@ import { isAdminUser } from '../common/Check';
 import { Chip } from '@mui/material';
 export const Header = () => {
     const { getAccessTokenSilently } = useAuth0();
-    const { loginWithRedirect, isAuthenticated, logout, user } = useAuth0();
+    const { loginWithRedirect, isAuthenticated, logout, user, getAccessTokenWithPopup } = useAuth0();
     const [cookies, setCookie, removeCookie] = useCookies();
     const [isShowedUserContents, setIsShowedUserContents] = useState(false);
     const [authState, setAuthState] = useState<AuthState>();
@@ -33,7 +33,9 @@ export const Header = () => {
     const authenticateUser = async () => {
         // 認証処理
         try {
-            await loginWithRedirect();
+            await loginWithRedirect({
+                redirectUri: "http://localhost:3000/",
+            });
         } catch (err) {
             console.log("Log in failed", err);
         }
