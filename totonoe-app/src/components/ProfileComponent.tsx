@@ -98,9 +98,6 @@ export const ProfileComponent: React.VFC<profileProps> = ({ profile, setProfile 
                                 </div>
                             </div>
                         </div>
-                        <div className="row">
-                            <p>投稿数：10件</p>
-                        </div>
                         <div className="row py-3 border-bottom">
                             {profile?.is_me
                                 ? ""

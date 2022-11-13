@@ -1,14 +1,18 @@
 import { useAuth0 } from '@auth0/auth0-react'
-import { Rating } from '@mui/material'
-import React, { Fragment, useState } from 'react'
+import { Rating, Button } from '@mui/material'
+import React, { Fragment, useState, useEffect } from 'react'
 import { useCookies } from 'react-cookie'
 import { FaRegCommentDots } from 'react-icons/fa'
 import { GrLike } from 'react-icons/gr'
 import { MdInsertEmoticon } from 'react-icons/md'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Article } from '../@types/article/Article'
 import { RatingScore } from '../@types/article/Rating'
 import { precisionScore, ratingList } from '../utils/constants'
+import { SetDateFormat } from '../common/Convert'
+import SettingsIcon from '@mui/icons-material/Settings';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { toast } from 'react-toastify'
 
 type ArticleProps = {
     article: Article | undefined
@@ -25,8 +29,9 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
         service_score: article?.service_score,
         ambience_score: article?.ambience_score,
     }
-
-    console.log("test:", article)
+    const [showDeleteButton, setShowDeleteButton] = useState(false);
+    const navigate = useNavigate();
+    const [isMyArticle, setIsMyArticle] = useState(false);
 
     const handleLike = async () => {
 
@@ -108,6 +113,58 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
         fetchUnLike();
     }
 
+    const handleDeleteArticle = async () => {
+        const accessToken = await getAccessTokenSilently({
+            audience: 'https://totonoe-app.com',
+            scope: 'read:posts',
+        });
+        const articleID = article?.id;
+
+        if (!accessToken) {
+            throw Error("アクセストークンがありません。");
+        }
+
+        const fetchDeleteArticle = async () => {
+            const uri = "http://localhost:4000/articles/" + articleID;
+            const requestOption: RequestInit = {
+                method: "DELETE",
+                mode: "cors",
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ 'user_id': cookies.userID, 'article': article })
+            };
+            await fetch(uri, requestOption)
+                .then((response) => {
+                    if (!response.ok) {
+                        const err = new Error;
+                        console.log(response);
+                        err.message = "記事削除に失敗しました。" + response.status;
+                        throw err;
+                    }
+                    return;
+                })
+                .then(() => {
+                    navigate('/profile/' + cookies.userID,
+                        { state: { toast: { status: "success", message: "記事を削除しました。" } } }
+                    );
+                })
+                .catch(err => {
+                    toast.warning(err)
+                    console.log(err)
+                });
+            return
+        }
+        fetchDeleteArticle();
+    }
+
+    useEffect(() => {
+        if (article.user_id === cookies.userID) {
+            setIsMyArticle(true);
+        }
+
+    }, [])
     return (
         <Fragment>
             <div className="article-wrap border container text-center my-3 p-5" style={{ width: "800px" }}>
@@ -125,20 +182,38 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
                                 </div>
                                 <div className="col-9 user text-start">
                                     <Link to={`/profile/${article?.user_id}`}><p className="user-name m-0">{article?.user_name}</p></Link>
-                                    <p className="article-date m-0">{setDateFormat(article?.created_at)}</p>
+                                    <p className="article-date m-0">投稿日：{SetDateFormat(article?.created_at)}</p>
+                                    <p className="article-date m-0">訪問日：{SetDateFormat(article?.admission_date)}</p>
                                 </div>
                             </div>
                         </div>
 
                         <div className="col-3 article-right">
                             <div className="row text-end">
-                                <div className="col-6 article-like-count">
+                                <div className="col-5 article-like-count">
                                     <GrLike size={30} onClick={handleLike} />
                                     <p>{article?.like_count}</p>
                                 </div>
-                                <div className="col-6 article-comment-count">
+                                <div className="col-5 article-comment-count">
                                     <FaRegCommentDots size={30} />
                                     <p>{article?.comment_count}</p>
+                                </div>
+                                <div className="col-2">
+                                    {/* ユーザーが投稿した記事であれば設定アイコンを表示する */}
+                                    {
+                                        isMyArticle &&
+                                        <SettingsIcon
+                                            onClick={() => { setShowDeleteButton(!showDeleteButton) }}
+                                        />
+                                    }
+                                    {/* 削除ボタン表示 */}
+                                    {showDeleteButton &&
+                                        <div className="row" style={{ position: "absolute" }}>
+                                            <Button variant="outlined" startIcon={<DeleteIcon />} color="error" onClick={handleDeleteArticle}>
+                                                削除する
+                                            </Button>
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -180,12 +255,4 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
             </div>
         </Fragment>
     )
-}
-
-function setDateFormat(rowDate: string | undefined): string | undefined {
-    if (!rowDate) {
-        return rowDate
-    }
-    var convertedDate = rowDate.split('T').at(0)
-    return convertedDate
 }
