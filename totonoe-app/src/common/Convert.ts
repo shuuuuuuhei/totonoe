@@ -54,3 +54,14 @@ export const ConvertNaNToOne = (num: number) => {
 export const ConvertPrefectureNameToIndex = (prefectureName: string) => {
     return prefectureList.indexOf(prefectureName)
 }
+
+/**
+ *  サーバから取得した日付を表示用に置換する
+ */
+export const SetDateFormat = (rowDate: string | undefined) => {
+    if (!rowDate) {
+        return rowDate
+    }
+    var convertedDate = rowDate.split('T').at(0)
+    return convertedDate
+}
