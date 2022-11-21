@@ -7,6 +7,7 @@ import { ConvertNaNToOne, UndefinedOrNullConvertToEmpty } from '../common/Conver
 import { FacilityList } from '../components/FacilityList';
 import { SearchOption } from '../components/SearchOption';
 import { prefectureList } from '../utils/constants';
+import { IsNullOrUndefinedOrEmpty } from '../common/Check';
 
 const baseUri = 'http://localhost:4000/facilities?';
 const facilityCountPerPage = 20;
@@ -17,10 +18,18 @@ type city = {
     prefectureID: string,
 }
 
+interface SearchFilterState {
+    "saunaOptionState": [],
+    "termsState": [],
+    "saunaTypeState": [],
+}
+
 const MinPageCount = 1;
 
 export const SearchResultPage = () => {
     const { search } = useLocation();
+    const location = useLocation();
+    const searchFilterState = location.state as SearchFilterState;
     const queryParams = new URLSearchParams(search);
     const areaParams = UndefinedOrNullConvertToEmpty(queryParams.get("area"));
     const facilityName = UndefinedOrNullConvertToEmpty(queryParams.get("name"));
@@ -88,6 +97,7 @@ export const SearchResultPage = () => {
         };
 
         const fetchFacilities = async () => {
+
             await fetch(uri, requestOption)
                 .then((response) => {
                     if (!response.ok) {
@@ -112,36 +122,78 @@ export const SearchResultPage = () => {
         fetchFacilities();
     }
 
-    useEffect(() => {
-        // window.alert(pageCount.targetPage)
+    /**
+     * サウナ条件検索
+     * 遷移元のサウナ条件を指定してサウナを取得する
+     */
+    const fetchSaunasFilterSearch = async () => {
+        console.log(searchFilterState);
+
+        const uri = `${baseUri}`;
+        const requestOption: RequestInit = {
+            method: "POST",
+            mode: "cors",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ 'sauna_option': searchFilterState.saunaOptionState, 'sauna_type': searchFilterState.saunaTypeState, 'terms': searchFilterState.termsState })
+        };
+
+        await fetch(uri, requestOption)
+            .then((response) => {
+                if (!response.ok) {
+                    const err = new Error;
+                    err.message = "サウナ施設一覧取得に失敗しました" + response.status;
+                    throw err;
+                }
+                return response.json();
+            })
+            .then((resData: Facility[]) => {
+                setFacilitiesState(resData);
+                setMaxPage(ConvertNaNToOne(calculateMaxPageCount(resData[0]?.full_count)));
+            })
+            .catch(err => {
+                console.log(err)
+            });
+    }
+    const fetchSaunas = async () => {
         const uri = `${baseUri}area=${areaParams}&facilityName=${facilityName}&page=${pageCount.targetPage.toString()}&priceStart=${priceStart}&priceEnd=${priceEnd}&priceStart=${priceStart}&temperatureStart=${temperatureStart}&temperatureEnd=${temperatureEnd}`;
-        const fetchSaunas = async () => {
-            const requestOption: RequestInit = {
-                method: "GET",
-                mode: "cors",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            };
-            console.log(uri)
-            await fetch(uri, requestOption)
-                .then((response) => {
-                    if (!response.ok) {
-                        const err = new Error;
-                        err.message = "サウナ施設一覧取得に失敗しました" + response.status;
-                        throw err;
-                    }
-                    return response.json();
-                })
-                .then((resData: Facility[]) => {
-                    setFacilitiesState(resData);
-                    setMaxPage(ConvertNaNToOne(calculateMaxPageCount(resData[0]?.full_count)));
-                })
-                .catch(err => {
-                    console.log(err)
-                });
+        const requestOption: RequestInit = {
+            method: "GET",
+            mode: "cors",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        };
+        console.log(uri)
+        await fetch(uri, requestOption)
+            .then((response) => {
+                if (!response.ok) {
+                    const err = new Error;
+                    err.message = "サウナ施設一覧取得に失敗しました" + response.status;
+                    throw err;
+                }
+                return response.json();
+            })
+            .then((resData: Facility[]) => {
+                setFacilitiesState(resData);
+                setMaxPage(ConvertNaNToOne(calculateMaxPageCount(resData[0]?.full_count)));
+            })
+            .catch(err => {
+                console.log(err)
+            });
+    }
+
+    useEffect(() => {
+
+        // 条件検索で遷移してきた場合は、
+        if (!IsNullOrUndefinedOrEmpty(searchFilterState)) {
+            fetchSaunasFilterSearch();
+        } else {
+            // 通常の検索ボタンで遷移してきた場合
+            fetchSaunas();
         }
-        fetchSaunas();
+
 
         // 全国の場合は都道府県リストを参照するため、都道府県リストをエリアリストに格納して処理を終了
         if (areaParams === '') {
