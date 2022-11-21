@@ -89,7 +89,7 @@ export const ArticlePostPage = () => {
     }
 
     const [facilityName, setFacilityName] = useState<string>();
-    const { getAccessTokenSilently } = useAuth0();
+    const { getAccessTokenSilently, loginWithRedirect } = useAuth0();
     const [cookies, setCookie, removeCookie] = useCookies();
     /**
      * 評価リスト
@@ -119,6 +119,10 @@ export const ArticlePostPage = () => {
     }, [])
 
 
+    /**
+     * 入力内容変更ハンドラ
+     * @param event 
+     */
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const name = event.target.name;
         const value = event.target.value;
@@ -130,10 +134,16 @@ export const ArticlePostPage = () => {
         console.log(article)
     }
 
+    /**
+     * 記事登録ハンドラ
+     * @param evt 
+     */
     const handleSubmit = async (evt: any) => {
         evt.preventDefault();
 
-        if (!cookies.userID) return
+        if (!cookies.userID) {
+            loginWithRedirect();
+        }
 
         // facilityIDが空文字もしくはUndefinedなら処理終了
         if (IsNullOrUndefinedOrEmpty(facilityID)) return
