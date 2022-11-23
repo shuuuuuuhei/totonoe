@@ -24,6 +24,7 @@ export const TotonoeDescription = () => {
                             <h5>投稿</h5>
                             <p style={{ fontSize: "12px" }}>
                                 サウナでのととのいを共有することができます。
+                                <br />
                                 また、他の人のサウナ投稿をチェックすることができます。
                             </p>
                         </div>

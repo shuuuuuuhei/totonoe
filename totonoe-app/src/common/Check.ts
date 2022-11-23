@@ -56,7 +56,7 @@ export const isGeneralUser = (authorization: AuthState | undefined) => {
 }
 
 /**
- * クッキーが存在するか
+ * クッキー(ユーザーID)が存在するか
  */
 
 export const useIsSavedCookieOfUserID = () => {

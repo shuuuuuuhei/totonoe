@@ -70,6 +70,11 @@ func (f *Facility) GetFacilitiesWithFilter(c *gin.Context) (*[]ValueObject.Facil
 	// Select句生成
 	facilitiesSelectQuery := createFacilitiesSelectQuery(filterQuery)
 
+	// ページを取得
+	targetPageCount := 1
+	// ページ数を設定
+	facilitiesSelectQuery = createPagingLimitQuery(facilitiesSelectQuery, targetPageCount)
+
 	if err := facilitiesSelectQuery.Debug().Scan(&facilities).Error; err != nil {
 		return nil, err
 	}
@@ -211,7 +216,12 @@ func (f *Facility) GetFacilities(c *gin.Context) (*[]ValueObject.FacilityVO, err
 	getFacilityQuery := createFacilityWhereQuery(conn, requestPrams)
 
 	// リクエストパラメータからページンング処理を行う
-	getFacilityQuery = createPagingLimitQuery(getFacilityQuery, requestPrams)
+	targetPageCount, err := strconv.Atoi(requestPrams.Get("page"))
+
+	if err != nil {
+		return nil, fmt.Errorf("ページ数取得に失敗しました")
+	}
+	getFacilityQuery = createPagingLimitQuery(getFacilityQuery, targetPageCount)
 
 	getFacilityQuery = createFacilitiesSelectQuery(getFacilityQuery)
 	// 施設情報取得
@@ -354,24 +364,19 @@ func (f *Facility) GetFacilityByID(c *gin.Context) (*ValueObject.FacilityVO, err
 	return &facility, nil
 }
 
-// createPagingLimitQuery ページングの条件を付与する
-func createPagingLimitQuery(conn *gorm.DB, requestPrams url.Values) *gorm.DB {
+// createPagingLimitQuery 現在ページを受け取り、ページングの条件を付与する
+func createPagingLimitQuery(conn *gorm.DB, targetPageCount int) *gorm.DB {
+
+	// 1ページに表示する件数
+	rowCountPerPage := 20
+
+	// 現在ページから表示ページ数を算出する
+	startRowCount := rowCountPerPage * (targetPageCount - 1)
 
 	// ページング処理
-	if requestPrams.Get("page") != "" {
-		// 1ページに表示する件数
-		rowCountPerPage := 20
-		targetPageCount, err := strconv.Atoi(requestPrams.Get("page"))
+	conn.Limit(rowCountPerPage)
+	conn.Offset(startRowCount)
 
-		if err != nil {
-			return conn
-		}
-
-		startRowCount := rowCountPerPage * (targetPageCount - 1)
-
-		conn.Limit(rowCountPerPage)
-		conn.Offset(startRowCount)
-	}
 	return conn
 }
 

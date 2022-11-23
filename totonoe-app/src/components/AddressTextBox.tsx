@@ -1,5 +1,5 @@
 import React, { Component, Fragment, useContext } from 'react'
-import { AddressState } from './FacilitySubmitComponent';
+import { AddressState } from './Facility/FacilitySubmitComponent';
 import { prefectureList } from '../utils/constants';
 import { TextField } from '@mui/material';
 

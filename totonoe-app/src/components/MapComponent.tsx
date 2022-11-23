@@ -5,6 +5,7 @@ import { FacilityMapInfo } from '../@types/sauna/Facility';
 import { UndefinedConvertToZero, UndefinedOrNullConvertToEmpty } from '../common/Convert';
 import "../style/Map.css";
 import { Button } from "@mui/material";
+import { Libraries } from "../utils/constants";
 
 
 type Position = {
@@ -12,8 +13,6 @@ type Position = {
     name: string | undefined,
     showInfoWindow: boolean,
 }
-
-type Libraries = ("drawing" | "geometry" | "localContext" | "places" | "visualization")[];
 
 const defaultZoom = 10;
 const containerStyle = {
