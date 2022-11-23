@@ -27,6 +27,12 @@ func (*Facility) GetFacilitiesBySaunaOption(*gin.Context) (*[]ValueObject.Facili
 	panic("unimplemented")
 }
 
+type facilityFilterParams struct {
+	SaunaType   []string `json:"sauna_type"`
+	Terms       []string `json:"terms"`
+	SaunaOption []string `json:"sauna_option"`
+}
+
 type facilityParams struct {
 	UserID   string          `json:"user_id"`
 	Facility Domain.Facility `json:"facility"`
@@ -48,6 +54,95 @@ type mapInfoListParams struct {
 const (
 	DEFAULT_LATLNG = 0
 )
+
+// GetFacilitiesWithFilter サウナ施設条件検索
+func (f *Facility) GetFacilitiesWithFilter(c *gin.Context) (*[]ValueObject.FacilityVO, error) {
+	conn := f.conn
+
+	params := facilityFilterParams{}
+	json.NewDecoder(c.Request.Body).Decode(&params)
+
+	facilities := []ValueObject.FacilityVO{}
+
+	// Where句生成
+	filterQuery := createFilterQuery(conn, params)
+
+	// Select句生成
+	facilitiesSelectQuery := createFacilitiesSelectQuery(filterQuery)
+
+	if err := facilitiesSelectQuery.Debug().Scan(&facilities).Error; err != nil {
+		return nil, err
+	}
+
+	return &facilities, nil
+}
+
+// 条件部を生成
+func createFilterQuery(conn *gorm.DB, params facilityFilterParams) *gorm.DB {
+
+	// サウナ条件をサブクエリで指定
+	conn = createSaunaQuery(conn, params)
+
+	// 施設条件を生成
+	if len(params.Terms) > 0 {
+		conn = createFacilityTermsQuery(conn, params.Terms)
+	}
+
+	return conn
+}
+
+// サウナの条件をサブクエリを使用して指定する
+func createSaunaQuery(conn *gorm.DB, params facilityFilterParams) *gorm.DB {
+	subquery := conn
+
+	if len(params.SaunaType) > 0 {
+
+		subquery = subquery.Where("sauna.sauna_type in (?)", params.SaunaType)
+	}
+
+	if len(params.SaunaOption) > 0 {
+
+		for _, option := range params.SaunaOption {
+			switch option {
+			case "rouryu_flg":
+				subquery = subquery.Or("sauna.rouryu_flg='1'")
+			case "sauna_mat_flg":
+				subquery = subquery.Or("sauna.sauna_mat_flg='1'")
+			case "tv_flg":
+				subquery = subquery.Or("sauna.tv_flg='1'")
+			case "bgm_flg":
+				subquery = subquery.Or("sauna.bgm_flg='1'")
+			}
+		}
+	}
+
+	// サブクエリ生成
+	conn = conn.Debug().Or("exists(?)", subquery.Table("sauna").Select("sauna.*").Where("sauna.facility_id = facility.id"))
+	return conn
+}
+
+// 設備条件のクエリを作成
+func createFacilityTermsQuery(conn *gorm.DB, terms []string) *gorm.DB {
+	for _, term := range terms {
+		switch term {
+		case "lodging_flg":
+			conn = conn.Or("facility.lodging_flg='1'")
+		case "restaurant_flg":
+			conn = conn.Or("facility.restaurant_flg='1'")
+		case "working_space_flg":
+			conn = conn.Or("facility.working_space_flg='1'")
+		case "air_bath_flg":
+			conn = conn.Or("facility.air_bath_flg='1'")
+		case "books_flg":
+			conn = conn.Or("facility.books_flg='1'")
+		case "water_server_flg":
+			conn = conn.Or("facility.water_server_flg='1'")
+		case "heat_wave_flg":
+			conn = conn.Or("facility.heat_wave_flg='1'")
+		}
+	}
+	return conn
+}
 
 // GetFacilityNameByID 施設IDから施設名を取得
 func (f *Facility) GetFacilityNameByID(c *gin.Context) (*ValueObject.FacilityVO, error) {
@@ -118,14 +213,22 @@ func (f *Facility) GetFacilities(c *gin.Context) (*[]ValueObject.FacilityVO, err
 	// リクエストパラメータからページンング処理を行う
 	getFacilityQuery = createPagingLimitQuery(getFacilityQuery, requestPrams)
 
+	getFacilityQuery = createFacilitiesSelectQuery(getFacilityQuery)
 	// 施設情報取得
-	getFacilityQuery.Debug().Table("facility").
+	getFacilityQuery.Debug().Scan(&facilities)
+
+	return &facilities, nil
+}
+
+// createFacilitiesSelectQuery 施設一覧取得クエリ生成
+func createFacilitiesSelectQuery(getFacilityQuery *gorm.DB) *gorm.DB {
+	getFacilityQuery = getFacilityQuery.Table("facility").
 		Select("count(facility.id) over() as full_count, facility.id,facility.name,prefecture.name || city.name AS address,facility.tel,facility.eigyo_start,facility.eigyo_end,facility.price,facility.lodging_flg,facility.restaurant_flg,facility.working_space_flg,facility.books_flg,facility.heat_wave_flg,facility.air_bath_flg,facility.break_space_flg, facility.water_server_flg").
 		Joins("left join address on address.facility_id = facility.id").
 		Joins("left join prefecture on prefecture.id = address.prefecture_id").
-		Joins("left join city on city.id = address.city_id").Scan(&facilities)
+		Joins("left join city on city.id = address.city_id")
 
-	return &facilities, nil
+	return getFacilityQuery
 }
 
 // CreateFacility 施設登録処理
