@@ -120,6 +120,7 @@ func (r *Routing) setRouting() {
 
 	// サウナ施設情報取得
 	r.Gin.GET("/facilities", facilityController.GetFacilities)
+	r.Gin.POST("/facilities", facilityController.GetFacilitiesWithFilter)
 	r.Gin.POST("/facilities/map_infomation", facilityController.GetFacilitiesByMapInfo)
 
 	/**

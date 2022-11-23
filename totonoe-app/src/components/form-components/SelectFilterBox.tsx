@@ -34,8 +34,6 @@ export const SelectFilterBox = () => {
 
             setSaunaTypeState(newSaunaTypeList);
         }
-        console.log(saunaTypeState);
-
     }
 
     /**
@@ -90,6 +88,10 @@ export const SelectFilterBox = () => {
         }
     }
 
+    const handleCheckBoxClear = () => {
+
+    }
+
     return (
         <Fragment>
             <div className="container">
@@ -132,9 +134,11 @@ export const SelectFilterBox = () => {
                 </div>
             </div>
             <div className="row justify-content-center">
-                <Button variant="contained" className="col-2 mx-2">クリア</Button>
-                <Link to={`/search?page=1`} state={{ "saunaOptionState": saunaOptionState, "termsState": termsListState, "saunaTypeState": saunaTypeState }}>
-                    <Button variant="contained" color="warning" className="col-3 mx-2">検索</Button>
+                {/* <Button variant="contained" className="col-3" onClick={handleCheckBoxClear}>クリア</Button> */}
+                <Link to={`/search?page=1`} state={{ "saunaOptionState": saunaOptionState, "termsState": termsListState, "saunaTypeState": saunaTypeState }} className=" text-center col-6">
+                    <Button variant="contained" color="warning" fullWidth>
+                        検索
+                    </Button>
                 </Link>
             </div>
         </Fragment>

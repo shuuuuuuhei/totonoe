@@ -13,6 +13,7 @@ type FacilityInputPort interface {
 	GetFacilities(*gin.Context)
 	GetFacilitiesByMapInfomation(*gin.Context)
 	GetFacilityNameByID(*gin.Context)
+	GetFacilitiesWithFilter(*gin.Context)
 }
 
 type FacilityOutputPort interface {
@@ -30,4 +31,5 @@ type FacilityRepository interface {
 	GetFacilities(*gin.Context) (*[]ValueObject.FacilityVO, error)
 	GetFacilitiesByMapInfomation(*gin.Context) (*[]ValueObject.FacilityVO, error)
 	GetFacilityNameByID(*gin.Context) (*ValueObject.FacilityVO, error)
+	GetFacilitiesWithFilter(*gin.Context) (*[]ValueObject.FacilityVO, error)
 }
