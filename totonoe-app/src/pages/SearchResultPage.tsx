@@ -4,8 +4,8 @@ import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { Link, useLocation } from 'react-router-dom';
 import { Facility } from '../@types/sauna/Facility';
 import { ConvertNaNToOne, UndefinedOrNullConvertToEmpty } from '../common/Convert';
-import { FacilityList } from '../components/FacilityList';
-import { SearchOption } from '../components/SearchOption';
+import { FacilityList } from '../components/Facility/FacilityList';
+import { SearchOption } from '../components/Facility/SearchOption';
 import { prefectureList } from '../utils/constants';
 import { IsNullOrUndefinedOrEmpty } from '../common/Check';
 
@@ -256,7 +256,7 @@ export const SearchResultPage = () => {
 
         return (
             <Fragment>
-                <div className="border row container" style={{ position: "absolute", top: "350px", left: "450px", backgroundColor: "white", width: "850px", }} onClick={() => setShow(false)}>
+                <div className="border row container" style={{ position: "absolute", top: "45%", left: "20%", backgroundColor: "white", width: "850px", }} onClick={() => setShow(false)}>
                     {areaParams === '' ?
                         // 全国の都道府県を表示
                         detailAreaPrefectureList?.map((detailArea) => {

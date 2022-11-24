@@ -25,7 +25,7 @@ export const FacilityMapComponent = (props: FacilityMapComponentProps) => {
     const currentLocation: google.maps.LatLngLiteral = { lat: props.lat, lng: props.lng }
     const [libraries] = useState<Libraries>(['places'])
     const containerStyle = {
-        height: "150px",
+        height: "200px",
     };
 
     if (IsNullOrUndefinedOrEmpty(props.lat) || IsNullOrUndefinedOrEmpty(props.lng)) {

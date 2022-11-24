@@ -30,35 +30,31 @@ export const SaunaDetail = (props: SaunaDetailProps) => {
                         <div className="facility-image py-5">
                             ここには画像が入る
                         </div>
-                        <div className="facility-map">
+                        <div className="facility-map py-5">
                             <FacilityMapComponent lat={props.facility.latitude} lng={props.facility.longitude} />
                         </div>
                     </div>
 
                     <div className="col-7">
                         <table className="table table-striped">
-                            <tbody>
-                                <tr>
+                            <tbody className="py-3">
+                                <tr style={{ lineHeight: "50px" }}>
                                     <td>施設名</td>
                                     <td>{props.facility.name}</td>
                                 </tr>
-                                <tr>
+                                <tr style={{ lineHeight: "50px" }}>
                                     <td>住所</td>
                                     <td>{props.facility.address}</td>
                                 </tr>
-                                <tr>
-                                    <td>アクセス</td>
-                                    <td>{props.facility.access}</td>
-                                </tr>
-                                <tr>
+                                <tr style={{ lineHeight: "50px" }}>
                                     <td>TEL</td>
                                     <td>{props.facility.tel}</td>
                                 </tr>
-                                <tr>
+                                <tr style={{ lineHeight: "50px" }}>
                                     <td>営業時間</td>
                                     <td>{StrConvertStrTime(props.facility.eigyo_start, props.facility.eigyo_end)}</td>
                                 </tr>
-                                <tr>
+                                <tr style={{ lineHeight: "50px" }}>
                                     <td>料金</td>
                                     <td>¥{props.facility.price}</td>
                                 </tr>

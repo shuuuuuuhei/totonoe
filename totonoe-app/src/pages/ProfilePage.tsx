@@ -4,7 +4,7 @@ import { useCookies } from "react-cookie"
 import { Navigate, useParams, useLocation } from 'react-router-dom'
 import { Article } from '../@types/article/Article'
 import { Profile } from '../@types/Profile'
-import { ArticleList } from '../components/ArticleList'
+import { ArticleList } from '../components/Article/ArticleList'
 import { ProfileComponent } from '../components/ProfileComponent'
 import { useIsSavedCookieOfUserID, IsNullOrUndefinedOrEmpty } from '../common/Check'
 import { toast } from 'react-toastify'
