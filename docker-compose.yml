@@ -1,27 +1,26 @@
 version: '3'
 services: 
-    db:
-        image: postgres:latest
+    totonoe:
+        container_name: totonoe
         build:
             context: .
             dockerfile: ./db/Dockerfile
-            args:
-                - DB_LANG=ja_JP
         environment:
             POSTGRES_USER: postgres
             POSTGRES_PASSWORD: postgres
             POSTGRES_DB: totonoe
         ports:
             - 5432:5432
-        restart: always
         volumes:
             - ./db:/usr/local/bin/postgres
+        networks:
+            - totonoe-network
     frontend:
         build: 
             context: .
             dockerfile: ./totonoe-app/Dockerfile
         depends_on: 
-            - db
+            - totonoe
         volumes:
             - ./totonoe-app:/frontend/src
         ports: 
@@ -31,15 +30,22 @@ services:
         environment: 
             - CHOKIDAR_USEPOLLING=true
         command: sh -c "npm start"
+        networks:
+            - totonoe-network
     backend:
         build: 
             context: .
             dockerfile: ./backend/Dockerfile
         depends_on: 
-            - db
+            - totonoe
         tty: true
         volumes:
             - ./backend:/backend
         ports:
             - 4000:4000
         command: go run main.go
+        networks:
+            - totonoe-network
+networks: 
+    totonoe-network:
+        external: true
