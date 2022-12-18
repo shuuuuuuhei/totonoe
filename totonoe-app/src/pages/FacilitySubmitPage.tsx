@@ -1,13 +1,13 @@
 import React, { Component, Fragment } from 'react'
 import { Input } from '../components/form-components/Input'
-import { FacilitySubmitComponent } from '../components/FacilitySubmitComponent'
+import { FacilitySubmitComponent } from '../components/Facility/FacilitySubmitComponent'
 
 export const SaunaSubmitPage = () => {
     const handleChange = () => {
-        
+
     }
 
-    return(
+    return (
         <Fragment>
             <FacilitySubmitComponent />
         </Fragment>

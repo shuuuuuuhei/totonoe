@@ -4,8 +4,8 @@ import { HiOutlinePencilAlt } from 'react-icons/hi';
 import { Link, useParams } from 'react-router-dom';
 import { Article } from '../@types/article/Article';
 import { Facility } from '../@types/sauna/Facility';
-import { ArticleList } from '../components/ArticleList';
-import { SaunaDetail } from '../components/SaunaDetail';
+import { ArticleList } from '../components/Article/ArticleList';
+import { SaunaDetail } from '../components/Facility/SaunaDetail';
 import { Valuation } from '../components/Valuation';
 
 export const SaunaPage = () => {
