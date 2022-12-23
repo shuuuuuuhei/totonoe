@@ -89,6 +89,15 @@ export const SelectFilterBox = () => {
     }
 
     const handleCheckBoxClear = () => {
+        // チェックボックスをクリア
+        const checkBoxList = document.querySelectorAll<HTMLInputElement>("input[type='checkbox']");
+        console.log(checkBoxList);
+
+        checkBoxList.forEach((checkBox) => {
+            checkBox.checked = false;
+        })
+
+        // リスト状態を初期化
 
     }
 
@@ -134,7 +143,7 @@ export const SelectFilterBox = () => {
                 </div>
             </div>
             <div className="row justify-content-center">
-                {/* <Button variant="contained" className="col-3" onClick={handleCheckBoxClear}>クリア</Button> */}
+                <Button variant="contained" className="col-3" onClick={handleCheckBoxClear}>クリア</Button>
                 <Link to={`/search?page=1`} state={{ "saunaOptionState": saunaOptionState, "termsState": termsListState, "saunaTypeState": saunaTypeState }} className=" text-center col-6">
                     <Button variant="contained" color="warning" fullWidth>
                         検索
