@@ -15,4 +15,5 @@ export type Article = {
     is_liked: boolean,
     admission_date: string
     created_at: string,
+    prefecture_id: number
 }

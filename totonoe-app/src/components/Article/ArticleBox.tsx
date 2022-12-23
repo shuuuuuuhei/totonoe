@@ -11,7 +11,7 @@ export type ArticleBoxProps = {
     article: Article | undefined
 }
 export const ArticleBox: React.VFC<ArticleBoxProps> = (props) => {
-    console.log(props.article);
+    console.log(props.article.prefecture_id);
 
     return (
         <Fragment>
@@ -29,7 +29,7 @@ export const ArticleBox: React.VFC<ArticleBoxProps> = (props) => {
                     <div className="text-center">
                         <Link to={"/saunas/" + props.article.facility_id}>
                             <h4>{props.article.facility_name}</h4>
-                            <p style={{ fontSize: "9px" }}>{prefectureList[props.article.prefecture_id]}</p>
+                            <p style={{ fontSize: "9px" }}>{prefectureList[props.article.prefecture_id - 1]}</p>
                         </Link>
                     </div>
                     <div className="article-content">

@@ -12,6 +12,7 @@ type ArticleVO struct {
 	CreatedAt     time.Time           `json:"created_at,omitempty"`
 	UpdatedAt     time.Time           `json:"updated_at,omitempty"`
 	FacilityID    uint32              `json:"facility_id,omitempty"`
+	PrefectureID    uint32            `json:"prefecture_id,omitempty"`
 	FacilityName  string              `json:"facility_name,omitempty"`
 	UserID        string              `json:"user_id,omitempty"`
 	UserName      string              `json:"user_name,omitempty"`

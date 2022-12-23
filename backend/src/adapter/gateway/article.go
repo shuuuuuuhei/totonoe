@@ -165,8 +165,10 @@ func (a *ArticleRepository) GetArticlesOrderByDate(ctx *gin.Context) (*[]ValueOb
 	articles := []ValueObject.ArticleVO{}
 
 	if err := conn.Debug().
-		Table("article").Limit(9).Select(`article.*,facility.id as facility_id, facility.name as facility_name, "user".id AS user_id, "user".name AS user_name`).
-		Joins("inner join facility on facility.id = article.facility_id").Joins(`inner join "user" on "user".id = article.user_id`).
+		Table("article").Limit(9).Select(`article.*,facility.id as facility_id, facility.name as facility_name, "user".id AS user_id, "user".name AS user_name, address.prefecture_id`).
+		Joins("inner join facility on facility.id = article.facility_id").
+		Joins(`inner join "user" on "user".id = article.user_id`).
+		Joins("inner join address on facility.id = address.facility_id").
 		Order("created_at DESC").Scan(&articles).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Println("記事が見つかりませんでした。)")
