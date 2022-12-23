@@ -1,9 +1,9 @@
 import { useAuth0 } from '@auth0/auth0-react'
-import { Rating, Button } from '@mui/material'
+import { Rating, Button, IconButton } from '@mui/material'
 import React, { Fragment, useState, useEffect } from 'react'
 import { useCookies } from 'react-cookie'
-import { FaRegCommentDots } from 'react-icons/fa'
-import { GrLike } from 'react-icons/gr'
+import ChatIcon from '@mui/icons-material/Chat';
+import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
 import { MdInsertEmoticon } from 'react-icons/md'
 import { Link, useNavigate } from 'react-router-dom'
 import { Article } from '../../@types/article/Article'
@@ -69,9 +69,19 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
                         return;
                     })
                     .then(() => {
-                        setArticle((prevState) => (
-                            prevState ? { ...prevState, like_count: prevState.like_count + 1, is_liked: true } : undefined
-                        ))
+                        if (!article.like_count) {
+                            setArticle({
+                                ...article,
+                                like_count: 1,
+                                is_liked: true,
+                            })
+                        } else {
+                            setArticle({
+                                ...article,
+                                like_count: article.like_count + 1,
+                                is_liked: true,
+                            })
+                        }
                     })
                     .catch(err => {
                         console.log(err)
@@ -190,12 +200,14 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
 
                         <div className="col-3 article-right">
                             <div className="row text-end">
-                                <div className="col-5 article-like-count">
-                                    <GrLike size={30} onClick={handleLike} />
+                                <div className="col-5 article-like-count text-center">
+                                    {
+                                        article.is_liked ? <IconButton onClick={handleLike}><ThumbUpOffAltIcon fontSize="large" color="warning" /></IconButton> : <IconButton onClick={handleLike}><ThumbUpOffAltIcon fontSize="large" /></IconButton>
+                                    }
                                     <p>{article?.like_count}</p>
                                 </div>
-                                <div className="col-5 article-comment-count">
-                                    <FaRegCommentDots size={30} />
+                                <div className="col-5 article-comment-count text-center py-2">
+                                    <ChatIcon fontSize="large" />
                                     <p>{article?.comment_count}</p>
                                 </div>
                                 <div className="col-2">
