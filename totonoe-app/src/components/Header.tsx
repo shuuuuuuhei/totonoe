@@ -15,6 +15,9 @@ import { toast } from 'react-toastify'
 import { AuthState } from '../@types/Authorization';
 import { isAdminUser } from '../common/Check';
 import { Chip } from '@mui/material';
+import AppIcon from '../images/Totonoe.png'
+
+
 export const Header = () => {
     const { getAccessTokenSilently } = useAuth0();
     const { loginWithRedirect, isAuthenticated, logout, user, getAccessTokenWithPopup } = useAuth0();
@@ -151,7 +154,7 @@ export const Header = () => {
                 pauseOnHover
             />
 
-            <div className="header row" id="top-header">
+            <div className="header row m-0 py-3" style={{ backgroundColor: "#FFCC66" }}>
                 <div className="header-top d-flex justify-content-between">
                     <div className="header-top-left">
                         <Link to={'saunas/new'}><GiHotSpices size={50} /></Link>
@@ -227,8 +230,8 @@ export const Header = () => {
                     </div>
                 </div>
                 <div className="d-flex justify-content-center">
-                    <div className="header-title">
-                        <Link to="/"><h1>Totonoe</h1></Link>
+                    <div className="header-title text-center">
+                        <Link to="/"><img src={AppIcon} alt="" style={{ width: "60%", height: "auto", borderRadius: "50%" }} /></Link>
                     </div>
                 </div>
             </div>
