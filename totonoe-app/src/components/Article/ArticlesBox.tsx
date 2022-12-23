@@ -46,13 +46,15 @@ export const ArticlesBox = () => {
     }
     return (
         <Fragment>
-            <div className="list-wrap container">
+            <div className="container">
                 <h5>人気の投稿</h5>
                 <div className="articles-box">
-                    <div className="row justify-content-center align-items-center py-3">
-                        <ArticleBox article={articles?.at(0)} />
-                        <ArticleBox article={articles?.at(1)} />
-                        <ArticleBox article={articles?.at(2)} />
+                    <div className="row py-3 ">
+                        {articles.map((article) => {
+                            return (
+                                <ArticleBox article={article} />
+                            )
+                        })}
                     </div>
                 </div>
             </div>
