@@ -11,8 +11,6 @@ export type ArticleBoxProps = {
     article: Article | undefined
 }
 export const ArticleBox: React.VFC<ArticleBoxProps> = (props) => {
-    console.log(props.article.prefecture_id);
-
     return (
         <Fragment>
             <div className="card col-3 mx-5 my-3">
