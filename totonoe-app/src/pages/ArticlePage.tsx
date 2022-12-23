@@ -4,23 +4,23 @@ import { useCookies } from 'react-cookie';
 import { useParams } from 'react-router-dom';
 import { Article } from '../@types/article/Article';
 import { Comment } from '../@types/article/Comment';
-import { DetailArticle } from '../components/Article';
+import { DetailArticle } from '../components/Article/Article';
 import { Comments } from '../components/Comment';
 
 export const ArticlePage = () => {
     const [article, setArticle] = useState<Article>();
     const [comments, setComments] = useState<Comment[]>();
     const params = useParams();
-    const {getAccessTokenSilently} = useAuth0();
-    const [cookies, setCookie,removeCookie] = useCookies();
-           
+    const { getAccessTokenSilently } = useAuth0();
+    const [cookies, setCookie, removeCookie] = useCookies();
+
     useEffect(() => {
-        if(!params.articleID) {
+        if (!params.articleID) {
             console.log("articleIDなし")
             return
         }
-        const fetchArticle = async() => {
-            const uri = "http://localhost:4000/articles/"+params.articleID;
+        const fetchArticle = async () => {
+            const uri = "http://localhost:4000/articles/" + params.articleID;
             const accessToken = await getAccessTokenSilently({
                 audience: 'https://totonoe-app.com',
                 scope: 'read:posts',
@@ -35,24 +35,24 @@ export const ArticlePage = () => {
                 },
             };
             await fetch(uri, requestOption)
-            .then((response) => {
-                if (!response.ok) {
-                    const err = new Error;
-                    console.log(response);
-                    err.message = "記事が見つかりませんでした。記事ID："+ params.articleID + ", レスポンスコード：" + response.status;
-                    throw err;
-                }
-                return response.json();
-            })
-            .then((resData: Article) => {
-                setArticle(resData)
-            })
-            .catch(err => {
-                console.log(err)
-            });        
+                .then((response) => {
+                    if (!response.ok) {
+                        const err = new Error;
+                        console.log(response);
+                        err.message = "記事が見つかりませんでした。記事ID：" + params.articleID + ", レスポンスコード：" + response.status;
+                        throw err;
+                    }
+                    return response.json();
+                })
+                .then((resData: Article) => {
+                    setArticle(resData)
+                })
+                .catch(err => {
+                    console.log(err)
+                });
         }
-        const fetchComment = async() => {
-            const uri = "http://localhost:4000/articles/"+params.articleID+"/comments";
+        const fetchComment = async () => {
+            const uri = "http://localhost:4000/articles/" + params.articleID + "/comments";
             const accessToken = await getAccessTokenSilently({
                 audience: 'https://totonoe-app.com',
                 scope: 'read:posts',
@@ -66,35 +66,35 @@ export const ArticlePage = () => {
                 },
             };
             await fetch(uri, requestOption)
-            .then((response) => {
-                if (!response.ok) {
-                    const err = new Error;
-                    console.log(response);
-                    err.message = "記事コメントの取得に失敗しました, articleID: "+ params.articleID + ", レスポンスコード：" + response.status;
-                    throw err;
-                }
-                return response.json();
-            })
-            .then((resData) => {
-                setComments(resData);
-            })
-            .catch(err => {
-                console.log(err)
-            });        
+                .then((response) => {
+                    if (!response.ok) {
+                        const err = new Error;
+                        console.log(response);
+                        err.message = "記事コメントの取得に失敗しました, articleID: " + params.articleID + ", レスポンスコード：" + response.status;
+                        throw err;
+                    }
+                    return response.json();
+                })
+                .then((resData) => {
+                    setComments(resData);
+                })
+                .catch(err => {
+                    console.log(err)
+                });
         }
         fetchComment();
         fetchArticle();
     }, [])
-    if(!article) {
-        return(
+    if (!article) {
+        return (
             <div>ロード中...</div>
         )
     }
-    return(
+    return (
         <Fragment>
-            <DetailArticle article={article}/>
-            <hr/>
-            <Comments comments={comments} setComments={setComments} articleID={article.id}/>
+            <DetailArticle article={article} />
+            <hr />
+            <Comments comments={comments} setComments={setComments} articleID={article.id} />
         </Fragment>
     )
 }
