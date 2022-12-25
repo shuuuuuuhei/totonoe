@@ -11,7 +11,7 @@ export const ArticlePage = () => {
     const [article, setArticle] = useState<Article>();
     const [comments, setComments] = useState<Comment[]>();
     const params = useParams();
-    const { getAccessTokenSilently } = useAuth0();
+    const { getAccessTokenSilently, loginWithRedirect } = useAuth0();
     const [cookies, setCookie, removeCookie] = useCookies();
 
     useEffect(() => {
@@ -21,19 +21,17 @@ export const ArticlePage = () => {
         }
         const fetchArticle = async () => {
             const uri = "http://localhost:4000/articles/" + params.articleID;
-            const accessToken = await getAccessTokenSilently({
-                audience: 'https://totonoe-app.com',
-                scope: 'read:posts',
-            });
+
             const requestOption: RequestInit = {
                 method: "GET",
                 mode: "cors",
                 headers: {
-                    Authorization: `Bearer ${accessToken}`,
                     "Content-Type": "application/json",
-                    "User-ID": cookies.userID,
+                    // 未ログインの場合はユーザーIDを指定しない
+                    "User-ID": cookies.userID ? cookies.userID : "",
                 },
             };
+
             await fetch(uri, requestOption)
                 .then((response) => {
                     if (!response.ok) {

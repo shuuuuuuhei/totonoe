@@ -13,7 +13,6 @@ import { Stack } from '@mui/material'
 export const ProfilePage = () => {
     const [profile, setProfile] = useState<Profile | null>();
     const [articles, setArticles] = useState<[Article]>();
-    const { getAccessTokenSilently, loginWithRedirect } = useAuth0();
     const [cookies, setCookie, removeCookie] = useCookies();
 
     /* 
@@ -41,31 +40,15 @@ export const ProfilePage = () => {
 
         const fetchGetArticle = async () => {
 
-            const accessToken = await getAccessTokenSilently({
-                audience: 'https://totonoe-app.com',
-                scope: 'read:posts',
-            });
 
-            if (!accessToken) {
-                throw Error("アクセストークンがありません。");
-            }
-
-            if (!useIsSavedCookieOfUserID) {
-                console.log("クッキー情報なし");
-
-                await loginWithRedirect({
-                    redirectUri: "http://localhost:3000/",
-                });
-            }
             const uri = "http://localhost:4000/users/" + userID + "/articles/";
 
             const requestOption: RequestInit = {
                 method: "GET",
                 mode: "cors",
                 headers: {
-                    Authorization: `Bearer ${accessToken}`,
                     "Content-Type": "application/json",
-                    "User-ID": cookies.userID,
+                    "User-ID": cookies.userID ? cookies.userID : "",
                 },
             };
             await fetch(uri, requestOption)
@@ -87,20 +70,11 @@ export const ProfilePage = () => {
         const fetchProfile = async () => {
 
             const uri = "http://localhost:4000/profile";
-            const accessToken = await getAccessTokenSilently({
-                audience: 'https://totonoe-app.com',
-                scope: 'read:posts',
-            });
-
-            if (!accessToken) {
-                throw Error("アクセストークンがありません。");
-            }
 
             const requestOption: RequestInit = {
                 method: "POST",
                 mode: "cors",
                 headers: {
-                    Authorization: `Bearer ${accessToken}`,
                     "Content-Type": "application/json",
                     "User-ID": cookies.userID,
                 },
