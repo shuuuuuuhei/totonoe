@@ -98,6 +98,9 @@ func (r *Routing) setRouting() {
 	store := cookie.NewStore([]byte("secret"))
 	r.Gin.Use(sessions.Sessions("auth-session", store))
 
+	// 一般ユーザー(ログインなし)アクセス可能
+	r.Gin.POST("/profile", userController.GetProfile)
+
 	r.Gin.GET("/articles", articleController.GetArticlesOrderByDate)
 
 	// 都道府県取得
@@ -117,6 +120,8 @@ func (r *Routing) setRouting() {
 
 	// 記事取得
 	r.Gin.GET("/facilities/:facilityID/articles", articleController.GetArticleByFacilityID)
+	r.Gin.GET("/users/:userID/articles/", articleController.GetArticlesByUserID)
+	r.Gin.GET("/articles/:articleID", articleController.GetArticleByID)
 
 	// サウナ施設情報取得
 	r.Gin.GET("/facilities", facilityController.GetFacilities)
@@ -127,13 +132,11 @@ func (r *Routing) setRouting() {
 	@description All Auth Route
 	*/
 	r.Gin.Use(corsMiddleware(), adapter.Wrap(jwtMiddleware.CheckJWT))
-
+	// ログインユーザーアクセス可能
 	// サウナ施設
 	r.Gin.POST("/facilities/new", facilityController.CreateFacility)
 
 	// 記事
-	r.Gin.GET("/users/:userID/articles/", articleController.GetArticlesByUserID)
-	r.Gin.GET("/articles/:articleID", articleController.GetArticleByID)
 	r.Gin.POST("/articles/new", articleController.CreateArticle)
 	r.Gin.POST("/articles/:articleID/like", articleController.LikeArticle)
 	r.Gin.DELETE("/articles/:articleID/like", articleController.DeleteLikedArtile)
@@ -141,7 +144,6 @@ func (r *Routing) setRouting() {
 	r.Gin.PUT("/articles", articleController.UpdateArticleByID)
 
 	// ユーザー
-	r.Gin.POST("/profile", userController.GetProfile)
 	r.Gin.POST("/follow", userController.Follow)
 	r.Gin.POST("/unfollow", userController.Unfollow)
 	r.Gin.POST("/signup", userController.SingUp)
