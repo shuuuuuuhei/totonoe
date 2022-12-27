@@ -107,7 +107,7 @@ export const MapComponent = () => {
                     return response.json();
                 })
                 .then((resData) => {
-                    console.log(resData)
+                    console.log("施設情報：", resData)
                     setFacilityMapInfoList(resData)
                 })
                 .catch(err => {
@@ -207,13 +207,12 @@ export const MapComponent = () => {
 
     const markerStyle = (searchLocationIndex: number) => {
 
-        const facility = facilityMapInfoList?.find((f) => (f.location_index === searchLocationIndex))
         return {
             color: "white",
             fontFamily: "sans-serif",
             fontSize: "15px",
             fontWeight: "100",
-            text: UndefinedConvertToZero(facility?.article_count).toString(),
+            text: UndefinedConvertToZero(facilityMapInfoList[searchLocationIndex].article_count).toString(),
         }
     };
 
@@ -239,9 +238,6 @@ export const MapComponent = () => {
         const maps = document.getElementById('googleMap')
         console.log(maps);
     }
-
-    console.log(currentLocation)
-
 
     return (
         <Fragment>
@@ -294,15 +290,15 @@ export const MapComponent = () => {
                                                 <Marker position={{ lat: facility.latitude, lng: facility.longitude }} label={markerStyle(index)} onClick={() => handleToShowedInfoWindow(index)} />
                                                 {facility.showInfoWindow && infoStyle && <InfoWindow position={{ lat: facility.latitude, lng: facility.longitude }} options={{ pixelOffset: infoStyle }}>
                                                     <div>
-                                                        <p>{facility.name}</p>
-                                                        {facility.id ? <Link to={`/saunas/${facility.id}`}><p>施設情報を確認する</p></Link>
+                                                        <p style={{ fontSize: "18px", fontWeight: 800 }}>{facility.name}</p>
+                                                        {facility.id ? <Link to={`/saunas/${facility.id}`}><Button>施設情報を確認する</Button></Link>
                                                             :
                                                             <>
                                                                 <p>施設情報なし</p>
                                                                 <Link
                                                                     to={`/saunas/new`}
                                                                     state={{ map_name: facility.name, map_lat: facility.latitude, map_lng: facility.longitude }}
-                                                                >施設を登録する</Link>
+                                                                ><Button>施設を登録する</Button></Link>
                                                             </>
                                                         }
                                                     </div>
