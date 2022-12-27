@@ -20,7 +20,7 @@ type ArticleProps = {
 export const DetailArticle: React.VFC<ArticleProps> = (props) => {
 
     const [article, setArticle] = useState<Article | undefined>(props.article);
-    const { getAccessTokenSilently } = useAuth0();
+    const { getAccessTokenSilently, loginWithRedirect } = useAuth0();
     const [cookies, setCookie, removeCookie] = useCookies();
     const ratingScore: RatingScore | undefined = {
         totonoi_score: article?.totonoi_score,
@@ -34,16 +34,17 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
     const [isMyArticle, setIsMyArticle] = useState(false);
 
     const handleLike = async () => {
-
-        const accessToken = await getAccessTokenSilently({
-            audience: 'https://totonoe-app.com',
-            scope: 'read:posts',
-        });
-        const articleID = article?.id;
-
-        if (!accessToken) {
-            throw Error("アクセストークンがありません。");
+        let accessToken = ""
+        try {
+            accessToken = await getAccessTokenSilently({
+                audience: 'https://totonoe-app.com',
+                scope: 'read:posts',
+            });
+        } catch (error) {
+            toast.warning("ログインしてください")
+            return;
         }
+        const articleID = article?.id;
 
         // 未いいねの場合
         if (!article?.is_liked) {
