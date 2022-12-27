@@ -6,6 +6,7 @@ import { CgDetailsMore } from 'react-icons/cg';
 import { MdInsertEmoticon } from 'react-icons/md';
 import { Profile } from '../@types/Profile';
 import { UndefinedConvertToZero } from '../common/Convert';
+import { toast } from 'react-toastify';
 
 type profileProps = {
     profile: Profile | undefined
@@ -17,14 +18,21 @@ export const ProfileComponent: React.VFC<profileProps> = ({ profile, setProfile 
 
     const handleFollow = async () => {
         if (!cookies.userID) {
-            return
+            toast.warning("ログインしてください")
+            return;
         }
         try {
             const uri = "http://localhost:4000/follow";
-            const accessToken = await getAccessTokenSilently({
-                audience: 'https://totonoe-app.com',
-                scope: 'read:posts',
-            })
+            let accessToken = ""
+            try {
+                accessToken = await getAccessTokenSilently({
+                    audience: 'https://totonoe-app.com',
+                    scope: 'read:posts',
+                });
+            } catch (error) {
+                toast.warning("ログインしてください")
+                return;
+            }
             const requestOption: RequestInit = {
                 method: "POST",
                 headers: {
@@ -36,14 +44,12 @@ export const ProfileComponent: React.VFC<profileProps> = ({ profile, setProfile 
             fetch(uri, requestOption)
                 .then((response) => response.json())
                 .then(data => {
-                    console.log("prev:", profile?.followed_count)
                     setProfile((prevState) => (
                         prevState ? { ...prevState, is_following: true, followed_count: UndefinedConvertToZero(prevState.followed_count) + 1, } : null
                     ))
                 })
         }
         catch (err) {
-            console.log("エラー", err)
         }
     }
 
@@ -54,10 +60,16 @@ export const ProfileComponent: React.VFC<profileProps> = ({ profile, setProfile 
 
         try {
             const uri = "http://localhost:4000/unfollow";
-            const accessToken = await getAccessTokenSilently({
-                audience: 'https://totonoe-app.com',
-                scope: 'read:posts',
-            })
+            let accessToken = ""
+            try {
+                accessToken = await getAccessTokenSilently({
+                    audience: 'https://totonoe-app.com',
+                    scope: 'read:posts',
+                });
+            } catch (error) {
+                toast.warning("ログインしてください")
+                return;
+            }
             const requestOption: RequestInit = {
                 method: "POST",
                 headers: {
@@ -75,11 +87,9 @@ export const ProfileComponent: React.VFC<profileProps> = ({ profile, setProfile 
                 })
         }
         catch (err) {
-            console.log("エラー", err)
         }
     }
 
-    console.log(useCookies)
 
     return (
         <Fragment>
