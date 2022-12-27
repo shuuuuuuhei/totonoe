@@ -4,7 +4,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { useCookies } from 'react-cookie';
 import { Input } from './Input';
 import { prefectureList } from '../../utils/constants';
-import { AddressState } from '../FacilitySubmitComponent';
+import { AddressState } from '../Facility/FacilitySubmitComponent';
 import { toast } from 'react-toastify';
 
 const defaultIndex = 0;
