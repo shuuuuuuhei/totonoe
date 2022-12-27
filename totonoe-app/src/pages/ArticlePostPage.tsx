@@ -14,7 +14,7 @@ import { Article } from '../@types/article/Article'
 import { NewArticle } from '../@types/article/NewArticle'
 import { RatingOptionProps, RatingScore } from '../@types/article/Rating'
 import { Facility } from '../@types/sauna/Facility'
-import { IsNullOrUndefinedOrEmpty } from '../common/Check'
+import { IsNullOrUndefinedOrEmpty, useIsSavedCookieOfUserID } from '../common/Check'
 import { UndefinedOrNullConvertToEmpty } from '../common/Convert'
 import { defaultScore, precisionScore, ratingList } from '../utils/constants'
 
@@ -141,7 +141,7 @@ export const ArticlePostPage = () => {
     const handleSubmit = async (evt: any) => {
         evt.preventDefault();
 
-        if (!cookies.userID) {
+        if (useIsSavedCookieOfUserID) {
             loginWithRedirect();
         }
 
