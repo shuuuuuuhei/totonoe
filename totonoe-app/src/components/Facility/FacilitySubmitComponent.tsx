@@ -204,10 +204,9 @@ export const FacilitySubmitComponent = () => {
                     // 都道府県IDと市区町村名から市区町村情報を取得
                     fetchCityInfo(prefectureIndex + 1, cityName)
                         .then((city: City) => {
-                            console.log("fetch;", city)
                             setAddress({
                                 ...address,
-                                prefecture_id: prefectureIndex,
+                                prefecture_id: prefectureIndex + 1,
                                 city_id: city.id,
                                 city_name: cityName,
                                 street_name: streetName,
