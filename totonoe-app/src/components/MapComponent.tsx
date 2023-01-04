@@ -1,12 +1,12 @@
 import { GoogleMap, InfoWindow, LoadScript, Marker } from "@react-google-maps/api";
-import React, { Fragment, useState, useRef, useEffect } from 'react';
+import React, { Fragment, useState, useRef, useEffect, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FacilityMapInfo } from '../@types/sauna/Facility';
 import { UndefinedConvertToZero, UndefinedOrNullConvertToEmpty } from '../common/Convert';
 import "../style/Map.css";
 import { Button } from "@mui/material";
 import { Libraries } from "../utils/constants";
-
+import LoadingButton from "@mui/lab/LoadingButton";
 
 type Position = {
     latlng_literal: google.maps.LatLngLiteral,
@@ -33,49 +33,89 @@ export const MapComponent = () => {
     */
     const [currentLocation, setCurrentLocation] = useState<google.maps.LatLngLiteral>();
 
-    const mapRef = useRef(null);
+    /**
+     * マップ状態管理
+     */
+    const [mapState, setMap] = useState(null);
 
-    const [isIndicatedResearchMapButton, setIsIndicatedResearchMapButton] = useState(false);
+    /**
+     * 初期ロード管理
+     */
+    const [isInitialLoaded, setIsInitialLoaded] = useState(false);
+
+    /**
+     * マップロード管理
+     */
+    const [mapLoad, setMapLoad] = useState(false);
 
     /**
      * @param map 
-     * 指定された地名から緯度経度情報を取得して周辺のサウナ地域の情報をマップにLoadする
+     * 経度緯度情報からマップをLoadする
      */
-    const onMapLoad = (map: google.maps.Map) => {
+    const onMapLoad = useCallback((map: google.maps.Map) => {
 
-        const geocoding = new google.maps.Geocoder();
+        setMapLoad(true);
+        // 初回ロード
+        if (!isInitialLoaded) {
 
-        /** 指定された地名から経度緯度情報を取得する */
-        geocoding.geocode({ address: areaParams }, (results, status) => {
-            if (status === 'OK' && results) {
-                console.log(results[0].geometry.location.lat())
-                const lat = results[0].geometry.location.lat();
-                const lng = results[0].geometry.location.lng();
+            const geocoding = new google.maps.Geocoder();
 
-                setCurrentLocation({
-                    lat: lat,
-                    lng: lng,
-                });
+            /** 指定された地名から経度緯度情報を取得する */
+            geocoding.geocode({ address: areaParams }, (results, status) => {
+                if (status === 'OK' && results) {
+                    const lat = results[0].geometry.location.lat();
+                    const lng = results[0].geometry.location.lng();
 
-                /** 取得した経度緯度情報から距離を指定してサウナ施設情報を取得するリクエストを生成する */
-                const request: google.maps.places.TextSearchRequest = {
-                    location: { lat: lat, lng: lng },
-                    query: 'サウナ',
-                    radius: 5000
-                };
+                    setCurrentLocation({
+                        lat: lat,
+                        lng: lng,
+                    });
 
-                const service = new google.maps.places.PlacesService(map);
-                service.textSearch(request, callback);
+                    /** 取得した経度緯度情報から距離を指定してサウナ施設情報を取得するリクエストを生成する */
+                    const request: google.maps.places.TextSearchRequest = {
+                        location: { lat: lat, lng: lng },
+                        query: 'サウナ',
+                        radius: 5000
+                    };
 
-                setMapStyle(map)
-            } else {
-                alert('Geocode was not successful for the following reason: ' + status);
-            }
-        })
+                    const service = new google.maps.places.PlacesService(map);
+                    service.textSearch(request, callback);
+
+                    setMapStyle(map);
+                    setIsInitialLoaded(true);
+                } else {
+                    alert('Geocode was not successful for the following reason: ' + status);
+                }
+            })
+        } else {
+            // ２回目以降ロード
+            const lat = currentLocation.lat;
+            const lng = currentLocation.lng;
+
+            setCurrentLocation({
+                lat: lat,
+                lng: lng,
+            });
+
+            /** 取得した経度緯度情報から距離を指定してサウナ施設情報を取得するリクエストを生成する */
+            const request: google.maps.places.TextSearchRequest = {
+                location: { lat: lat, lng: lng },
+                query: 'サウナ',
+                radius: 5000
+            };
+
+            console.log(request);
+
+            const service = new google.maps.places.PlacesService(map);
+            service.textSearch(request, callback);
+        }
 
         /** infoWindowをバルーン上に表示するように設定する。マップ生成後(Load後)に設定しないとエラーが発生するためここに書く。 */
         setInfoStyle(new google.maps.Size(0, -45));
-    }
+
+        setMap(map);
+        setTimeout(() => setMapLoad(false), 3000);
+    }, [currentLocation, mapState])
 
     /**
      * 
@@ -107,7 +147,6 @@ export const MapComponent = () => {
                     return response.json();
                 })
                 .then((resData) => {
-                    console.log("施設情報：", resData)
                     setFacilityMapInfoList(resData)
                 })
                 .catch(err => {
@@ -167,7 +206,6 @@ export const MapComponent = () => {
         if (status == google.maps.places.PlacesServiceStatus.OK && results !== null) {
             for (var i = 0; i < results.length; i++) {
                 var place = results[i];
-                console.log(results[i])
 
                 if (!place.geometry?.location?.toJSON()) {
                     break
@@ -179,7 +217,6 @@ export const MapComponent = () => {
                 })
             }
         }
-        console.log(newLocationList)
 
         /**取得した緯度経度情報から施設情報を取得(まだ試行なし) */
         getFacilitiesInfo(newLocationList);
@@ -217,12 +254,9 @@ export const MapComponent = () => {
     };
 
     /**
-     * 初回マップ移動時に再検索ボタンを表示する
+     * 初回マップ表示位置から移動時に再検索ボタンを表示する
      */
     const indicateMapChangeButton = (e: google.maps.MapMouseEvent) => {
-        // if (!isIndicatedResearchMapButton) {
-        //     setIsIndicatedResearchMapButton(true);
-        // }
         setCurrentLocation({
             lat: e.latLng.lat(),
             lng: e.latLng.lng(),
@@ -230,13 +264,7 @@ export const MapComponent = () => {
     }
 
     const handleChangeMap = () => {
-        // if (mapRef.current) {
-        //     const mapBounds = new window.google.maps.LatLngBounds(currentLocation);
-        //     mapRef.current.map_.fitBounds(mapBounds);
-        // }
-
-        const maps = document.getElementById('googleMap')
-        console.log(maps);
+        onMapLoad(mapState);
     }
 
     return (
@@ -268,10 +296,11 @@ export const MapComponent = () => {
                     </div>
                     {process.env.REACT_APP_GOOGLE_MAP_API ?
                         <div className="google-map col-8">
-                            <Button onClick={handleChangeMap}>再検索</Button>
+                            <LoadingButton loading={mapLoad} onClick={handleChangeMap} style={{ position: "absolute", top: "55%", left: "58%", zIndex: 1000, backgroundColor: "white" }} >
+                                このエリアで再検索
+                            </LoadingButton>
                             <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAP_API} libraries={libraries} id='googleMap'>
                                 <GoogleMap
-                                    ref={mapRef}
                                     mapContainerStyle={containerStyle}
                                     center={currentLocation}
                                     zoom={12}
@@ -280,8 +309,7 @@ export const MapComponent = () => {
                                         mapTypeControl: false,
                                         fullscreenControl: false,
                                     }}
-                                    onLoad={map => onMapLoad(map)}
-                                    id="map"
+                                    onLoad={onMapLoad}
                                     onMouseDown={indicateMapChangeButton}
                                 >
                                     {facilityMapInfoList?.map((facility, index) => {
