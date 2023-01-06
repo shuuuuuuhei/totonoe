@@ -3,7 +3,7 @@ import { Input } from '../form-components/Input'
 import { Button, Form } from 'react-bootstrap'
 import { InputScope } from '../form-components/InputScope'
 import { Link } from 'react-router-dom'
-import { termsList } from '../../utils/constants'
+import { termsList, MinPageCount } from '../../utils/constants'
 
 type searchOptionProps = {
     handleSearch: (searchOption: string) => void
@@ -73,7 +73,7 @@ export const SearchOption = (props: searchOptionProps) => {
     }
 
     const returnPositionFromTop = () => {
-        const positionFromTop = document.getElementById('top-header')?.offsetTop;
+        const positionFromTop = document.getElementById('result-top')?.offsetTop;
         window.scrollTo({
             top: positionFromTop,
             behavior: "auto",
@@ -85,10 +85,9 @@ export const SearchOption = (props: searchOptionProps) => {
         const termsOption = termsListState?.map((terms) => { return "&" + terms.id + "=1" });
 
         // 追加検索のuriに検索条件を付与して、検索関数に引数として渡す
-        const searchOption = "&price_start=" + price.start + "&price_end=" + price.end + "&temperature_start=" + temperature.start + "&temperature_end=" + termsOption?.join('');
-        props.handleSearch(searchOption);
-
+        const searchOption = `&price_start=${price.start}&price_end=${price.end}&temperature_start=${temperature.start}&temperature_end=${termsOption?.join('')}&page=${MinPageCount}`;
         returnPositionFromTop();
+        props.handleSearch(searchOption);
     }
 
     // チェックボックスクリア処理

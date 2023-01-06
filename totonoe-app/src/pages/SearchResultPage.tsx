@@ -6,7 +6,7 @@ import { Facility } from '../@types/sauna/Facility';
 import { ConvertNaNToOne, UndefinedOrNullConvertToEmpty } from '../common/Convert';
 import { FacilityList } from '../components/Facility/FacilityList';
 import { SearchOption } from '../components/Facility/SearchOption';
-import { prefectureList } from '../utils/constants';
+import { prefectureList, MinPageCount } from '../utils/constants';
 import { IsNullOrUndefinedOrEmpty } from '../common/Check';
 
 const baseUri = 'http://localhost:4000/facilities?';
@@ -24,7 +24,6 @@ interface SearchFilterState {
     "saunaTypeState": [],
 }
 
-const MinPageCount = 1;
 
 export const SearchResultPage = () => {
     const { search } = useLocation();
@@ -102,7 +101,7 @@ export const SearchResultPage = () => {
                 .then((response) => {
                     if (!response.ok) {
                         const err = new Error;
-                        err.message = "サウナ施設一覧取得に失敗しました" + response.status;
+                        err.message = "サウナ施設一覧取得に失敗しました" + response.status + response.statusText;
                         throw err;
                     }
                     return response.json();
@@ -287,7 +286,7 @@ export const SearchResultPage = () => {
 
     return (
         <Fragment>
-            <div className="container text-center">
+            <div className="container text-center" id="result-top">
                 <div className="row">
                     <div className="search-option col-3 py-5">
                         <div className="row text-start border p-3 mb-3">
@@ -298,6 +297,7 @@ export const SearchResultPage = () => {
                             </div>
                             {areaParams ? <button><Link to={`/map?lang=jp&area=${areaParams}`}>GoogleMapで探す</Link></button> : <></>}
                         </div>
+                        {/* 条件検索 */}
                         <SearchOption handleSearch={handleSearch} />
                     </div>
                     <div className="result-list col-9 pt-5 px-5">
