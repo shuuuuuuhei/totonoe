@@ -163,3 +163,8 @@ export const AUTH_UNAUTHORIZED_STATE = '3';
  * マップライブラリ
  */
 export type Libraries = ("drawing" | "geometry" | "localContext" | "places" | "visualization")[];
+
+/**
+ * 最小ページ
+ */
+export const MinPageCount = 1;
