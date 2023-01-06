@@ -3,8 +3,8 @@ import { Button, Form } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { Modal, Typography, Box } from '@mui/material';
 import { SelectFilterBox } from './form-components/SelectFilterBox';
+import { MinPageCount } from '../utils/constants';
 
-const MinPageCount = 1;
 const style = {
     position: 'absolute' as 'absolute',
     top: '50%',

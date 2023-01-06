@@ -8,7 +8,7 @@ const filterTitleStyle = {
     fontWeight: "600",
     marginBottom: 0,
 };
-const MinPageCount = 1;
+
 export const SelectFilterBox = () => {
 
     const [saunaTypeState, setSaunaTypeState] = useState([]);
