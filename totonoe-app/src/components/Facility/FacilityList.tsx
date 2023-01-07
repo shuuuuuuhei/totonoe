@@ -4,11 +4,27 @@ import { BsHeart } from 'react-icons/bs'
 import { Link } from 'react-router-dom'
 import { StrConvertStrTime } from '../../common/Convert'
 import { Facility } from '../../@types/sauna/Facility'
+import { useAuth0 } from '@auth0/auth0-react'
+import { toast } from 'react-toastify'
 
 type FacilityListProps = {
     facilities: Facility[]
 }
 export const FacilityList = (props: FacilityListProps) => {
+    const { getAccessTokenSilently, loginWithRedirect } = useAuth0();
+
+    // ログインチェック
+    const checkLogin = async () => {
+        try {
+            await getAccessTokenSilently({
+                audience: 'https://totonoe-app.com',
+                scope: 'read:posts',
+            });
+        } catch (error) {
+            toast.warning("ログインしてください")
+            return;
+        }
+    }
     return (
         <Fragment>
             {props.facilities.map((facility) => {
@@ -19,11 +35,9 @@ export const FacilityList = (props: FacilityListProps) => {
                                 {/* サウナ施設詳細ページリンク */}
                                 <Link to={'/saunas/' + facility.id}><h3>{facility.name}</h3></Link>
                             </div>
-                            <div className="facility-action col-2 row">
+                            <div className="facility-action col-2 row" onClick={() => checkLogin}>
                                 {/* 投稿ページのリンク */}
-                                <Link to={`/saunas/${facility.id}/articles/new`} className="col-6"><HiOutlinePencilAlt size={40} /></Link>
-                                {/* お気に入り登録(未着手)
-                                <BsHeart size={35} className="col-6"/> */}
+                                <Link to={`/saunas/${facility.id}/articles/new`} className="col-6" ><HiOutlinePencilAlt size={40} /></Link>
                             </div>
                             <p className="facility-address">{facility.address}</p>
                             <div className="row">
