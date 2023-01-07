@@ -207,10 +207,8 @@ func (f *Facility) GetFacilitiesByMapInfomation(c *gin.Context) (*[]ValueObject.
 // GetFacilities サウナ施設条件検索を行う
 func (f *Facility) GetFacilities(c *gin.Context) (*[]ValueObject.FacilityVO, error) {
 	conn := f.conn
-
 	facilities := []ValueObject.FacilityVO{}
 	requestPrams := c.Request.URL.Query()
-	fmt.Println(requestPrams)
 
 	// リクエストパラメータからWhere句を作成する
 	getFacilityQuery := createFacilityWhereQuery(conn, requestPrams)
@@ -225,7 +223,9 @@ func (f *Facility) GetFacilities(c *gin.Context) (*[]ValueObject.FacilityVO, err
 
 	getFacilityQuery = createFacilitiesSelectQuery(getFacilityQuery)
 	// 施設情報取得
-	getFacilityQuery.Debug().Scan(&facilities)
+	if err := getFacilityQuery.Debug().Scan(&facilities).Error; err != nil {
+		return nil, err
+	}
 
 	return &facilities, nil
 }
@@ -374,8 +374,8 @@ func createPagingLimitQuery(conn *gorm.DB, targetPageCount int) *gorm.DB {
 	startRowCount := rowCountPerPage * (targetPageCount - 1)
 
 	// ページング処理
-	conn.Limit(rowCountPerPage)
-	conn.Offset(startRowCount)
+	conn.Debug().Limit(rowCountPerPage)
+	conn.Debug().Offset(startRowCount)
 
 	return conn
 }
