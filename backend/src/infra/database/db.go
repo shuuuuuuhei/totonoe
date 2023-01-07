@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"os"
@@ -112,13 +113,20 @@ func (d *DB) CreateData() {
 	}
 
 	authorization := Domain.Authorization{
+		ID:             0,
 		UserID:         user.ID,
 		AuthKB:         "999",
 		RequestStateKB: "0",
-		RequestDate:    time.Time{},
-		AppliedDate:    time.Time{},
-		CreatedAt:      time.Time{},
-		UpdatedAt:      time.Time{},
+		RequestDate: sql.NullTime{
+			Time:  time.Now(),
+			Valid: false,
+		},
+		AppliedDate: sql.NullTime{
+			Time:  time.Now(),
+			Valid: false,
+		},
+		CreatedAt: time.Time{},
+		UpdatedAt: time.Time{},
 	}
 
 	if err := d.Connection.Create(&authorization).Error; err != nil {
@@ -141,10 +149,16 @@ func (d *DB) CreateData() {
 			UserID:         user.ID,
 			AuthKB:         "0",
 			RequestStateKB: "1",
-			RequestDate:    time.Now(),
-			AppliedDate:    time.Time{},
-			CreatedAt:      time.Time{},
-			UpdatedAt:      time.Time{},
+			RequestDate: sql.NullTime{
+				Time:  time.Now(),
+				Valid: true,
+			},
+			AppliedDate: sql.NullTime{
+				Time:  time.Time{},
+				Valid: false,
+			},
+			CreatedAt: time.Time{},
+			UpdatedAt: time.Time{},
 		}
 
 		if err := d.Connection.Create(&authorization).Error; err != nil {
