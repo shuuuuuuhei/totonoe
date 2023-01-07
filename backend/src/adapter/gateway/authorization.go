@@ -18,7 +18,6 @@ import (
 type Authorization struct {
 	conn *gorm.DB
 }
-
 type authorizationParams struct {
 	UserID string `json:"user_id,omitempty"`
 	AuthKB string `json:"auth_kb,omitempty"`
@@ -56,6 +55,27 @@ const (
 	// 管理者
 	ADMIN_AUTH_KB = "999"
 )
+
+// DeleteAuthorization 権限情報削除処理
+func (a *Authorization) DeleteAuthorization(c *gin.Context) error {
+	conn := a.conn
+
+	params := authorizationParams{}
+
+	// パラメータ取得
+	json.NewDecoder(c.Request.Body).Decode(&params)
+
+	// ユーザー存在チェックを行う
+	if err := common.CheckUserByID(params.UserID, conn); err != nil {
+		return err
+	}
+
+	if err := conn.Debug().Where("user_id=?", params.UserID).Delete(&Domain.Authorization{}).Error; err != nil {
+		return fmt.Errorf("権限情報削除に失敗しました。ユーザーID：" + params.UserID)
+	}
+
+	return nil
+}
 
 // NewInitialAuth 初期権限情報を登録する
 func (a *Authorization) NewInitialAuth(c *gin.Context) error {
