@@ -7,6 +7,7 @@ import (
 )
 
 type AuthorizationInputPort interface {
+	NewInitialAuth(c *gin.Context)
 	ApplySubmitFacilityAuth(c *gin.Context)
 	CertificationAuth(c *gin.Context)
 	GetAuthorization(c *gin.Context)
@@ -23,6 +24,7 @@ type AuthorizationOutputPort interface {
 }
 
 type AuthorizationRepository interface {
+	NewInitialAuth(c *gin.Context) error
 	ApplySubmitFacilityAuth(c *gin.Context) error
 	CertificationAuth(c *gin.Context) error
 	GetAuthorization(c *gin.Context) (*Domain.Authorization, error)

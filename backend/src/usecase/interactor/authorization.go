@@ -10,6 +10,18 @@ type Authorization struct {
 	Repository port.AuthorizationRepository
 }
 
+// NewInitialAuth implements port.AuthorizationInputPort
+func (a *Authorization) NewInitialAuth(c *gin.Context) {
+	err := a.Repository.NewInitialAuth(c)
+
+	if err != nil {
+		a.Outputport.RenderError(err)
+		return
+	}
+
+	a.Outputport.RenderOK()
+}
+
 // GetAppliedAuthorization implements port.AuthorizationInputPort
 func (a *Authorization) GetAppliedAuthorization(c *gin.Context) {
 	appliedAuthorizationList, err := a.Repository.GetAppliedAuthorization(c)

@@ -155,6 +155,9 @@ func (r *Routing) setRouting() {
 	r.Gin.POST("/articles/:articleID/comments/new", commentController.CreateComment)
 	r.Gin.DELETE("/articles/:articleID/comment/new", commentController.DeleteComment)
 
+	// 初期権限登録処理
+	r.Gin.POST("/authorization/new", authorizationController.NewInitialAuth)
+
 	// 施設投稿権限申請登録処理
 	r.Gin.POST("/authorization/post/facilities", authorizationController.ApplySubmitFacilityAuth)
 
