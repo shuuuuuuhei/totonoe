@@ -6,7 +6,7 @@ import { TextField } from '@mui/material';
 export const AddressTextBox = () => {
     const { address, setAddress } = useContext(AddressState);
     const fullAddressStr = () => {
-        return prefectureList[address.prefecture_id] + address.city_name + address.street_name;
+        return prefectureList[address.prefecture_id - 1] + address.city_name + address.street_name;
     }
 
     return (
