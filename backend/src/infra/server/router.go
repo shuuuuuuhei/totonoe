@@ -93,6 +93,12 @@ func (r *Routing) setRouting() {
 		Conn:              r.DB.Connection,
 	}
 
+	accountController := controller.Account{
+		InputPortFactory:  interactor.NewAccountInputPort,
+		OutputPortFactory: presenter.NewAccountOutputport,
+		RepositoryFactory: gateway.NewAccountRepository,
+		Conn:              r.DB.Connection,
+	}
 	r.Gin.Use(corsMiddleware())
 
 	store := cookie.NewStore([]byte("secret"))
@@ -173,8 +179,8 @@ func (r *Routing) setRouting() {
 	// 権限承認済ユーザー情報取得
 	r.Gin.POST("/authorization/applied", authorizationController.GetAppliedAuthorization)
 
-	// 権限情報削除
-	r.Gin.DELETE("/authorization", authorizationController.DeleteAuthorization)
+	// アカウント情報削除
+	r.Gin.DELETE("/account", accountController.DeleteAccount)
 }
 
 // corsMiddleware CORSの設定
