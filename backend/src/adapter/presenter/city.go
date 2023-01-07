@@ -1,6 +1,8 @@
 package presenter
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"main.go/model/ValueObject"
 	"main.go/usecase/port"
@@ -22,6 +24,7 @@ func (c *City) RenderCities(city *[]ValueObject.CityVO) {
 
 // RenderError エラーをレスポンスする
 func (c *City) RenderError(err error) {
+	fmt.Println(err)
 	c.c.JSON(500, err)
 }
 

@@ -1,6 +1,8 @@
 package presenter
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"main.go/model/ValueObject"
 
@@ -33,6 +35,7 @@ func (a *Article) RenderArticles(articles *[]ValueObject.ArticleVO) {
 
 // RenderError はErrorを返す
 func (a *Article) RenderError(err error) {
+	fmt.Println(err)
 	a.c.JSON(500, err)
 }
 

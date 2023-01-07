@@ -1,6 +1,8 @@
 package presenter
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"main.go/model/Domain"
 	"main.go/model/ValueObject"
@@ -27,8 +29,9 @@ func (a *Authorization) RenderAuthorization(authorization *Domain.Authorization)
 }
 
 // RenderError implements port.AuthorizationOutputPort
-func (a *Authorization) RenderError(e error) {
-	a.c.JSON(500, e)
+func (a *Authorization) RenderError(err error) {
+	fmt.Println(err)
+	a.c.JSON(500, err)
 }
 
 // RenderOK implements port.AuthorizationOutputPort

@@ -1,6 +1,8 @@
 package presenter
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"main.go/model/ValueObject"
 
@@ -19,6 +21,7 @@ func NewUserOutputPort(c *gin.Context) port.UserOutputPort {
 
 // RenderError 500 エラーを返す
 func (u *User) RenderError(err error) {
+	fmt.Println(err)
 	u.c.JSON(500, err)
 }
 

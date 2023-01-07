@@ -1,6 +1,8 @@
 package presenter
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"main.go/model/Domain"
 	"main.go/model/ValueObject"
@@ -22,6 +24,7 @@ func (f Facility) RenderOK() {
 }
 
 func (f Facility) RenderError(err error) {
+	fmt.Println(err)
 	f.c.JSON(500, err)
 }
 
