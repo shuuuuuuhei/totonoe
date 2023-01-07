@@ -1,6 +1,7 @@
 package gateway
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -55,6 +56,39 @@ const (
 	// 管理者
 	ADMIN_AUTH_KB = "999"
 )
+
+// NewInitialAuth 初期権限情報を登録する
+func (a *Authorization) NewInitialAuth(c *gin.Context) error {
+	conn := a.conn
+
+	params := authorizationParams{}
+
+	// パラメータ取得
+	json.NewDecoder(c.Request.Body).Decode(&params)
+
+	// ユーザー存在チェックを行う
+	if err := common.CheckUserByID(params.UserID, conn); err != nil {
+		return err
+	}
+
+	newAuthorization := Domain.Authorization{
+		UserID: params.UserID,
+		AuthKB: GENERAL_AUTH_KB,
+		RequestDate: sql.NullTime{
+			Time:  time.Time{},
+			Valid: false,
+		},
+		AppliedDate: sql.NullTime{
+			Time:  time.Time{},
+			Valid: false,
+		},
+	}
+	if err := conn.Debug().Create(&newAuthorization).Error; err != nil {
+		return fmt.Errorf("権限情報登録に失敗しました。ユーザーID：" + newAuthorization.UserID)
+	}
+
+	return nil
+}
 
 // GetApplyingAuthorization 申請中情報取得
 func (a *Authorization) GetApplyingAuthorization(c *gin.Context) (*[]ValueObject.ApplyingAuthorization, error) {
@@ -187,7 +221,10 @@ func (a *Authorization) ApplySubmitFacilityAuth(c *gin.Context) error {
 			UserID:         params.UserID,
 			AuthKB:         params.AuthKB,
 			RequestStateKB: INITIAL_AUTH_STATE,
-			RequestDate:    time.Now(),
+			RequestDate: sql.NullTime{
+				Time:  time.Now(),
+				Valid: false,
+			},
 		}
 
 		// ユーザ権限テーブル新規登録
@@ -312,7 +349,11 @@ func (a *Authorization) CertificationAuth(c *gin.Context) error {
 			// 施設投稿可能権限の設定を行う
 			authorization.AuthKB = FACILITY_POST_AUTH_KB
 			authorization.RequestStateKB = AUTHORIZED_STATE
-			authorization.AppliedDate = time.Now()
+			authorization.AppliedDate = sql.NullTime{
+				Time:  time.Now(),
+				Valid: false,
+			}
+
 			if err := tx.Debug().Save(&authorization).Error; err != nil {
 				return err
 			}
