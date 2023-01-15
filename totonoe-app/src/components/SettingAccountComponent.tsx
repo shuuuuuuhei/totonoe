@@ -7,6 +7,8 @@ import { toast } from 'react-toastify';
 import { AuthState } from '../@types/Authorization';
 import { APPLY_AUTH_KB, ADMIN_AUTH_KB, AUTH_REQUESTED_STATE } from '../utils/constants';
 import { isAdminUser, isAppliedUser, isApplyingUser, IsNullOrUndefinedOrEmpty, isUnAuthorizedUser, isGeneralUser } from '../common/Check';
+import AuthConfig from "../json/auth_config.json";
+import { ManagementClient } from 'auth0';
 
 // ButtonState
 const generalState = 0;
@@ -15,7 +17,7 @@ const appliedState = 2;
 const applyingState = 3;
 const unApplied = 4;
 export const SettingAccountComponent = () => {
-    const { getAccessTokenSilently } = useAuth0();
+    const { getAccessTokenSilently, logout } = useAuth0();
     const [cookies, setCookie, removeCookie] = useCookies();
     const [authState, setAuthState] = useState<AuthState>();
 
@@ -120,7 +122,51 @@ export const SettingAccountComponent = () => {
             </div>
         )
     }
-    console.log(authState);
+
+    /**
+    * アカウント削除処理
+    */
+    const handleAccountDeleteButton = async () => {
+        console.log("テスト");
+        const userID = cookies.userID;
+
+        if (IsNullOrUndefinedOrEmpty(userID)) {
+            console.log("ユーザーIDなし");
+            return;
+        }
+
+        const accessToken = await getAccessTokenSilently({
+            audience: 'https://totonoe-app.com',
+            scope: 'read:posts',
+        });
+        const uri = "http://localhost:4000/account";
+        const requestOption: RequestInit = {
+            method: "DELETE",
+            mode: "cors",
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+                "User-ID": userID,
+            },
+            body: JSON.stringify({ 'user_id': userID, })
+        };
+        fetch(uri, requestOption)
+            .then((response) => {
+                if (!response.ok) {
+                    const err = new Error;
+                    err.message = "アカウント情報を削除できませんでした。" + response.text + response.status;
+                    throw err;
+                }
+            })
+            .then(() => {
+                removeCookie("userID", { path: '/' });
+                logout({ returnTo: window.location.origin });
+            })
+            .catch(err => {
+                console.log("退会処理に失敗しました。エラー：" + err);
+                toast.error("退会処理に失敗しました。");
+            });
+    }
 
     return (
         <Fragment>
@@ -219,7 +265,9 @@ export const SettingAccountComponent = () => {
                         color='error'
                         size='small'
                         className="col-3"
-                        variant='outlined'>
+                        variant='outlined'
+                        onClick={handleAccountDeleteButton}
+                    >
                         アカウントを削除する
                     </Button>
                 </div>
