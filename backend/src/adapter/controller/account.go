@@ -13,6 +13,12 @@ type Account struct {
 	Conn              *gorm.DB
 }
 
+// NewAccount サインアップ時にリクエストを受ける
+func (a *Account) NewAccount(c *gin.Context) {
+	inputPort := a.newInputport(c)
+	inputPort.NewAccount(c)
+}
+
 func (a *Account) DeleteAccount(c *gin.Context) {
 	inputPort := a.newInputport(c)
 	inputPort.DeleteAccount(c)

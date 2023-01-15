@@ -152,7 +152,6 @@ func (r *Routing) setRouting() {
 	// ユーザー
 	r.Gin.POST("/follow", userController.Follow)
 	r.Gin.POST("/unfollow", userController.Unfollow)
-	r.Gin.POST("/signup", userController.SingUp)
 	r.Gin.PUT("/profile", userController.UpdateProfile)
 
 	// 記事コメント
@@ -160,9 +159,6 @@ func (r *Routing) setRouting() {
 	r.Gin.GET("/articles/:articleID/comments/:commentID", commentController.GetCommentsByArticleID)
 	r.Gin.POST("/articles/:articleID/comments/new", commentController.CreateComment)
 	r.Gin.DELETE("/articles/:articleID/comment/new", commentController.DeleteComment)
-
-	// 初期権限登録処理
-	r.Gin.POST("/authorization/new", authorizationController.NewInitialAuth)
 
 	// 施設投稿権限申請登録処理
 	r.Gin.POST("/authorization/post/facilities", authorizationController.ApplySubmitFacilityAuth)
@@ -178,6 +174,9 @@ func (r *Routing) setRouting() {
 
 	// 権限承認済ユーザー情報取得
 	r.Gin.POST("/authorization/applied", authorizationController.GetAppliedAuthorization)
+
+	// アカウント情報登録
+	r.Gin.POST("/account/new", accountController.NewAccount)
 
 	// アカウント情報削除
 	r.Gin.DELETE("/account", accountController.DeleteAccount)

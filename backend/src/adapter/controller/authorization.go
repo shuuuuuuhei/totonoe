@@ -38,11 +38,6 @@ func (a *Authorization) GetAppliedAuthorization(c *gin.Context) {
 	inputPort.GetAppliedAuthorization(c)
 }
 
-func (a *Authorization) NewInitialAuth(c *gin.Context) {
-	inputPort := a.newInputPort(c)
-	inputPort.NewInitialAuth(c)
-}
-
 func (a *Authorization) DeleteAuthorization(c *gin.Context) {
 	inputPort := a.newInputPort(c)
 	inputPort.DeleteAuthorization(c)

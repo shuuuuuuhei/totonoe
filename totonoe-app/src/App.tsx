@@ -17,7 +17,7 @@ import { UserSettingPage } from './pages/UserSettingPage';
 import { AdminPage } from './pages/AdminPage';
 import { IsNullOrUndefinedOrEmpty } from './common/Check';
 
-function App() {
+export const App = () => {
   const { user, getIdTokenClaims, getAccessTokenWithPopup, isAuthenticated } = useAuth0();
   const [cookies, setCookie, removeCookie] = useCookies();
   const userID = user?.sub?.split('|').at(1);
@@ -39,11 +39,9 @@ function App() {
         audience: 'https://totonoe-app.com',
         scope: 'read:current_user',
       });
+
       // ユーザー登録
       await fetchSubmitUser(accessToken);
-
-      // 初期権限情報を登録する
-      await fetchSubmitInitialAuthorization(accessToken);
 
       // ユーザーIDをクッキーに保存する
       setUserInfoCookie();
@@ -60,7 +58,7 @@ function App() {
   }
 
   /**
-   * ユーザー登録リクエストを送信する(初回ログイン時)
+   * ユーザー登録処理(初回ログイン時)
    */
   const fetchSubmitUser = (accessToken: string): Promise<Error> => {
     const fetchSubmitUserPromise: Promise<Error> = new Promise((resolve, reject) => {
@@ -82,7 +80,7 @@ function App() {
         body: JSON.stringify({ 'user_id': submitUser.id, 'name': submitUser.name, 'email': submitUser.email })
       };
 
-      const uri = "http://localhost:4000/signup";
+      const uri = "http://localhost:4000/account/new";
       fetch(uri, requestOption)
         .then((response) => {
           if (!response.ok) {
@@ -185,4 +183,3 @@ function App() {
     </BrowserRouter>
   );
 }
-export default App;

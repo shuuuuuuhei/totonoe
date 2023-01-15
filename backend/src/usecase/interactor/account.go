@@ -15,6 +15,18 @@ type tx struct {
 	db *gorm.DB
 }
 
+// NewAccount implements port.AccountInputPort
+func (a *AccountInputPort) NewAccount(ctx *gin.Context) {
+	err := a.Repository.NewAccount(ctx)
+
+	if err != nil {
+		a.OutputPort.RenderError(err)
+		return
+	}
+
+	return
+}
+
 // DeleteAccount implements port.AccountInputPort
 func (a *AccountInputPort) DeleteAccount(ctx *gin.Context) {
 	err := a.Repository.DeleteAccount(ctx)

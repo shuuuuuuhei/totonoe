@@ -22,16 +22,6 @@ func (u *User) UpdateProfile(c *gin.Context) {
 	u.OutputPort.RenderOK()
 }
 
-// SignUp ユーザ新規登録機能
-func (u *User) SignUp(c *gin.Context) {
-	err := u.UserRepo.SignUp(c)
-	if err != nil {
-		u.OutputPort.RenderError(err)
-		return
-	}
-	u.OutputPort.RenderOK()
-}
-
 // GetProfile repository ユーザログイン機能を呼び出す。結果をOutputportに渡す。
 func (u User) GetProfile(c *gin.Context) {
 	user, err := u.UserRepo.GetProfile(c)

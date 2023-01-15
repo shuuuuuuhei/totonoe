@@ -6,6 +6,7 @@ import (
 
 // AccountOutputPort 出力インタフェース
 type AccountInputPort interface {
+	NewAccount(ctx *gin.Context)
 	DeleteAccount(ctx *gin.Context)
 }
 
@@ -17,5 +18,6 @@ type AccountOutputPort interface {
 
 // ArticleRepository ロジックインタフェース
 type AccountRepository interface {
+	NewAccount(ctx *gin.Context) error
 	DeleteAccount(ctx *gin.Context) error
 }
