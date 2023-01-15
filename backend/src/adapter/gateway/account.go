@@ -1,8 +1,10 @@
 package gateway
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -56,12 +58,13 @@ func (a *Account) DeleteAccount(ctx *gin.Context) error {
 		}
 
 		// 記事情報
-		if err := tx.Debug().Where("user_id=?", params.UserID).Delete(&Domain.ArticleLike{}).Error; err != nil {
+		if err := tx.Debug().Where("user_id=?", params.UserID).
+			Delete(&Domain.Article{}).Error; err != nil {
 			return err
 		}
 
-		// ユーザー情報
-		if err := tx.Debug().Where("id=?", params.UserID).Delete(&Domain.User{}).Error; err != nil {
+		// ユーザー情報(削除フラグと削除日を更新して論理削除する)
+		if err := tx.Debug().Where("id=?", params.UserID).Updates(Domain.User{DeleteFlg: 1, DeletedAt: sql.NullTime{Time: time.Now(), Valid: true}}).Error; err != nil {
 			return err
 		}
 
