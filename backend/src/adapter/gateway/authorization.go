@@ -77,39 +77,6 @@ func (a *Authorization) DeleteAuthorization(c *gin.Context) error {
 	return nil
 }
 
-// NewInitialAuth 初期権限情報を登録する
-func (a *Authorization) NewInitialAuth(c *gin.Context) error {
-	conn := a.conn
-
-	params := authorizationParams{}
-
-	// パラメータ取得
-	json.NewDecoder(c.Request.Body).Decode(&params)
-
-	// ユーザー存在チェックを行う
-	if err := common.CheckUserByID(params.UserID, conn); err != nil {
-		return err
-	}
-
-	newAuthorization := Domain.Authorization{
-		UserID: params.UserID,
-		AuthKB: GENERAL_AUTH_KB,
-		RequestDate: sql.NullTime{
-			Time:  time.Time{},
-			Valid: false,
-		},
-		AppliedDate: sql.NullTime{
-			Time:  time.Time{},
-			Valid: false,
-		},
-	}
-	if err := conn.Debug().Create(&newAuthorization).Error; err != nil {
-		return fmt.Errorf("権限情報登録に失敗しました。ユーザーID：" + newAuthorization.UserID)
-	}
-
-	return nil
-}
-
 // GetApplyingAuthorization 申請中情報取得
 func (a *Authorization) GetApplyingAuthorization(c *gin.Context) (*[]ValueObject.ApplyingAuthorization, error) {
 	conn := a.conn
