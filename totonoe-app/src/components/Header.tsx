@@ -19,15 +19,16 @@ import AppIcon from '../images/Totonoe.png'
 
 
 export const Header = () => {
-    const { getAccessTokenSilently } = useAuth0();
-    const { loginWithRedirect, isAuthenticated, logout, user, getAccessTokenWithPopup } = useAuth0();
+    const { getAccessTokenWithPopup, loginWithRedirect, logout, isAuthenticated } = useAuth0();
     const [cookies, setCookie, removeCookie] = useCookies();
     const [isShowedUserContents, setIsShowedUserContents] = useState(false);
     const [authState, setAuthState] = useState<AuthState>();
 
     useEffect(() => {
-        // 権限情報取得
-        getAuthorization();
+        if (isAuthenticated) {
+            // 権限情報取得
+            getAuthorization();
+        }
     }, [])
 
     /**
@@ -62,10 +63,16 @@ export const Header = () => {
     const getAuthorization = async () => {
         const userID = cookies.userID;
         const uri = "http://localhost:4000/authorization";
-        const accessToken = await getAccessTokenSilently({
-            audience: 'https://totonoe-app.com',
-            scope: 'read:posts',
-        });
+        let accessToken = "";
+        try {
+            accessToken = await getAccessTokenWithPopup({
+                audience: 'https://totonoe-app.com',
+                scope: 'read:posts',
+            });
+        } catch (error) {
+            console.log(error);
+
+        }
 
         if (!accessToken) {
             throw Error("アクセストークンがありません。");
@@ -104,7 +111,7 @@ export const Header = () => {
     const getUserName = async () => {
         const userID = cookies.userID;
         const uri = "http://localhost:4000/authorization";
-        const accessToken = await getAccessTokenSilently({
+        const accessToken = await getAccessTokenWithPopup({
             audience: 'https://totonoe-app.com',
             scope: 'read:posts',
         });
