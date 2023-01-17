@@ -2,6 +2,7 @@ package presenter
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"main.go/model/ValueObject"
@@ -27,10 +28,10 @@ func (u *User) RenderError(err error) {
 
 // RenderOK 200 のみ返す
 func (u *User) RenderOK() {
-	u.c.JSON(200, nil)
+	u.c.JSON(http.StatusOK, nil)
 }
 
 // RenderProfile 200 Userを返す
 func (u *User) RenderProfile(user *ValueObject.ProfileVO) {
-	u.c.JSON(200, user)
+	u.c.JSON(http.StatusOK, user)
 }

@@ -2,6 +2,7 @@ package presenter
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"main.go/model/ValueObject"
@@ -25,12 +26,12 @@ func NewArticleOutputport(c *gin.Context) port.ArticleOutputPort {
 
 // RenderArticle はArticleを返す
 func (a *Article) RenderArticle(article *ValueObject.ArticleVO) {
-	a.c.JSON(200, article)
+	a.c.JSON(http.StatusOK, article)
 }
 
 // RenderArticles はArticlesを返す
 func (a *Article) RenderArticles(articles *[]ValueObject.ArticleVO) {
-	a.c.JSON(200, articles)
+	a.c.JSON(http.StatusOK, articles)
 }
 
 // RenderError はErrorを返す
@@ -41,5 +42,5 @@ func (a *Article) RenderError(err error) {
 
 // RenderOK レスポンス200のみ返す
 func (a *Article) RenderOK(c *gin.Context) {
-	a.c.JSON(200, nil)
+	a.c.JSON(http.StatusOK, nil)
 }

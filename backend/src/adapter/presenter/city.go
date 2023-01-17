@@ -2,6 +2,7 @@ package presenter
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"main.go/model/ValueObject"
@@ -14,12 +15,12 @@ type City struct {
 
 // RenderCity 市区町村情報をレスポンスする
 func (c *City) RenderCity(city *ValueObject.CityVO) {
-	c.c.JSON(200, city)
+	c.c.JSON(http.StatusOK, city)
 }
 
 // RenderCities 市区町村リストをレスポンスする
 func (c *City) RenderCities(city *[]ValueObject.CityVO) {
-	c.c.JSON(200, city)
+	c.c.JSON(http.StatusOK, city)
 }
 
 // RenderError エラーをレスポンスする
