@@ -19,6 +19,8 @@ export type Facility = {
     air_bath_flg: string,
     break_space_flg: string,
     water_server_flg: string,
+    latitude: number,
+    longitude: number,
     saunas: Sauna[],
     water_baths: WaterBath[],
     amenities: Amenity[],

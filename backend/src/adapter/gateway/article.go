@@ -56,7 +56,7 @@ func (a *ArticleRepository) GetArticleByID(c *gin.Context) (*ValueObject.Article
 	}
 
 	if err := conn.Debug().Table("article").
-		Select(`article.*,"user".name AS user_name, facility.name AS facility_name, count(likes_count.id) AS like_count,  case when liked.id is null  then false else true end AS is_liked, count(comment.id) AS comment_count`).
+		Select(`article.*,"user".name AS user_name, facility.name AS facility_name, COALESCE(count(likes_count.id), 0) AS like_count,  case when liked.id is null  then false else true end AS is_liked, count(comment.id) AS comment_count`).
 		Joins(`left join "user" on "user".id = article.user_id`).
 		Joins("left join facility on facility.id = article.facility_id").
 		Joins("left join article_like likes_count on likes_count.article_id = article.id").
@@ -93,7 +93,7 @@ func (a *ArticleRepository) GetArticlesByUserID(c *gin.Context) (*[]ValueObject.
 	}
 
 	if err := conn.Debug().Table("article").
-		Select(`article.*,"user".name AS user_name, facility.name AS facility_name, count(likes_count.id) AS like_count,  case when liked.id is null  then false else true end AS is_liked, count(comment.id) AS comment_count`).
+		Select(`article.*,"user".name AS user_name, facility.name AS facility_name, COALESCE(count(likes_count.id), 0) AS like_count,  case when liked.id is null  then false else true end AS is_liked, count(comment.id) AS comment_count`).
 		Joins(`left join  "user" on "user".id = article.user_id`).
 		Joins("left join facility on facility.id = article.facility_id").
 		Joins("left join article_like likes_count on likes_count.article_id = article.id").
@@ -165,10 +165,11 @@ func (a *ArticleRepository) GetArticlesOrderByDate(ctx *gin.Context) (*[]ValueOb
 	articles := []ValueObject.ArticleVO{}
 
 	if err := conn.Debug().
-		Table("article").
-		Limit(10).
-		Order("created_at DESC").
-		Find(&articles).Error; err != nil {
+		Table("article").Limit(9).Select(`article.*,facility.id as facility_id, facility.name as facility_name, "user".id AS user_id, "user".name AS user_name, address.prefecture_id`).
+		Joins("inner join facility on facility.id = article.facility_id").
+		Joins(`inner join "user" on "user".id = article.user_id`).
+		Joins("inner join address on facility.id = address.facility_id").
+		Order("created_at DESC").Scan(&articles).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Println("記事が見つかりませんでした。)")
 			return nil, nil
@@ -285,7 +286,7 @@ func (a *ArticleRepository) GetArticleByFacilityID(ctx *gin.Context) (*[]ValueOb
 	articles := []ValueObject.ArticleVO{}
 
 	if err := conn.Debug().Table("article").
-		Select(`article.*, "user".id AS user_id, "user".name AS user_name, facility.id AS facility_id, facility.name AS facility_name, count(likes_count.id) AS like_count,  case when liked.id is null  then false else true end AS is_liked, count(comment.id) AS comment_count`).
+		Select(`article.*, "user".id AS user_id, "user".name AS user_name, facility.id AS facility_id, facility.name AS facility_name, COALESCE(count(likes_count.id), 0) AS like_count,  case when liked.id is null  then false else true end AS is_liked, count(comment.id) AS comment_count`).
 		Joins(`left join  "user" on "user".id = article.user_id`).
 		Joins("left join facility on facility.id = article.facility_id").
 		Joins("left join article_like likes_count on likes_count.article_id = article.id").
@@ -304,19 +305,19 @@ func (a *ArticleRepository) GetArticleByFacilityID(ctx *gin.Context) (*[]ValueOb
 
 // DeleteArticleByID コンテキストを受け取り、IDからArticleを削除する
 func (a *ArticleRepository) DeleteArticleByID(c *gin.Context) error {
-	//conn := a.conn
+	conn := a.conn
 
-	// result := conn.Where("id = ?", articleID).Delete(&ValueObject.ArticleVO{ID: })
+	params := articleParams{}
 
-	// // エラー
-	// if result.Error != nil {
-	// 	return result.Error
-	// }
+	json.NewDecoder(c.Request.Body).Decode(&params)
 
-	// // 削除レコードなし
-	// if result.RowsAffected < 1 {
-	// 	return fmt.Errorf("削除対象の記事が見つかりませんでした。ID = %s", articleID)
-	// }
+	if params.Article.UserID != params.UserID {
+		return fmt.Errorf("ユーザーが記事作成者でないため削除できませんでした")
+	}
+
+	if err := conn.Debug().Delete(&params.Article).Error; err != nil {
+		return err
+	}
 
 	// 正常時
 	return nil

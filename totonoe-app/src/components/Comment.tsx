@@ -5,6 +5,7 @@ import { MdInsertEmoticon } from 'react-icons/md';
 import { Comment } from '../@types/article/Comment';
 import { NewComment } from '../@types/article/NewComment';
 import { Textarea } from './form-components/Textarea';
+import { toast } from 'react-toastify';
 
 type CommentProps = {
     comments: Comment[] | undefined
@@ -17,32 +18,36 @@ export const Comments: React.VFC<CommentProps> = (props) => {
         content: "",
         article_id: props.articleID,
     });
-    const {getAccessTokenSilently} = useAuth0();
-    const [cookies, setCookie,removeCookie] = useCookies();
+    const { getAccessTokenSilently } = useAuth0();
+    const [cookies, setCookie, removeCookie] = useCookies();
 
     const handleChange: React.ChangeEventHandler<HTMLSelectElement> = (event) => {
         const value = event.target.value;
         setCommentState((prevState) => (
-            {...prevState, content: value}
+            { ...prevState, content: value }
         ))
     }
 
     const handleSubmit = () => {
-        if(newComment.content == "") {
+        if (newComment.content == "") {
+            toast.warning("コメントを追加してください")
             return
         }
 
         // fetch post comment
-        const fetchPostComment = async() => {
-            try{
-                const uri = "http://localhost:4000/articles/"+newComment.article_id+"/comments/new";
-                const accessToken = await getAccessTokenSilently({
-                    audience: 'https://totonoe-app.com',
-                    scope: 'read:posts',
-                })
+        const fetchPostComment = async () => {
 
-                if(!accessToken) {
-                    throw("アクセストークンがありません");
+            try {
+                const uri = "http://localhost:4000/articles/" + newComment.article_id + "/comments/new";
+                let accessToken = ""
+                try {
+                    accessToken = await getAccessTokenSilently({
+                        audience: 'https://totonoe-app.com',
+                        scope: 'read:posts',
+                    });
+                } catch (error) {
+                    toast.warning("ログインしてください")
+                    return;
                 }
 
                 const requestOption: RequestInit = {
@@ -51,13 +56,13 @@ export const Comments: React.VFC<CommentProps> = (props) => {
                         Authorization: `Bearer ${accessToken}`,
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({'content': newComment.content, 'user_id': cookies.userID,})
+                    body: JSON.stringify({ 'content': newComment.content, 'user_id': cookies.userID, })
                 }
 
                 fetch(uri, requestOption)
                     .then((response) => {
-                        if(!response.ok) {
-                            throw Error("コメントを作成できませんでした。"); 
+                        if (!response.ok) {
+                            throw Error("コメントを作成できませんでした。");
                         }
                         return response.json()
                     })
@@ -73,24 +78,24 @@ export const Comments: React.VFC<CommentProps> = (props) => {
                         }));
                     })
             }
-            catch(err){
+            catch (err) {
                 console.log("エラー", err);
             }
         }
-        fetchPostComment(); 
+        fetchPostComment();
     }
 
-    return(
+    return (
         <Fragment>
             <div className="comment-wrap container p-5">
                 <h4 className="comment">コメント</h4>
                 <div className="comments">
                     {props.comments?.map((comment) => {
-                        return(
+                        return (
                             <Fragment>
                                 <div className="comment-header row">
                                     <div className="col-1 user-icon">
-                                        <MdInsertEmoticon size={30}/>
+                                        <MdInsertEmoticon size={30} />
                                     </div>
                                     <div className="col-2 user">
                                         {comment.user_name}
@@ -108,7 +113,7 @@ export const Comments: React.VFC<CommentProps> = (props) => {
                         <button className="btn btn-primary" onClick={handleSubmit}>コメントを追加</button>
                     </div>
                     <div className="comment-form">
-                        <Textarea 
+                        <Textarea
                             name="Content"
                             rows={5}
                             value={newComment?.content}

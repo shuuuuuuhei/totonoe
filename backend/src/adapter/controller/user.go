@@ -33,12 +33,6 @@ func (u *User) Unfollow(c *gin.Context) {
 	inputport.Unfollow(c)
 }
 
-// Unfollow ユーザフォロー機能
-func (u *User) SingUp(c *gin.Context) {
-	inputport := u.newInputport(c)
-	inputport.SignUp(c)
-}
-
 // プロフィール更新
 func (u *User) UpdateProfile(c *gin.Context) {
 	inputport := u.newInputport(c)

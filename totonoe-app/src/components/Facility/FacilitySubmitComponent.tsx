@@ -1,21 +1,20 @@
 import React, { Component, Fragment, useState, useEffect, createContext } from 'react'
 import { DropdownButton, Dropdown, ButtonGroup, Button, Form, Col, Alert } from 'react-bootstrap'
-import '../style/QuantityInput.css'
-import { SaunaSubmitComponent } from './SaunaSubmitComponent'
-import { WaterBathSubmitComponent } from './WaterBathSubmitComponent'
+import { WaterBathSubmitComponent } from '../WaterBathSubmitComponent'
 import { useCookies } from 'react-cookie'
 import { useAuth0 } from '@auth0/auth0-react'
-import { SelectAddress } from './form-components/SelectAdress'
-import { TermsCheckBox } from './form-components/TermsCheckBox'
-import { IsRequiredCheckFacilitySubmitForm } from '../@types/Form'
+import { SelectAddress } from '../form-components/SelectAdress'
+import { TermsCheckBox } from '../form-components/TermsCheckBox'
+import { IsRequiredCheckFacilitySubmitForm } from '../../@types/Form'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { IsNullOrUndefinedOrEmpty } from '../common/Check'
-import { WaterBath } from '../@types/sauna/Waterbath'
-import { NewFacility, Facility, Address, City } from '../@types/sauna/Facility'
-import { NewSauna } from '../@types/sauna/Sauna'
-import { ConvertPrefectureNameToIndex } from '../common/Convert'
-import { AddressTextBox } from './AddressTextBox'
+import { IsNullOrUndefinedOrEmpty } from '../../common/Check'
+import { WaterBath } from '../../@types/sauna/Waterbath'
+import { NewFacility, Facility, Address, City } from '../../@types/sauna/Facility'
+import { NewSauna } from '../../@types/sauna/Sauna'
+import { ConvertPrefectureNameToIndex } from '../../common/Convert'
+import { AddressTextBox } from '../AddressTextBox'
+import { SaunaSubmitComponent } from './SaunaSubmitComponent'
 const MinPrice = 1;
 interface MapInfo {
     map_name: string | null,
@@ -205,10 +204,9 @@ export const FacilitySubmitComponent = () => {
                     // 都道府県IDと市区町村名から市区町村情報を取得
                     fetchCityInfo(prefectureIndex + 1, cityName)
                         .then((city: City) => {
-                            console.log("fetch;", city)
                             setAddress({
                                 ...address,
-                                prefecture_id: prefectureIndex,
+                                prefecture_id: prefectureIndex + 1,
                                 city_id: city.id,
                                 city_name: cityName,
                                 street_name: streetName,

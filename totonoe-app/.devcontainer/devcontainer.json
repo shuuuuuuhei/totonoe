@@ -1,0 +1,33 @@
+{
+    "name": "totonoe_frontend_devcontainer",
+    "dockerComposeFile": "../../docker-compose.yml",
+    "service": "frontend",
+    "workspaceFolder": "/frontend",
+    "forwardPorts": [
+        3000
+    ],
+    "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+    ],
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "editor.formatOnSave": true,
+                "editor.defaultFormatter": "esbenp.prettier-vscode",
+                "[javascript]": {
+                    "editor.defaultFormatter": "esbenp.prettier-vscode"
+                },
+                "[typescript]": {
+                    "editor.defaultFormatter": "esbenp.prettier-vscode"
+                },
+                "[typescriptreact]": {
+                    "editor.defaultFormatter": "esbenp.prettier-vscode"
+                }
+            },
+        }
+    },
+    // コンテナ作成後にGitをインストール
+    "postCreateCommand": "apt-get update && apt-get install -y git"
+}

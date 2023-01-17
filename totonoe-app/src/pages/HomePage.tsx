@@ -1,22 +1,21 @@
 import React, { Fragment } from "react";
-import { AreaBox } from "../components/AreaBox";
-import { ArticlesBox } from "../components/ArticlesBox";
+import { AreaBox } from "../components/Facility/AreaBox";
+import { ArticlesBox } from "../components/Article/ArticlesBox";
 import { SearchBox } from "../components/SearchBox";
+import { TotonoeDescription } from "../components/Description";
 export const Home: React.VFC = () => {
     return (
         <Fragment>
             <SearchBox />
             <div className="container text-center">
                 <div className="row my-5">
-                    <div className="col-10">
-                        <AreaBox />
-                    </div>
-                    <div className="col-2">
-                        閲覧履歴
-                    </div>
+                    <AreaBox />
                 </div>
             </div>
+
+            <TotonoeDescription />
             <ArticlesBox />
+            {/* <FacilityBox /> */}
         </Fragment>
     );
 }

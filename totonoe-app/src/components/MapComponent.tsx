@@ -1,18 +1,18 @@
 import { GoogleMap, InfoWindow, LoadScript, Marker } from "@react-google-maps/api";
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useState, useRef, useEffect, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FacilityMapInfo } from '../@types/sauna/Facility';
 import { UndefinedConvertToZero, UndefinedOrNullConvertToEmpty } from '../common/Convert';
 import "../style/Map.css";
-
+import { Button } from "@mui/material";
+import { Libraries } from "../utils/constants";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 type Position = {
     latlng_literal: google.maps.LatLngLiteral,
     name: string | undefined,
     showInfoWindow: boolean,
 }
-
-type Libraries = ("drawing" | "geometry" | "localContext" | "places" | "visualization")[];
 
 const defaultZoom = 10;
 const containerStyle = {
@@ -23,55 +23,99 @@ const containerStyle = {
 export const MapComponent = () => {
 
     const [libraries] = useState<Libraries>(['places'])
-
     const { search } = useLocation();
     const queryParams = new URLSearchParams(search);
     const areaParams = UndefinedOrNullConvertToEmpty(queryParams.get("area"));
-
-    const [currentLocation, setCurrentLocation] = useState<google.maps.LatLngLiteral>();
-
     const [facilityMapInfoList, setFacilityMapInfoList] = useState<FacilityMapInfo[]>();
     const [infoStyle, setInfoStyle] = useState<google.maps.Size>();
+    /**
+     * 検索したエリアの経度緯度
+    */
+    const [currentLocation, setCurrentLocation] = useState<google.maps.LatLngLiteral>();
+
+    /**
+     * マップ状態管理
+     */
+    const [mapState, setMap] = useState(null);
+
+    /**
+     * 初期ロード管理
+     */
+    const [isInitialLoaded, setIsInitialLoaded] = useState(false);
+
+    /**
+     * マップロード管理
+     */
+    const [mapLoad, setMapLoad] = useState(false);
 
     /**
      * @param map 
-     * 指定された地名から緯度経度情報を取得して周辺のサウナ地域の情報をマップにLoadする
+     * 経度緯度情報からマップをLoadする
      */
-    const onMapLoad = (map: google.maps.Map) => {
+    const onMapLoad = useCallback((map: google.maps.Map) => {
 
-        const geocoding = new google.maps.Geocoder();
+        setMapLoad(true);
+        // 初回ロード
+        if (!isInitialLoaded) {
 
-        /** 指定された地名から経度緯度情報を取得する */
-        geocoding.geocode({ address: areaParams }, (results, status) => {
-            if (status === 'OK' && results) {
-                console.log(results[0].geometry.location.lat())
-                const lat = results[0].geometry.location.lat();
-                const lng = results[0].geometry.location.lng();
+            const geocoding = new google.maps.Geocoder();
 
-                setCurrentLocation({
-                    lat: lat,
-                    lng: lng,
-                });
+            /** 指定された地名から経度緯度情報を取得する */
+            geocoding.geocode({ address: areaParams }, (results, status) => {
+                if (status === 'OK' && results) {
+                    const lat = results[0].geometry.location.lat();
+                    const lng = results[0].geometry.location.lng();
 
-                /** 取得した経度緯度情報から距離を指定してサウナ施設情報を取得するリクエストを生成する */
-                const request: google.maps.places.TextSearchRequest = {
-                    location: { lat: lat, lng: lng },
-                    query: 'サウナ',
-                    radius: 5000
-                };
+                    setCurrentLocation({
+                        lat: lat,
+                        lng: lng,
+                    });
 
-                const service = new google.maps.places.PlacesService(map);
-                service.textSearch(request, callback);
+                    /** 取得した経度緯度情報から距離を指定してサウナ施設情報を取得するリクエストを生成する */
+                    const request: google.maps.places.TextSearchRequest = {
+                        location: { lat: lat, lng: lng },
+                        query: 'サウナ',
+                        radius: 5000
+                    };
 
-                setMapStyle(map)
-            } else {
-                alert('Geocode was not successful for the following reason: ' + status);
-            }
-        })
+                    const service = new google.maps.places.PlacesService(map);
+                    service.textSearch(request, callback);
+
+                    setMapStyle(map);
+                    setIsInitialLoaded(true);
+                } else {
+                    alert('Geocode was not successful for the following reason: ' + status);
+                }
+            })
+        } else {
+            // ２回目以降ロード
+            const lat = currentLocation.lat;
+            const lng = currentLocation.lng;
+
+            setCurrentLocation({
+                lat: lat,
+                lng: lng,
+            });
+
+            /** 取得した経度緯度情報から距離を指定してサウナ施設情報を取得するリクエストを生成する */
+            const request: google.maps.places.TextSearchRequest = {
+                location: { lat: lat, lng: lng },
+                query: 'サウナ',
+                radius: 5000
+            };
+
+            console.log(request);
+
+            const service = new google.maps.places.PlacesService(map);
+            service.textSearch(request, callback);
+        }
 
         /** infoWindowをバルーン上に表示するように設定する。マップ生成後(Load後)に設定しないとエラーが発生するためここに書く。 */
         setInfoStyle(new google.maps.Size(0, -45));
-    }
+
+        setMap(map);
+        setTimeout(() => setMapLoad(false), 3000);
+    }, [currentLocation, mapState])
 
     /**
      * 
@@ -103,7 +147,6 @@ export const MapComponent = () => {
                     return response.json();
                 })
                 .then((resData) => {
-                    console.log(resData)
                     setFacilityMapInfoList(resData)
                 })
                 .catch(err => {
@@ -113,7 +156,6 @@ export const MapComponent = () => {
 
         fetchGetFacilitiesByMapInfo();
     }
-
     /**
      * 
      * @param map googleMaps
@@ -121,10 +163,10 @@ export const MapComponent = () => {
      */
     const setMapStyle = (map: google.maps.Map) => {
         /* 地図上の施設や自然物ごとの設定を行う */
-        const featureStyleInMap = [
+        const featureStyleInMap: google.maps.MapTypeStyle[] = [
             {
                 "featureType": "all",
-                "stylers": "",
+                "stylers": [],
             },
             {
                 "featureType": "road.arterial",
@@ -163,7 +205,6 @@ export const MapComponent = () => {
         if (status == google.maps.places.PlacesServiceStatus.OK && results !== null) {
             for (var i = 0; i < results.length; i++) {
                 var place = results[i];
-                console.log(results[i])
 
                 if (!place.geometry?.location?.toJSON()) {
                     break
@@ -175,7 +216,6 @@ export const MapComponent = () => {
                 })
             }
         }
-        console.log(newLocationList)
 
         /**取得した緯度経度情報から施設情報を取得(まだ試行なし) */
         getFacilitiesInfo(newLocationList);
@@ -203,15 +243,28 @@ export const MapComponent = () => {
 
     const markerStyle = (searchLocationIndex: number) => {
 
-        const facility = facilityMapInfoList?.find((f) => (f.location_index === searchLocationIndex))
         return {
             color: "white",
             fontFamily: "sans-serif",
             fontSize: "15px",
             fontWeight: "100",
-            text: UndefinedConvertToZero(facility?.article_count).toString(),
+            text: UndefinedConvertToZero(facilityMapInfoList[searchLocationIndex].article_count).toString(),
         }
     };
+
+    /**
+     * 初回マップ表示位置から移動時に再検索ボタンを表示する
+     */
+    const indicateMapChangeButton = (e: google.maps.MapMouseEvent) => {
+        setCurrentLocation({
+            lat: e.latLng.lat(),
+            lng: e.latLng.lng(),
+        })
+    }
+
+    const handleChangeMap = () => {
+        onMapLoad(mapState);
+    }
 
     return (
         <Fragment>
@@ -233,7 +286,7 @@ export const MapComponent = () => {
                                         <div className="row">
                                             <div className="col-6">
                                                 施設情報なし
-                                                </div>
+                                            </div>
                                         </div>
                                     }
                                 </div>
@@ -242,7 +295,10 @@ export const MapComponent = () => {
                     </div>
                     {process.env.REACT_APP_GOOGLE_MAP_API ?
                         <div className="google-map col-8">
-                            <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAP_API} libraries={libraries} >
+                            <LoadingButton loading={mapLoad} onClick={handleChangeMap} style={{ position: "absolute", top: "55%", left: "58%", zIndex: 1000, backgroundColor: "white" }} >
+                                このエリアで再検索
+                            </LoadingButton>
+                            <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAP_API} libraries={libraries} id='googleMap'>
                                 <GoogleMap
                                     mapContainerStyle={containerStyle}
                                     center={currentLocation}
@@ -252,8 +308,8 @@ export const MapComponent = () => {
                                         mapTypeControl: false,
                                         fullscreenControl: false,
                                     }}
-                                    onLoad={map => onMapLoad(map)}
-                                    id="map"
+                                    onLoad={onMapLoad}
+                                    onMouseDown={indicateMapChangeButton}
                                 >
                                     {facilityMapInfoList?.map((facility, index) => {
                                         return (
@@ -261,15 +317,15 @@ export const MapComponent = () => {
                                                 <Marker position={{ lat: facility.latitude, lng: facility.longitude }} label={markerStyle(index)} onClick={() => handleToShowedInfoWindow(index)} />
                                                 {facility.showInfoWindow && infoStyle && <InfoWindow position={{ lat: facility.latitude, lng: facility.longitude }} options={{ pixelOffset: infoStyle }}>
                                                     <div>
-                                                        <p>{facility.name}</p>
-                                                        {facility.id ? <Link to={`/saunas/${facility.id}`}><p>施設情報を確認する</p></Link>
+                                                        <p style={{ fontSize: "18px", fontWeight: 800 }}>{facility.name}</p>
+                                                        {facility.id ? <Link to={`/saunas/${facility.id}`}><Button>施設情報を確認する</Button></Link>
                                                             :
                                                             <>
                                                                 <p>施設情報なし</p>
                                                                 <Link
                                                                     to={`/saunas/new`}
                                                                     state={{ map_name: facility.name, map_lat: facility.latitude, map_lng: facility.longitude }}
-                                                                >施設を登録する</Link>
+                                                                ><Button>施設を登録する</Button></Link>
                                                             </>
                                                         }
                                                     </div>

@@ -93,10 +93,19 @@ func (r *Routing) setRouting() {
 		Conn:              r.DB.Connection,
 	}
 
+	accountController := controller.Account{
+		InputPortFactory:  interactor.NewAccountInputPort,
+		OutputPortFactory: presenter.NewAccountOutputport,
+		RepositoryFactory: gateway.NewAccountRepository,
+		Conn:              r.DB.Connection,
+	}
 	r.Gin.Use(corsMiddleware())
 
 	store := cookie.NewStore([]byte("secret"))
 	r.Gin.Use(sessions.Sessions("auth-session", store))
+
+	// 一般ユーザー(ログインなし)アクセス可能
+	r.Gin.POST("/profile", userController.GetProfile)
 
 	r.Gin.GET("/articles", articleController.GetArticlesOrderByDate)
 
@@ -117,34 +126,32 @@ func (r *Routing) setRouting() {
 
 	// 記事取得
 	r.Gin.GET("/facilities/:facilityID/articles", articleController.GetArticleByFacilityID)
+	r.Gin.GET("/users/:userID/articles/", articleController.GetArticlesByUserID)
+	r.Gin.GET("/articles/:articleID", articleController.GetArticleByID)
 
 	// サウナ施設情報取得
 	r.Gin.GET("/facilities", facilityController.GetFacilities)
+	r.Gin.POST("/facilities", facilityController.GetFacilitiesWithFilter)
 	r.Gin.POST("/facilities/map_infomation", facilityController.GetFacilitiesByMapInfo)
 
 	/**
 	@description All Auth Route
 	*/
 	r.Gin.Use(corsMiddleware(), adapter.Wrap(jwtMiddleware.CheckJWT))
-
+	// ログインユーザーアクセス可能
 	// サウナ施設
 	r.Gin.POST("/facilities/new", facilityController.CreateFacility)
 
 	// 記事
-	r.Gin.GET("/users/:userID/articles/", articleController.GetArticlesByUserID)
-	r.Gin.GET("/articles/:articleID", articleController.GetArticleByID)
 	r.Gin.POST("/articles/new", articleController.CreateArticle)
 	r.Gin.POST("/articles/:articleID/like", articleController.LikeArticle)
 	r.Gin.DELETE("/articles/:articleID/like", articleController.DeleteLikedArtile)
-	// ↓まだ試してない
 	r.Gin.DELETE("/articles/:articleID", articleController.DeleteArticleByID)
 	r.Gin.PUT("/articles", articleController.UpdateArticleByID)
 
 	// ユーザー
-	r.Gin.POST("/profile", userController.GetProfile)
 	r.Gin.POST("/follow", userController.Follow)
 	r.Gin.POST("/unfollow", userController.Unfollow)
-	r.Gin.POST("/signup", userController.SingUp)
 	r.Gin.PUT("/profile", userController.UpdateProfile)
 
 	// 記事コメント
@@ -167,6 +174,15 @@ func (r *Routing) setRouting() {
 
 	// 権限承認済ユーザー情報取得
 	r.Gin.POST("/authorization/applied", authorizationController.GetAppliedAuthorization)
+
+	// アカウント情報登録
+	r.Gin.POST("/account/new", accountController.NewAccount)
+
+	// アカウント情報削除
+	r.Gin.DELETE("/account", accountController.DeleteAccount)
+
+	// アカウント情報取得
+	r.Gin.GET("/account/:userID", accountController.GetAccountInfo)
 }
 
 // corsMiddleware CORSの設定

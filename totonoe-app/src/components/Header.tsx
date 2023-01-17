@@ -15,16 +15,20 @@ import { toast } from 'react-toastify'
 import { AuthState } from '../@types/Authorization';
 import { isAdminUser } from '../common/Check';
 import { Chip } from '@mui/material';
+import AppIcon from '../images/Totonoe.png'
+
+
 export const Header = () => {
-    const { getAccessTokenSilently } = useAuth0();
-    const { loginWithRedirect, isAuthenticated, logout, user } = useAuth0();
+    const { getAccessTokenWithPopup, loginWithRedirect, logout, isAuthenticated } = useAuth0();
     const [cookies, setCookie, removeCookie] = useCookies();
     const [isShowedUserContents, setIsShowedUserContents] = useState(false);
     const [authState, setAuthState] = useState<AuthState>();
 
     useEffect(() => {
-        // 権限情報取得
-        getAuthorization();
+        if (isAuthenticated) {
+            // 権限情報取得
+            getAuthorization();
+        }
     }, [])
 
     /**
@@ -33,7 +37,9 @@ export const Header = () => {
     const authenticateUser = async () => {
         // 認証処理
         try {
-            await loginWithRedirect();
+            await loginWithRedirect({
+                redirectUri: "http://localhost:3000/",
+            });
         } catch (err) {
             console.log("Log in failed", err);
         }
@@ -57,10 +63,16 @@ export const Header = () => {
     const getAuthorization = async () => {
         const userID = cookies.userID;
         const uri = "http://localhost:4000/authorization";
-        const accessToken = await getAccessTokenSilently({
-            audience: 'https://totonoe-app.com',
-            scope: 'read:posts',
-        });
+        let accessToken = "";
+        try {
+            accessToken = await getAccessTokenWithPopup({
+                audience: 'https://totonoe-app.com',
+                scope: 'read:posts',
+            });
+        } catch (error) {
+            console.log(error);
+
+        }
 
         if (!accessToken) {
             throw Error("アクセストークンがありません。");
@@ -99,7 +111,7 @@ export const Header = () => {
     const getUserName = async () => {
         const userID = cookies.userID;
         const uri = "http://localhost:4000/authorization";
-        const accessToken = await getAccessTokenSilently({
+        const accessToken = await getAccessTokenWithPopup({
             audience: 'https://totonoe-app.com',
             scope: 'read:posts',
         });
@@ -149,7 +161,7 @@ export const Header = () => {
                 pauseOnHover
             />
 
-            <div className="header row" id="top-header">
+            <div className="header row m-0 py-3" style={{ backgroundColor: "#FFCC66" }}>
                 <div className="header-top d-flex justify-content-between">
                     <div className="header-top-left">
                         <Link to={'saunas/new'}><GiHotSpices size={50} /></Link>
@@ -225,8 +237,8 @@ export const Header = () => {
                     </div>
                 </div>
                 <div className="d-flex justify-content-center">
-                    <div className="header-title">
-                        <Link to="/"><h1>Totonoe</h1></Link>
+                    <div className="header-title text-center">
+                        <Link to="/"><img src={AppIcon} alt="" style={{ width: "60%", height: "auto", borderRadius: "50%" }} /></Link>
                     </div>
                 </div>
             </div>

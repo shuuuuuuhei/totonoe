@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"os"
@@ -21,6 +22,7 @@ type DB struct {
 	UserName   string
 	Password   string
 	DBName     string
+	Port       string
 	Connection *gorm.DB
 }
 
@@ -32,11 +34,13 @@ func NewDB() *DB {
 		UserName: c.DB.Production.Username,
 		Password: c.DB.Production.Password,
 		DBName:   c.DB.Production.DBName,
+		Port:     c.Routing.Port,
 	})
 }
 
 func newDB(d *DB) *DB {
-	dsn := d.UserName + "://" + d.Password + "@" + d.Host + "/" + d.DBName + "?sslmode=disable"
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", d.Host, d.UserName, d.Password, d.DBName, d.Port)
+	fmt.Println(dsn)
 	newLogger := createNewLogger()
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
@@ -91,12 +95,13 @@ func (d *DB) DBMigrate() {
 	fmt.Println("migrate: ", err)
 	err = d.Connection.AutoMigrate(Domain.Authorization{})
 	fmt.Println("migrate: ", err)
-
+	fmt.Println("----db migrate done----")
 }
 
 // CreateData サンプルデータ作成
 func (d *DB) CreateData() {
 	fmt.Println("----start create db----")
+
 	user := Domain.User{}
 	user.Email = "aaa@test.com"
 	user.Name = "test"
@@ -108,13 +113,20 @@ func (d *DB) CreateData() {
 	}
 
 	authorization := Domain.Authorization{
+		ID:             0,
 		UserID:         user.ID,
 		AuthKB:         "999",
 		RequestStateKB: "0",
-		RequestDate:    time.Time{},
-		AppliedDate:    time.Time{},
-		CreatedAt:      time.Time{},
-		UpdatedAt:      time.Time{},
+		RequestDate: sql.NullTime{
+			Time:  time.Now(),
+			Valid: false,
+		},
+		AppliedDate: sql.NullTime{
+			Time:  time.Now(),
+			Valid: false,
+		},
+		CreatedAt: time.Time{},
+		UpdatedAt: time.Time{},
 	}
 
 	if err := d.Connection.Create(&authorization).Error; err != nil {
@@ -137,10 +149,16 @@ func (d *DB) CreateData() {
 			UserID:         user.ID,
 			AuthKB:         "0",
 			RequestStateKB: "1",
-			RequestDate:    time.Now(),
-			AppliedDate:    time.Time{},
-			CreatedAt:      time.Time{},
-			UpdatedAt:      time.Time{},
+			RequestDate: sql.NullTime{
+				Time:  time.Now(),
+				Valid: true,
+			},
+			AppliedDate: sql.NullTime{
+				Time:  time.Time{},
+				Valid: false,
+			},
+			CreatedAt: time.Time{},
+			UpdatedAt: time.Time{},
 		}
 
 		if err := d.Connection.Create(&authorization).Error; err != nil {
@@ -227,6 +245,7 @@ func (d *DB) CreateData() {
 		article.Content = "content_" + strconv.Itoa(i)
 		article.FacilityID = 1
 		article.UserID = user.ID
+		article.AdmissionDate = time.Date(2022, 5, 20, 23, 59, 59, 0, time.UTC)
 		if err := d.Connection.Create(&article).Error; err != nil {
 			fmt.Println(err)
 			return

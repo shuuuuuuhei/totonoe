@@ -1,6 +1,7 @@
 package Domain
 
 import (
+	"database/sql"
 	"time"
 )
 
@@ -16,6 +17,8 @@ type User struct {
 	ArticleLikes  []ArticleLike `json:"article_likes,omitempty"`
 	Following     []*User       `gorm:"many2many:user_relation_ship" json:"following,omitempty"`
 	Authorization Authorization `json:"authorization,omitempty"`
+	DeleteFlg     int8          `json:"delete_flg,omitempty"`
 	CreatedAt     time.Time     `gorm:"autoCreateTime" json:"created_at,omitempty"`
 	UpdatedAt     time.Time     `gorm:"autoUpdateTime" json:"updated_at,omitempty"`
+	DeletedAt     sql.NullTime  `json:"deleted_at,omitempty"`
 }

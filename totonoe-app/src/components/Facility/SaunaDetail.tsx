@@ -1,21 +1,22 @@
 import React, { Component, Fragment } from 'react'
-import { StrConvertStrTime, ConvertKBToMaruORHyphen, UndefinedOrNullConvertToEmpty } from '../common/Convert'
-import { Facility } from '../@types/sauna/Facility'
+import { StrConvertStrTime, ConvertKBToMaruORHyphen, UndefinedOrNullConvertToEmpty } from '../../common/Convert'
+import { Facility } from '../../@types/sauna/Facility'
+import { FacilityMapComponent } from '../FacilityMapComponent'
 
 type SaunaDetailProps = {
-    facility: Facility|undefined
+    facility: Facility | undefined
 }
 export const SaunaDetail = (props: SaunaDetailProps) => {
 
-    if(!props.facility) {
-        return(
+    if (!props.facility) {
+        return (
             <Fragment>
                 ロード中...
             </Fragment>
         )
     }
     console.log(props.facility)
-    return(
+    return (
         <Fragment>
             <div className="container facility-info">
                 {/* 
@@ -30,39 +31,35 @@ export const SaunaDetail = (props: SaunaDetailProps) => {
                             ここには画像が入る
                         </div>
                         <div className="facility-map py-5">
-                            ここにはマップが入る
+                            <FacilityMapComponent lat={props.facility.latitude} lng={props.facility.longitude} />
                         </div>
                     </div>
 
                     <div className="col-7">
-                    <table className="table table-striped">                  
-                        <tbody>
-                            <tr>
-                                <td>施設名</td>
-                                <td>{props.facility.name}</td>
-                            </tr>
-                            <tr>
-                                <td>住所</td>
-                                <td>{props.facility.address}</td>
-                            </tr>
-                            <tr>
-                                <td>アクセス</td>
-                                <td>{props.facility.access}</td>
-                            </tr>
-                            <tr>
-                                <td>TEL</td>
-                                <td>{props.facility.tel}</td>
-                            </tr>
-                            <tr>
-                                <td>営業時間</td>
-                                <td>{StrConvertStrTime(props.facility.eigyo_start, props.facility.eigyo_end)}</td>
-                            </tr>
-                            <tr>
-                                <td>料金</td>
-                                <td>¥{props.facility.price}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                        <table className="table table-striped">
+                            <tbody className="py-3">
+                                <tr style={{ lineHeight: "50px" }}>
+                                    <td>施設名</td>
+                                    <td>{props.facility.name}</td>
+                                </tr>
+                                <tr style={{ lineHeight: "50px" }}>
+                                    <td>住所</td>
+                                    <td>{props.facility.address}</td>
+                                </tr>
+                                <tr style={{ lineHeight: "50px" }}>
+                                    <td>TEL</td>
+                                    <td>{props.facility.tel}</td>
+                                </tr>
+                                <tr style={{ lineHeight: "50px" }}>
+                                    <td>営業時間</td>
+                                    <td>{StrConvertStrTime(props.facility.eigyo_start, props.facility.eigyo_end)}</td>
+                                </tr>
+                                <tr style={{ lineHeight: "50px" }}>
+                                    <td>料金</td>
+                                    <td>¥{props.facility.price}</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
                 {/* 
@@ -77,10 +74,10 @@ export const SaunaDetail = (props: SaunaDetailProps) => {
                             :
                             props.facility.saunas.map((sauna, index) => {
                                 console.log("saunas", sauna)
-                                return(
+                                return (
                                     <div className="sauna-contents container text-center py-5">
                                         <div className="sauna-basic-info">
-                                            <h4>サウナ{index+1}</h4>
+                                            <h4>サウナ{index + 1}</h4>
                                             <p>{sauna.sauna_type}</p>
                                             <p>温度　{sauna.temperature}度</p>
                                             <p>収容人数 {sauna.capacity}人</p>
@@ -108,7 +105,7 @@ export const SaunaDetail = (props: SaunaDetailProps) => {
                                                 <div className="col-4">
                                                     <p>サウナマット</p>
                                                     {ConvertKBToMaruORHyphen(sauna.sauna_mat_flg)}
-    
+
                                                 </div>
                                                 <div className="col-4">
                                                     <p>TV</p>
@@ -116,24 +113,24 @@ export const SaunaDetail = (props: SaunaDetailProps) => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <hr/>
+                                        <hr />
                                     </div>
                                 )
                             })
                         }
                     </div>
                     <div className="col-6 waterbaths">
-                        {!props.facility.water_baths ? <p>水風呂情報なし</p> 
+                        {!props.facility.water_baths ? <p>水風呂情報なし</p>
                             :
                             props.facility.water_baths?.map((waterbath, index) => {
-                                return(
+                                return (
                                     <div className="water-bath container text-center py-5">
                                         <div className="waterbath-basic-info">
-                                            <h4>水風呂{index+1}</h4>
+                                            <h4>水風呂{index + 1}</h4>
                                             <p>温度　{waterbath.temperature}度</p>
                                             <p>収容人数 {waterbath.capacity}人</p>
                                         </div>
-                                        <hr/>
+                                        <hr />
                                     </div>
                                 )
                             })
@@ -202,17 +199,17 @@ export const SaunaDetail = (props: SaunaDetailProps) => {
                     アメニティ情報開始
                     ---------
                 */}
-                <hr/>
+                <hr />
                 <div className="row facility-amenity">
                     <div className="col-3">
                         <h5>アメニティ</h5>
                     </div>
                     <div className="col-9">
                         <div className="row facility-amenities">
-                            {!props.facility.amenities ? <p>アメニティ情報なし</p> 
-                            : 
+                            {!props.facility.amenities ? <p>アメニティ情報なし</p>
+                                :
                                 props.facility.amenities?.map((amenity, index) => {
-                                    return(
+                                    return (
                                         <div className="amenity">
                                             <p>・{amenity.name}</p>
                                         </div>
@@ -227,7 +224,7 @@ export const SaunaDetail = (props: SaunaDetailProps) => {
                     アメニティ情報終了
                     ---------
                 */}
-                <hr/>
+                <hr />
             </div>
 
         </Fragment>

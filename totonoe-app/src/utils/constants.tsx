@@ -100,6 +100,9 @@ export const MaxScore = 5;
 export const MinScore = 1;
 export const precisionScore = 0.5;
 
+/**
+ * 評価項目リスト
+ */
 export const ratingList: RatingProperty[] = [
     {
         name: "ととのい度",
@@ -155,3 +158,13 @@ export const AUTH_AUTHORIZED_STATE = '2';
  * 権限申請状態：3 (承認棄却)
  */
 export const AUTH_UNAUTHORIZED_STATE = '3';
+
+/**
+ * マップライブラリ
+ */
+export type Libraries = ("drawing" | "geometry" | "localContext" | "places" | "visualization")[];
+
+/**
+ * 最小ページ
+ */
+export const MinPageCount = 1;

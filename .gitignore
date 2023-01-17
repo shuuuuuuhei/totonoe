@@ -25,3 +25,13 @@ totonoe-app/src/reducer/dist/ArticleReducer.js
 totonoe-app/src/reducer/dist/ArticlesReducer.js
 totonoe-app/src/components/dist/FacilitySubmitComponent.js
 totonoe-app/src/components/dist/MapComponent.js
+totonoe-app/src/components/Facility/dist/AreaBox.js
+totonoe-app/src/components/Facility/dist/FacilityList.js
+totonoe-app/src/components/Facility/dist/FacilitySubmitComponent.js
+totonoe-app/src/components/Facility/dist/SaunaDetail.js
+totonoe-app/src/components/Facility/dist/SaunaSubmitComponent.js
+totonoe-app/src/components/Facility/dist/SearchOption.js
+totonoe-app/src/components/Article/dist/Article.js
+totonoe-app/src/components/Article/dist/ArticleBox.js
+totonoe-app/src/components/Article/dist/ArticleList.js
+totonoe-app/src/components/Article/dist/ArticlesBox.js

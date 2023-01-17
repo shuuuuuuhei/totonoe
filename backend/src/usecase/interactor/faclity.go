@@ -10,6 +10,17 @@ type Facility struct {
 	FacilityRepo port.FacilityRepository
 }
 
+// GetFacilitiesWithFilter サウナ施設条件検索
+func (f *Facility) GetFacilitiesWithFilter(c *gin.Context) {
+	facilities, err := f.FacilityRepo.GetFacilitiesWithFilter(c)
+
+	if err != nil {
+		f.OutputPort.RenderError(err)
+		return
+	}
+	f.OutputPort.RenderFacilities(facilities)
+}
+
 // GetFacilityNameByID implements port.FacilityInputPort
 func (f *Facility) GetFacilityNameByID(c *gin.Context) {
 	facility, err := f.FacilityRepo.GetFacilityNameByID(c)

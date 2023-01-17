@@ -4,9 +4,10 @@ import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { Link, useLocation } from 'react-router-dom';
 import { Facility } from '../@types/sauna/Facility';
 import { ConvertNaNToOne, UndefinedOrNullConvertToEmpty } from '../common/Convert';
-import { FacilityList } from '../components/FacilityList';
-import { SearchOption } from '../components/SearchOption';
-import { prefectureList } from '../utils/constants';
+import { FacilityList } from '../components/Facility/FacilityList';
+import { SearchOption } from '../components/Facility/SearchOption';
+import { prefectureList, MinPageCount } from '../utils/constants';
+import { IsNullOrUndefinedOrEmpty } from '../common/Check';
 
 const baseUri = 'http://localhost:4000/facilities?';
 const facilityCountPerPage = 20;
@@ -17,10 +18,17 @@ type city = {
     prefectureID: string,
 }
 
-const MinPageCount = 1;
+interface SearchFilterState {
+    "saunaOptionState": [],
+    "termsState": [],
+    "saunaTypeState": [],
+}
+
 
 export const SearchResultPage = () => {
     const { search } = useLocation();
+    const location = useLocation();
+    const searchFilterState = location.state as SearchFilterState;
     const queryParams = new URLSearchParams(search);
     const areaParams = UndefinedOrNullConvertToEmpty(queryParams.get("area"));
     const facilityName = UndefinedOrNullConvertToEmpty(queryParams.get("name"));
@@ -88,11 +96,12 @@ export const SearchResultPage = () => {
         };
 
         const fetchFacilities = async () => {
+
             await fetch(uri, requestOption)
                 .then((response) => {
                     if (!response.ok) {
                         const err = new Error;
-                        err.message = "サウナ施設一覧取得に失敗しました" + response.status;
+                        err.message = "サウナ施設一覧取得に失敗しました" + response.status + response.statusText;
                         throw err;
                     }
                     return response.json();
@@ -112,36 +121,78 @@ export const SearchResultPage = () => {
         fetchFacilities();
     }
 
-    useEffect(() => {
-        // window.alert(pageCount.targetPage)
+    /**
+     * サウナ条件検索
+     * 遷移元のサウナ条件を指定してサウナを取得する
+     */
+    const fetchSaunasFilterSearch = async () => {
+        console.log(searchFilterState);
+
+        const uri = `${baseUri}`;
+        const requestOption: RequestInit = {
+            method: "POST",
+            mode: "cors",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ 'sauna_option': searchFilterState.saunaOptionState, 'sauna_type': searchFilterState.saunaTypeState, 'terms': searchFilterState.termsState })
+        };
+
+        await fetch(uri, requestOption)
+            .then((response) => {
+                if (!response.ok) {
+                    const err = new Error;
+                    err.message = "サウナ施設一覧取得に失敗しました" + response.status;
+                    throw err;
+                }
+                return response.json();
+            })
+            .then((resData: Facility[]) => {
+                setFacilitiesState(resData);
+                setMaxPage(ConvertNaNToOne(calculateMaxPageCount(resData[0]?.full_count)));
+            })
+            .catch(err => {
+                console.log(err)
+            });
+    }
+    const fetchSaunas = async () => {
         const uri = `${baseUri}area=${areaParams}&facilityName=${facilityName}&page=${pageCount.targetPage.toString()}&priceStart=${priceStart}&priceEnd=${priceEnd}&priceStart=${priceStart}&temperatureStart=${temperatureStart}&temperatureEnd=${temperatureEnd}`;
-        const fetchSaunas = async () => {
-            const requestOption: RequestInit = {
-                method: "GET",
-                mode: "cors",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            };
-            console.log(uri)
-            await fetch(uri, requestOption)
-                .then((response) => {
-                    if (!response.ok) {
-                        const err = new Error;
-                        err.message = "サウナ施設一覧取得に失敗しました" + response.status;
-                        throw err;
-                    }
-                    return response.json();
-                })
-                .then((resData: Facility[]) => {
-                    setFacilitiesState(resData);
-                    setMaxPage(ConvertNaNToOne(calculateMaxPageCount(resData[0]?.full_count)));
-                })
-                .catch(err => {
-                    console.log(err)
-                });
+        const requestOption: RequestInit = {
+            method: "GET",
+            mode: "cors",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        };
+        console.log(uri)
+        await fetch(uri, requestOption)
+            .then((response) => {
+                if (!response.ok) {
+                    const err = new Error;
+                    err.message = "サウナ施設一覧取得に失敗しました" + response.status;
+                    throw err;
+                }
+                return response.json();
+            })
+            .then((resData: Facility[]) => {
+                setFacilitiesState(resData);
+                setMaxPage(ConvertNaNToOne(calculateMaxPageCount(resData[0]?.full_count)));
+            })
+            .catch(err => {
+                console.log(err)
+            });
+    }
+
+    useEffect(() => {
+
+        // 条件検索で遷移してきた場合は、
+        if (!IsNullOrUndefinedOrEmpty(searchFilterState)) {
+            fetchSaunasFilterSearch();
+        } else {
+            // 通常の検索ボタンで遷移してきた場合
+            fetchSaunas();
         }
-        fetchSaunas();
+
 
         // 全国の場合は都道府県リストを参照するため、都道府県リストをエリアリストに格納して処理を終了
         if (areaParams === '') {
@@ -204,7 +255,7 @@ export const SearchResultPage = () => {
 
         return (
             <Fragment>
-                <div className="border row container" style={{ position: "absolute", top: "350px", left: "450px", backgroundColor: "white", width: "850px", }} onClick={() => setShow(false)}>
+                <div className="border row container" style={{ position: "absolute", top: "45%", left: "20%", backgroundColor: "white", width: "850px", }} onClick={() => setShow(false)}>
                     {areaParams === '' ?
                         // 全国の都道府県を表示
                         detailAreaPrefectureList?.map((detailArea) => {
@@ -235,7 +286,7 @@ export const SearchResultPage = () => {
 
     return (
         <Fragment>
-            <div className="container text-center">
+            <div className="container text-center" id="result-top">
                 <div className="row">
                     <div className="search-option col-3 py-5">
                         <div className="row text-start border p-3 mb-3">
@@ -246,6 +297,7 @@ export const SearchResultPage = () => {
                             </div>
                             {areaParams ? <button><Link to={`/map?lang=jp&area=${areaParams}`}>GoogleMapで探す</Link></button> : <></>}
                         </div>
+                        {/* 条件検索 */}
                         <SearchOption handleSearch={handleSearch} />
                     </div>
                     <div className="result-list col-9 pt-5 px-5">

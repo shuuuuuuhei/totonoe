@@ -1,5 +1,6 @@
 import { APPLY_AUTH_KB, ADMIN_AUTH_KB, AUTH_REQUESTED_STATE, AUTH_AUTHORIZED_STATE, GENERAL_USER, AUTH_UNAUTHORIZED_STATE, UNAPPLIED_STATE } from '../utils/constants'
 import { AuthState } from '../@types/Authorization';
+import { useCookies } from 'react-cookie';
 
 /**
  * nullまたはundefinedまたは空文字の判定を行う
@@ -52,4 +53,14 @@ export const isUnAuthorizedUser = (authorization: AuthState | undefined) => {
  */
 export const isGeneralUser = (authorization: AuthState | undefined) => {
     return authorization.auth_kb === GENERAL_USER && authorization.request_state_kb === UNAPPLIED_STATE
+}
+
+/**
+ * クッキー(ユーザーID)が存在するか
+ */
+
+export const useIsSavedCookieOfUserID = () => {
+    const [cookies, setCookie, removeCookie] = useCookies();
+
+    return !IsNullOrUndefinedOrEmpty(cookies.userID)
 }

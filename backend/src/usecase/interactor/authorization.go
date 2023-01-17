@@ -10,6 +10,18 @@ type Authorization struct {
 	Repository port.AuthorizationRepository
 }
 
+// DeleteAuthorization 権限情報削除
+func (a *Authorization) DeleteAuthorization(c *gin.Context) {
+	err := a.Repository.DeleteAuthorization(c)
+
+	if err != nil {
+		a.Outputport.RenderError(err)
+		return
+	}
+
+	a.Outputport.RenderOK()
+}
+
 // GetAppliedAuthorization implements port.AuthorizationInputPort
 func (a *Authorization) GetAppliedAuthorization(c *gin.Context) {
 	appliedAuthorizationList, err := a.Repository.GetAppliedAuthorization(c)

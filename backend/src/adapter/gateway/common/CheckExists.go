@@ -4,10 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"log"
+
 	"main.go/model/Domain"
 
 	"gorm.io/gorm"
 )
+
+// UndeleteFlg 未削除フラグ(0)
+const UndeleteFlg = 0
 
 // CheckUserByID ユーザ存在チェック
 func CheckUserByID(userID string, conn *gorm.DB) error {
@@ -16,8 +20,8 @@ func CheckUserByID(userID string, conn *gorm.DB) error {
 	if userID == "" {
 		return nil
 	}
-	
-	if err := conn.Where("id = ?", userID).First(&user).Error; err != nil {
+
+	if err := conn.Debug().Where("id = ? and delete_flg=?", userID, UndeleteFlg).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return fmt.Errorf("ユーザが見つかりませんでした。ID = %s", userID)
 		}

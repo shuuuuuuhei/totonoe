@@ -1,6 +1,8 @@
 package presenter
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"main.go/model/ValueObject"
 	"main.go/usecase/port"
@@ -18,7 +20,7 @@ func NewCommentOutputPort(c *gin.Context) port.CommentOutputPort {
 }
 
 func (c Comment) RenderOK() {
-	c.ctx.JSON(200, nil)
+	c.ctx.JSON(http.StatusOK, nil)
 }
 
 func (c Comment) RenderErr(err error) {
@@ -26,9 +28,9 @@ func (c Comment) RenderErr(err error) {
 }
 
 func (c Comment) RenderComments(comments *[]ValueObject.CommentVO) {
-	c.ctx.JSON(200, comments)
+	c.ctx.JSON(http.StatusOK, comments)
 }
 
 func (c Comment) RenderComment(comment *ValueObject.CommentVO) {
-	c.ctx.JSON(200, comment)
+	c.ctx.JSON(http.StatusOK, comment)
 }
