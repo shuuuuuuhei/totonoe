@@ -18,7 +18,7 @@ import { AdminPage } from './pages/AdminPage';
 import { IsNullOrUndefinedOrEmpty } from './common/Check';
 
 export const App = () => {
-  const { user, getIdTokenClaims, getAccessTokenWithPopup, isAuthenticated } = useAuth0();
+  const { user, getIdTokenClaims, getAccessTokenWithPopup, isAuthenticated, logout } = useAuth0();
   const [cookies, setCookie, removeCookie] = useCookies();
   const userID = user?.sub?.split('|').at(1);
 
@@ -50,8 +50,6 @@ export const App = () => {
       toast.success('ユーザ登録が完了しました！');
       return;
     } catch (error) {
-      // サインアップが失敗した場合はAuth0側のユーザー情報を削除する処理を書く
-
       toast.error('ユーザー登録に失敗しました。');
       return;
     }
@@ -98,43 +96,54 @@ export const App = () => {
     });
     return fetchSubmitUserPromise;
   }
+
   /**
-   * 初期権限を登録する
+   * アカウント情報取得処理
    */
-  const fetchSubmitInitialAuthorization = (accessToken: string): Promise<Error> => {
-    const fetchSubmitUserPromise: Promise<Error> = new Promise((resolve, reject) => {
-      const requestOption: RequestInit = {
-        method: "POST",
-        mode: "cors",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-          "User-ID": cookies.userID,
-        },
+  const getAccountInfo = async () => {
+    const accessToken = await getAccessTokenWithPopup({
+      audience: 'https://totonoe-app.com',
+      scope: 'read:current_user',
+    });
 
-        body: JSON.stringify({ 'user_id': userID })
-      };
+    const requestOption: RequestInit = {
+      method: "GET",
+      mode: "cors",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+        "User-ID": cookies.userID,
+      },
+    };
 
-      const uri = "http://localhost:4000/authorization/new";
-      fetch(uri, requestOption)
-        .then((response) => {
-          if (!response.ok) {
-            const err = new Error;
-            console.log(response);
-            err.message = "初期権限登録に失敗しました。レスポンスコード：" + response.status + response.statusText;
+    const uri = "http://localhost:4000/account/" + userID;
+    fetch(uri, requestOption)
+      .then((response) => {
+        if (!response.ok) {
+          const err = new Error;
+          err.message = "アカウント情報取得処理に失敗しました。レスポンスコード：" + response.status + response.statusText;
+          // Auth0にユーザー情報が存在するがDB側に存在しなかったケース(App管理者がユーザーをAuth0ユーザーを削除する必要がある)
+          if (response.status === 404) {
+            toast.error('このアカウントは使用できません。');
+            // await new Promise(resolve => setTimeout(resolve, 3000)) // 3秒待つ
             throw err;
           }
-          return response.json();
-        })
-        .then(() => {
-          // 初期権限登録成功
-          resolve(null);
-        })
-        .catch(err => {
-          reject(err);
-        });
-    });
-    return fetchSubmitUserPromise;
+          toast.error('アカウント情報が取得できませんでした。');
+          throw err;
+        }
+      })
+      .then(() => {
+        toast.success('おかえりなさい！');
+      })
+      .catch(err => {
+        console.log(err);
+
+        // クッキー情報を削除する
+        removeCookie("userID", { path: '/' });
+
+        // リダイレクトするとメッセージ表示が消えるため、3秒後にログアウト処理を実施する
+        setTimeout(() => logout({ returnTo: window.location.origin }), 3000);
+      });
   }
 
   /**
@@ -154,9 +163,11 @@ export const App = () => {
       signupUser();
     } else if (IsNullOrUndefinedOrEmpty(cookies.userID) && isAuthenticated) {
 
+      // アカウント情報取得
+      getAccountInfo();
+
       // ログイン時にcookieが未発行の場合
       setUserInfoCookie();
-      toast.success('おかえりなさい！');
     }
 
   }, [user])
@@ -183,3 +194,5 @@ export const App = () => {
     </BrowserRouter>
   );
 }
+
+
