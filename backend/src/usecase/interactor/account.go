@@ -15,6 +15,18 @@ type tx struct {
 	db *gorm.DB
 }
 
+// GetAccount implements port.AccountInputPort
+func (a *AccountInputPort) GetAccount(ctx *gin.Context) {
+	accountInfo, err := a.Repository.GetAccount(ctx)
+
+	if err != nil {
+		a.OutputPort.RenderError(err)
+		return
+	}
+	a.OutputPort.RenderAccountInfo(ctx, accountInfo)
+	return
+}
+
 // NewAccount implements port.AccountInputPort
 func (a *AccountInputPort) NewAccount(ctx *gin.Context) {
 	err := a.Repository.NewAccount(ctx)
@@ -24,6 +36,7 @@ func (a *AccountInputPort) NewAccount(ctx *gin.Context) {
 		return
 	}
 
+	a.OutputPort.RenderOK(ctx)
 	return
 }
 
@@ -35,7 +48,7 @@ func (a *AccountInputPort) DeleteAccount(ctx *gin.Context) {
 		a.OutputPort.RenderError(err)
 		return
 	}
-
+	a.OutputPort.RenderOK(ctx)
 	return
 }
 

@@ -11,6 +11,7 @@ import (
 	"gorm.io/gorm"
 	"main.go/adapter/gateway/common"
 	"main.go/model/Domain"
+	"main.go/model/ValueObject"
 	"main.go/usecase/port"
 )
 
@@ -22,6 +23,20 @@ type accountParams struct {
 	UserID string `json:"user_id"`
 	Name   string `json:"name"`
 	Email  string `json:"email"`
+}
+
+// GetAccount アカウント情報取得
+func (a *Account) GetAccount(ctx *gin.Context) (*ValueObject.AccountVO, error) {
+	conn := a.conn
+	userID := ctx.Param("userID")
+
+	accountInfo := &ValueObject.AccountVO{}
+
+	if err := conn.Debug().Table("user").Where("id=? and delete_flg=0", userID).First(&accountInfo).Error; err != nil {
+		return nil, err
+	}
+
+	return accountInfo, nil
 }
 
 // NewAccount アカウント登録処理

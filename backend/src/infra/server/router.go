@@ -180,6 +180,9 @@ func (r *Routing) setRouting() {
 
 	// アカウント情報削除
 	r.Gin.DELETE("/account", accountController.DeleteAccount)
+
+	// アカウント情報取得
+	r.Gin.GET("/account/:userID", accountController.GetAccountInfo)
 }
 
 // corsMiddleware CORSの設定

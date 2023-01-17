@@ -24,6 +24,11 @@ func (a *Account) DeleteAccount(c *gin.Context) {
 	inputPort.DeleteAccount(c)
 }
 
+func (a *Account) GetAccountInfo(c *gin.Context) {
+	inputPort := a.newInputport(c)
+	inputPort.GetAccount(c)
+}
+
 func (a *Account) newInputport(c *gin.Context) port.AccountInputPort {
 	outputPort := a.OutputPortFactory(c)
 	repository := a.RepositoryFactory(a.Conn)
