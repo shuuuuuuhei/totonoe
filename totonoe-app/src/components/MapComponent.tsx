@@ -156,7 +156,6 @@ export const MapComponent = () => {
 
         fetchGetFacilitiesByMapInfo();
     }
-
     /**
      * 
      * @param map googleMaps
@@ -164,10 +163,10 @@ export const MapComponent = () => {
      */
     const setMapStyle = (map: google.maps.Map) => {
         /* 地図上の施設や自然物ごとの設定を行う */
-        const featureStyleInMap = [
+        const featureStyleInMap: google.maps.MapTypeStyle[] = [
             {
                 "featureType": "all",
-                "stylers": "",
+                "stylers": [],
             },
             {
                 "featureType": "road.arterial",
@@ -287,7 +286,7 @@ export const MapComponent = () => {
                                         <div className="row">
                                             <div className="col-6">
                                                 施設情報なし
-                                                </div>
+                                            </div>
                                         </div>
                                     }
                                 </div>
