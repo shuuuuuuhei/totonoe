@@ -7,6 +7,9 @@ import { MdInsertEmoticon } from 'react-icons/md';
 import { Profile } from '../@types/Profile';
 import { UndefinedConvertToZero } from '../common/Convert';
 import { toast } from 'react-toastify';
+import { useErrorHandler } from 'react-error-boundary';
+import { ErrorPageProps } from '../@types/ErrorPage';
+import { useNavigate } from 'react-router-dom';
 
 type profileProps = {
     profile: Profile | undefined
@@ -15,7 +18,9 @@ type profileProps = {
 export const ProfileComponent: React.VFC<profileProps> = ({ profile, setProfile }) => {
     const { getAccessTokenSilently } = useAuth0();
     const [cookies, setCookie, removeCookie] = useCookies();
+    const navigate = useNavigate();
 
+    const handleError = useErrorHandler();
     const handleFollow = async () => {
         if (!cookies.userID) {
             toast.warning("ログインしてください")
@@ -30,7 +35,7 @@ export const ProfileComponent: React.VFC<profileProps> = ({ profile, setProfile 
                     scope: 'read:posts',
                 });
             } catch (error) {
-                toast.warning("ログインしてください")
+                toast.warning("ログインしてください");
                 return;
             }
             const requestOption: RequestInit = {
@@ -42,7 +47,15 @@ export const ProfileComponent: React.VFC<profileProps> = ({ profile, setProfile 
                 body: JSON.stringify({ 'user_id': cookies.userID, "following_id": profile?.user_id })
             }
             fetch(uri, requestOption)
-                .then((response) => response.json())
+                .then((response) => {
+                    if (!response.ok) {
+                        // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                        const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                        navigate('/error', { state: errorInfo });
+                        return;
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     setProfile((prevState) => (
                         prevState ? { ...prevState, is_following: true, followed_count: UndefinedConvertToZero(prevState.followed_count) + 1, } : null
@@ -50,6 +63,7 @@ export const ProfileComponent: React.VFC<profileProps> = ({ profile, setProfile 
                 })
         }
         catch (err) {
+            handleError(err);
         }
     }
 

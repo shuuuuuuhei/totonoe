@@ -1,11 +1,13 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import React, { Fragment, useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ErrorPageProps } from '../@types/ErrorPage';
 import { Article } from '../@types/article/Article';
 import { Comment } from '../@types/article/Comment';
 import { DetailArticle } from '../components/Article/Article';
 import { Comments } from '../components/Comment';
+import { ConvertErrorMessageToErrorPageProps } from '../common/Convert';
 
 export const ArticlePage = () => {
     const [article, setArticle] = useState<Article>();
@@ -13,7 +15,7 @@ export const ArticlePage = () => {
     const params = useParams();
     const { getAccessTokenSilently, loginWithRedirect } = useAuth0();
     const [cookies, setCookie, removeCookie] = useCookies();
-
+    const navigate = useNavigate();
     useEffect(() => {
         if (!params.articleID) {
             console.log("articleIDなし")
@@ -35,10 +37,10 @@ export const ArticlePage = () => {
             await fetch(uri, requestOption)
                 .then((response) => {
                     if (!response.ok) {
-                        const err = new Error;
-                        console.log(response);
-                        err.message = "記事が見つかりませんでした。記事ID：" + params.articleID + ", レスポンスコード：" + response.status;
-                        throw err;
+                        // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                        const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                        navigate('/error', { state: errorInfo });
+                        return;
                     }
                     return response.json();
                 })
@@ -46,7 +48,10 @@ export const ArticlePage = () => {
                     setArticle(resData)
                 })
                 .catch(err => {
-                    console.log(err)
+                    // エラーメッセージを受け取りエラーページの引数を設定する
+                    const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
+                    navigate('/error', { state: errorInfo });
+                    return;
                 });
         }
         const fetchComment = async () => {
@@ -66,10 +71,10 @@ export const ArticlePage = () => {
             await fetch(uri, requestOption)
                 .then((response) => {
                     if (!response.ok) {
-                        const err = new Error;
-                        console.log(response);
-                        err.message = "記事コメントの取得に失敗しました, articleID: " + params.articleID + ", レスポンスコード：" + response.status;
-                        throw err;
+                        // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                        const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                        navigate('/error', { state: errorInfo });
+                        return;
                     }
                     return response.json();
                 })
@@ -77,7 +82,10 @@ export const ArticlePage = () => {
                     setComments(resData);
                 })
                 .catch(err => {
-                    console.log(err)
+                    // エラーメッセージを受け取りエラーページの引数を設定する
+                    const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
+                    navigate('/error', { state: errorInfo });
+                    return;
                 });
         }
         fetchComment();

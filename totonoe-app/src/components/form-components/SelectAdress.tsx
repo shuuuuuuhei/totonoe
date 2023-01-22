@@ -6,6 +6,8 @@ import { Input } from './Input';
 import { prefectureList } from '../../utils/constants';
 import { AddressState } from '../Facility/FacilitySubmitComponent';
 import { toast } from 'react-toastify';
+import { ErrorPageProps } from '../../@types/ErrorPage';
+import { useNavigate } from 'react-router-dom';
 
 const defaultIndex = 0;
 type City = {
@@ -15,6 +17,7 @@ type City = {
 
 export const SelectAddress = () => {
 
+    const navigate = useNavigate();
     const { address, setAddress } = useContext(AddressState);
     const [cityList, setCityList] = useState<City[]>([{
         id: address?.city_id,
@@ -66,7 +69,10 @@ export const SelectAddress = () => {
             fetch(uri, requestOption)
                 .then((response) => {
                     if (!response.ok) {
-                        throw (new Error("市町村情報の取得に失敗しました。" + response.status));
+                        // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                        const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                        navigate('/error', { state: errorInfo });
+                        return;
                     }
                     return response.json();
                 })

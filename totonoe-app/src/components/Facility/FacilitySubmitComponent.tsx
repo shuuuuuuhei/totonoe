@@ -12,9 +12,10 @@ import { IsNullOrUndefinedOrEmpty } from '../../common/Check'
 import { WaterBath } from '../../@types/sauna/Waterbath'
 import { NewFacility, Facility, Address, City } from '../../@types/sauna/Facility'
 import { NewSauna } from '../../@types/sauna/Sauna'
-import { ConvertPrefectureNameToIndex } from '../../common/Convert'
+import { ConvertErrorMessageToErrorPageProps, ConvertPrefectureNameToIndex } from '../../common/Convert'
 import { AddressTextBox } from '../AddressTextBox'
 import { SaunaSubmitComponent } from './SaunaSubmitComponent'
+import { ErrorPageProps } from '../../@types/ErrorPage'
 const MinPrice = 1;
 interface MapInfo {
     map_name: string | null,
@@ -401,7 +402,10 @@ export const FacilitySubmitComponent = () => {
                 fetch(uri, requestOption)
                     .then((response) => {
                         if (!response.ok) {
-                            throw (new Error("サウナ施設の登録に失敗しました。" + response.status))
+                            // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                            const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                            navigate('/error', { state: errorInfo });
+                            return;
                         }
                         return response.json();
                     })
@@ -411,7 +415,10 @@ export const FacilitySubmitComponent = () => {
                         navigate('/saunas/' + data.id);
                     })
             } catch (err) {
-                console.log(err)
+                // エラーメッセージを受け取りエラーページの引数を設定する
+                const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
+                navigate('/error', { state: errorInfo });
+                return;
             }
         }
         fetchPostFacility();
@@ -453,7 +460,10 @@ export const FacilitySubmitComponent = () => {
             const city = await fetch(uri, requestOption)
                 .then((response) => {
                     if (!response.ok) {
-                        throw (new Error("市町村情報の取得に失敗しました。" + response.status));
+                        // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                        const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                        navigate('/error', { state: errorInfo });
+                        return;
                     }
                     return response.json();
                 })
@@ -464,7 +474,10 @@ export const FacilitySubmitComponent = () => {
             return city;
         }
         catch (err) {
-            return err;
+            // エラーメッセージを受け取りエラーページの引数を設定する
+            const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
+            navigate('/error', { state: errorInfo });
+            return;
         }
     }
 

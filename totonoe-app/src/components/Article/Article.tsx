@@ -13,6 +13,8 @@ import { SetDateFormat } from '../../common/Convert'
 import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { toast } from 'react-toastify'
+import { useErrorHandler } from 'react-error-boundary';
+import { ErrorPageProps } from '../../@types/ErrorPage';
 
 type ArticleProps = {
     article: Article | undefined
@@ -32,6 +34,7 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
     const [showDeleteButton, setShowDeleteButton] = useState(false);
     const navigate = useNavigate();
     const [isMyArticle, setIsMyArticle] = useState(false);
+    const handleError = useErrorHandler();
 
     const handleLike = async () => {
         let accessToken = ""
@@ -62,12 +65,12 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
                 await fetch(uri, requestOption)
                     .then((response) => {
                         if (!response.ok) {
-                            const err = new Error;
-                            console.log(response);
-                            err.message = "いいねに失敗しました" + response.status;
-                            throw err;
+                            // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                            const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                            navigate('/error', { state: errorInfo });
+                            return;
                         }
-                        return;
+                        return response.json();
                     })
                     .then(() => {
                         if (!article.like_count) {
@@ -85,7 +88,7 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
                         }
                     })
                     .catch(err => {
-                        console.log(err)
+                        toast.error("いいねに失敗しました。")
                     });
             }
             fetchLike();
@@ -105,10 +108,10 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
             await fetch(uri, requestOption)
                 .then((response) => {
                     if (!response.ok) {
-                        const err = new Error;
-                        console.log(response);
-                        err.message = "いいね解除に失敗しました" + response.status;
-                        throw err;
+                        // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                        const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                        navigate('/error', { state: errorInfo });
+                        return;
                     }
                     return;
                 })
@@ -149,10 +152,10 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
             await fetch(uri, requestOption)
                 .then((response) => {
                     if (!response.ok) {
-                        const err = new Error;
-                        console.log(response);
-                        err.message = "記事削除に失敗しました。" + response.status;
-                        throw err;
+                        // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                        const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                        navigate('/error', { state: errorInfo });
+                        return;
                     }
                     return;
                 })
@@ -162,8 +165,7 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
                     );
                 })
                 .catch(err => {
-                    toast.warning(err)
-                    console.log(err)
+                    toast.error("いいね解除に失敗しました。")
                 });
             return
         }

@@ -1,12 +1,14 @@
 import React, { Component, Fragment, useState, useEffect, ChangeEvent } from 'react'
 import { Form } from 'react-bootstrap'
 import { Profile } from '../@types/Profile';
-import { UndefinedOrNullConvertToEmpty } from '../common/Convert';
+import { ConvertErrorMessageToErrorPageProps, UndefinedOrNullConvertToEmpty } from '../common/Convert';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useCookies } from 'react-cookie';
 import { Button } from '@mui/material';
 import { IsNullOrUndefinedOrEmpty } from '../common/Check';
 import { toast } from 'react-toastify';
+import { ErrorPageProps } from '../@types/ErrorPage';
+import { useNavigate } from 'react-router-dom';
 
 export const SettingProfileComponent = () => {
     const [introduction, setIntroduction] = useState("");
@@ -14,6 +16,7 @@ export const SettingProfileComponent = () => {
     const [lastName, setLastName] = useState("");
     const { getAccessTokenSilently } = useAuth0();
     const [cookies, setCookie, removeCookie] = useCookies();
+    const navigate = useNavigate();
 
     /**
      * プロフィール情報取得
@@ -44,9 +47,10 @@ export const SettingProfileComponent = () => {
         await fetch(uri, requestOption)
             .then((response) => {
                 if (!response.ok) {
-                    const err = new Error;
-                    err.message = "プロフィールが見つかりませんでした。" + response.status;
-                    throw err;
+                    // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                    const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                    navigate('/error', { state: errorInfo });
+                    return;
                 }
                 return response.json();
             })
@@ -57,7 +61,10 @@ export const SettingProfileComponent = () => {
                 console.log(resData);
             })
             .catch(err => {
-                console.log(err)
+                // エラーメッセージを受け取りエラーページの引数を設定する
+                const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
+                navigate('/error', { state: errorInfo });
+                return;
             });
     }
 
@@ -166,9 +173,10 @@ export const SettingProfileComponent = () => {
         await fetch(uri, requestOption)
             .then((response) => {
                 if (!response.ok) {
-                    const err = new Error;
-                    err.message = "プロフィールが更新できませんでした" + response.text;
-                    throw err;
+                    // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                    const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                    navigate('/error', { state: errorInfo });
+                    return;
                 }
                 return response.json();
             })
@@ -177,7 +185,10 @@ export const SettingProfileComponent = () => {
 
             })
             .catch(err => {
-                console.log(err)
+                // エラーメッセージを受け取りエラーページの引数を設定する
+                const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
+                navigate('/error', { state: errorInfo });
+                return;
             });
     }
 

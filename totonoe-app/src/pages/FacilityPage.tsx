@@ -1,18 +1,20 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { BsHeart } from 'react-icons/bs';
 import { HiOutlinePencilAlt } from 'react-icons/hi';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { ErrorPageProps } from '../@types/ErrorPage';
 import { Article } from '../@types/article/Article';
 import { Facility } from '../@types/sauna/Facility';
 import { ArticleList } from '../components/Article/ArticleList';
 import { SaunaDetail } from '../components/Facility/SaunaDetail';
 import { Valuation } from '../components/Valuation';
+import { ConvertErrorMessageToErrorPageProps } from '../common/Convert';
 
 export const SaunaPage = () => {
 
     const [facility, setFacilityState] = useState<Facility>();
     const [articles, setArticlesState] = useState<[Article]>();
-
+    const navigate = useNavigate();
     const [activeMode, setActiveMode] = useState("nav-1");
     const { facilityID } = useParams();
 
@@ -27,8 +29,6 @@ export const SaunaPage = () => {
         setActiveMode(id)
     }
 
-    console.log(facilityID)
-
     useEffect(() => {
         const fetchSauna = async () => {
             const uri = "http://localhost:4000/facility/" + facilityID;
@@ -42,9 +42,10 @@ export const SaunaPage = () => {
             await fetch(uri, requestOption)
                 .then((response) => {
                     if (!response.ok) {
-                        const err = new Error;
-                        err.message = "サウナ施設取得に失敗しました" + response.status;
-                        throw err;
+                        // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                        const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                        navigate('/error', { state: errorInfo });
+                        return;
                     }
                     return response.json();
                 })
@@ -53,7 +54,10 @@ export const SaunaPage = () => {
                     console.log(facility)
                 })
                 .catch(err => {
-                    console.log(err)
+                    // エラーメッセージを受け取りエラーページの引数を設定する
+                    const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
+                    navigate('/error', { state: errorInfo });
+                    return;
                 });
         }
         const fetchGetArticlesByFacilityID = async () => {
@@ -68,9 +72,10 @@ export const SaunaPage = () => {
             await fetch(uri, requestOption)
                 .then((response) => {
                     if (!response.ok) {
-                        const err = new Error;
-                        err.message = "サウナ施設に紐づく記事情報取得に失敗しました" + response.status;
-                        throw err;
+                        // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                        const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                        navigate('/error', { state: errorInfo });
+                        return;
                     }
                     return response.json();
                 })
@@ -79,7 +84,10 @@ export const SaunaPage = () => {
                     console.log(articles)
                 })
                 .catch(err => {
-                    console.log(err)
+                    // エラーメッセージを受け取りエラーページの引数を設定する
+                    const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
+                    navigate('/error', { state: errorInfo });
+                    return;
                 });
         }
         fetchSauna();

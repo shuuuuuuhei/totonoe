@@ -1,10 +1,14 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { BsChevronDoubleLeft, BsChevronDoubleRight } from 'react-icons/bs';
+import { ErrorPageProps } from '../../@types/ErrorPage';
 import type { Article } from '../../@types/article/Article';
 import { ArticleBox } from './ArticleBox';
+import { useNavigate } from 'react-router-dom';
+import { ConvertErrorMessageToErrorPageProps } from '../../common/Convert';
 
 export const ArticlesBox = () => {
     const [articles, setArticles] = useState<[Article]>();
+    const navigate = useNavigate();
     useEffect(() => {
         const fetchArticle = async () => {
 
@@ -20,11 +24,11 @@ export const ArticlesBox = () => {
             await fetch(uri, requestOption)
                 .then((response) => {
                     if (!response.ok) {
-                        const err = new Error;
-                        console.log(response);
-                        err.message = "記事が見つかりませんでした。" + response.status;
-                        throw err;
-                    };
+                        // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                        const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                        navigate('/error', { state: errorInfo });
+                        return;
+                    }
                     return response.json();
                 })
                 .then((resData) => {
@@ -32,7 +36,10 @@ export const ArticlesBox = () => {
                     console.log(resData)
                 })
                 .catch(err => {
-                    console.log(err)
+                    // エラーメッセージを受け取りエラーページの引数を設定する
+                    const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
+                    navigate('/error', { state: errorInfo });
+                    return;
                 });
         }
         fetchArticle();

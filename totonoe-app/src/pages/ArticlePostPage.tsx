@@ -10,12 +10,13 @@ import DatePicker, { registerLocale } from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { ErrorPageProps } from '../@types/ErrorPage'
 import { Article } from '../@types/article/Article'
 import { NewArticle } from '../@types/article/NewArticle'
 import { RatingOptionProps, RatingScore } from '../@types/article/Rating'
 import { Facility } from '../@types/sauna/Facility'
 import { IsNullOrUndefinedOrEmpty, useIsSavedCookieOfUserID } from '../common/Check'
-import { UndefinedOrNullConvertToEmpty } from '../common/Convert'
+import { ConvertErrorCodeToErrorMessage, ConvertErrorMessageToErrorPageProps, UndefinedOrNullConvertToEmpty } from '../common/Convert'
 import { defaultScore, precisionScore, ratingList } from '../utils/constants'
 
 
@@ -58,7 +59,10 @@ export const ArticlePostPage = () => {
     const getFacilityName = (id: string | undefined) => {
 
         if (IsNullOrUndefinedOrEmpty(id)) {
-            return "";
+            // 施設IDが指定されていないので404ページに遷移する
+            const errorInfo: ErrorPageProps = ConvertErrorCodeToErrorMessage(404)
+            navigate('/error', { state: errorInfo });
+            return;
         }
 
         const fetchGetFacilityName = async () => {
@@ -73,7 +77,10 @@ export const ArticlePostPage = () => {
             await fetch(uri, requestOption)
                 .then((response) => {
                     if (!response.ok) {
-                        throw new Error(response.status + "施設名の取得に失敗しました。")
+                        // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                        const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                        navigate('/error', { state: errorInfo });
+                        return;
                     }
                     return response.json();
                 })
@@ -81,7 +88,10 @@ export const ArticlePostPage = () => {
                     setFacilityName(facility.name)
                 })
                 .catch(err => {
-                    console.log(err)
+                    // エラーメッセージを受け取りエラーページの引数を設定する
+                    const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
+                    navigate('/error', { state: errorInfo });
+                    return;
                 });
         }
 
@@ -165,7 +175,10 @@ export const ArticlePostPage = () => {
             await fetch(uri, requestOption)
                 .then((response) => {
                     if (!response.ok) {
-                        throw new Error("記事投稿に失敗しました。" + response.json() + response.status)
+                        // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                        const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                        navigate('/error', { state: errorInfo });
+                        return;
                     }
                     return response.json()
                 })

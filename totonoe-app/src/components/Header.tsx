@@ -6,7 +6,7 @@ import { IconContext } from 'react-icons';
 import { CgProfile } from "react-icons/cg";
 import { GiHotSpices } from "react-icons/gi";
 import { HiOutlineLogin, HiOutlinePencilAlt } from "react-icons/hi";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "../style/Header.css";
@@ -16,6 +16,7 @@ import { AuthState } from '../@types/Authorization';
 import { isAdminUser } from '../common/Check';
 import { Chip } from '@mui/material';
 import AppIcon from '../images/Totonoe.png'
+import { ErrorPageProps } from '../@types/ErrorPage';
 
 
 export const Header = () => {
@@ -23,6 +24,7 @@ export const Header = () => {
     const [cookies, setCookie, removeCookie] = useCookies();
     const [isShowedUserContents, setIsShowedUserContents] = useState(false);
     const [authState, setAuthState] = useState<AuthState>();
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -91,9 +93,11 @@ export const Header = () => {
         await fetch(uri, requestOption)
             .then((response) => {
                 if (!response.ok) {
-                    const err = new Error;
-                    err.message = "権限情報が取得できませんでした" + response.text + response.status;
-                    throw err;
+                    // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                    // handleError({ statusCode: response.status, message: response.statusText });
+                    const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                    navigate('/error', { state: errorInfo });
+                    return;
                 }
                 return response.json();
             })
@@ -133,9 +137,11 @@ export const Header = () => {
         await fetch(uri, requestOption)
             .then((response) => {
                 if (!response.ok) {
-                    const err = new Error;
-                    err.message = "権限情報が取得できませんでした" + response.text + response.status;
-                    throw err;
+                    // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                    // handleError({ statusCode: response.status, message: response.statusText });
+                    const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                    navigate('/error', { state: errorInfo });
+                    return;
                 }
                 return response.json();
             })
@@ -192,7 +198,7 @@ export const Header = () => {
                                                     style={{ width: "150px" }}
                                                 >
                                                     マイページ
-                                            </Button>
+                                                </Button>
                                             </Link>
                                             <Link to={"setting/profile"}>
                                                 <Button
