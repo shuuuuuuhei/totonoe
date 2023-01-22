@@ -11,11 +11,14 @@ import { Home } from './pages/HomePage';
 import { ProfilePage } from './pages/ProfilePage';
 import { SearchMapPage } from './pages/SearchMapPage';
 import { SearchResultPage } from './pages/SearchResultPage';
-import { SignUpPage } from './pages/SignUpPage';
 import { toast } from 'react-toastify'
 import { UserSettingPage } from './pages/UserSettingPage';
 import { AdminPage } from './pages/AdminPage';
 import { IsNullOrUndefinedOrEmpty } from './common/Check';
+import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
+import { ErrorFallback } from './pages/Error/ErrorComponent';
+import { ErrorPage404 } from './pages/Error/Page404';
+import { ErrorPage } from './pages/Error/ErrorPage';
 
 export const App = () => {
   const { user, getIdTokenClaims, getAccessTokenWithPopup, isAuthenticated, logout } = useAuth0();
@@ -125,7 +128,6 @@ export const App = () => {
           // Auth0にユーザー情報が存在するがDB側に存在しなかったケース(App管理者がユーザーをAuth0ユーザーを削除する必要がある)
           if (response.status === 404) {
             toast.error('このアカウントは使用できません。');
-            // await new Promise(resolve => setTimeout(resolve, 3000)) // 3秒待つ
             throw err;
           }
           toast.error('アカウント情報が取得できませんでした。');
@@ -176,20 +178,23 @@ export const App = () => {
     <BrowserRouter>
       <Header />
       <div>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/profile/:userID" element={<ProfilePage />}></Route>
-          <Route path="/articles/new" element={<ArticlePostPage />}></Route>
-          <Route path="/saunas/:facilityID/articles/new" element={<ArticlePostPage />}></Route>
-          <Route path="/articles/:articleID" element={<ArticlePage />}></Route>
-          <Route path="/search" element={<SearchResultPage />}></Route>
-          <Route path="/saunas/:facilityID" element={<SaunaPage />}></Route>
-          <Route path="/saunas/new/" element={<SaunaSubmitPage />}></Route>
-          <Route path="/map" element={<SearchMapPage />}></Route>
-          <Route path="/signup" element={<SignUpPage />}></Route>
-          <Route path="/setting/profile" element={<UserSettingPage />}></Route>
-          <Route path="/admin" element={<AdminPage />}></Route>
-        </Routes>
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/profile/:userID" element={<ProfilePage />}></Route>
+            <Route path="/articles/new" element={<ArticlePostPage />}></Route>
+            <Route path="/saunas/:facilityID/articles/new" element={<ArticlePostPage />}></Route>
+            <Route path="/articles/:articleID" element={<ArticlePage />}></Route>
+            <Route path="/search" element={<SearchResultPage />}></Route>
+            <Route path="/saunas/:facilityID" element={<SaunaPage />}></Route>
+            <Route path="/saunas/new/" element={<SaunaSubmitPage />}></Route>
+            <Route path="/map" element={<SearchMapPage />}></Route>
+            <Route path="/setting/profile" element={<UserSettingPage />}></Route>
+            <Route path="/admin" element={<AdminPage />}></Route>
+            <Route path="*" element={<ErrorPage404 />}></Route>
+            <Route path="/error" element={<ErrorPage />}></Route>
+          </Routes>
+        </ErrorBoundary>
       </div>
     </BrowserRouter>
   );

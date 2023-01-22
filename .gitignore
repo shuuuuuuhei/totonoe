@@ -35,3 +35,4 @@ totonoe-app/src/components/Article/dist/Article.js
 totonoe-app/src/components/Article/dist/ArticleBox.js
 totonoe-app/src/components/Article/dist/ArticleList.js
 totonoe-app/src/components/Article/dist/ArticlesBox.js
+*.js
