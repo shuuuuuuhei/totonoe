@@ -2,7 +2,8 @@ import React, { Component, Fragment } from 'react'
 import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import { HiOutlinePencilAlt } from 'react-icons/hi'
-const themeColor = "#ffd54f";
+import { themeColor } from '../utils/constants';
+
 export const TotonoeDescription = () => {
     return (
         <Fragment>
@@ -15,7 +16,7 @@ export const TotonoeDescription = () => {
                         <span style={{ background: `linear-gradient(transparent 70%,${themeColor}  0%)` }}>お気に入りのサウナ</span>や
                         <span style={{ background: `linear-gradient(transparent 70%, ${themeColor} 0%)` }}>気になるサウナ</span>を検索したり、</p>
                     <p style={{ fontWeight: "bold" }}>訪れたサウナで体験した<span style={{ background: `linear-gradient(transparent 70%, ${themeColor} 0%)` }}>ととのいを共有する</span>
-                    ことができます。</p>
+                        ことができます。</p>
                 </div>
                 <div className="row justify-content-center py-3">
                     <div className="col-3 border mx-2">
