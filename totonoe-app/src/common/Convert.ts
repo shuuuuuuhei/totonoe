@@ -1,4 +1,5 @@
-import { prefectureList } from '../utils/constants';
+import { ErrorPageProps } from '../@types/ErrorPage';
+import { ErrorCodeWithMessage, prefectureList } from '../utils/constants';
 /**
  * 値を受け取り、Undefinedなら0に変換する
  */
@@ -64,4 +65,32 @@ export const SetDateFormat = (rowDate: string | undefined) => {
     }
     var convertedDate = rowDate.split('T').at(0)
     return convertedDate
+}
+
+/**
+ * エラーメッセージからに変換する
+ */
+export const ConvertErrorMessageToErrorPageProps = (errMessage: string): ErrorPageProps => {
+
+    let errorInfo: ErrorPageProps;
+
+    if (errMessage === "Failed to fetch") {
+        errorInfo = { statusCode: 503, message: "サーバーが応答していません。もう少し時間をあけてからアクセスしてください。" };
+    }
+
+    // ステータスコードがない場合
+    return errorInfo;
+}
+/**
+ * エラーコードからエラーメッセージに変換する
+ */
+export const ConvertErrorCodeToErrorMessage = (statusCode: number): ErrorPageProps => {
+
+    const errorInfo: ErrorPageProps[] = ErrorCodeWithMessage.map((value) => {
+        if (statusCode === value.statusCode) {
+            return value
+        }
+    });
+
+    return errorInfo.at(0);
 }
