@@ -1,3 +1,4 @@
+import { ErrorPageProps } from "../@types/ErrorPage";
 import { RatingProperty } from "../@types/article/Rating";
 
 /**
@@ -168,3 +169,13 @@ export type Libraries = ("drawing" | "geometry" | "localContext" | "places" | "v
  * 最小ページ
  */
 export const MinPageCount = 1;
+
+/**
+ * Totonoeテーマカラー
+ */
+export const themeColor = "#ffd54f";
+
+/**
+ * エラーコード/エラーメッセージ
+*/
+export const ErrorCodeWithMessage: ErrorPageProps[] = [{ statusCode: 404, message: "このページはすでに削除されているか、URLが間違っている可能性があります。" }]
