@@ -19,6 +19,7 @@ import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { ErrorFallback } from './pages/Error/ErrorComponent';
 import { ErrorPage404 } from './pages/Error/Page404';
 import { ErrorPage } from './pages/Error/ErrorPage';
+import { Button } from '@mui/material';
 
 export const App = () => {
   const { user, getIdTokenClaims, getAccessTokenWithPopup, isAuthenticated, logout } = useAuth0();
@@ -175,10 +176,10 @@ export const App = () => {
   }, [user])
 
   return (
-    <BrowserRouter>
-      <Header />
-      <div>
+    <div>
+      <BrowserRouter>
         <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <Header />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/profile/:userID" element={<ProfilePage />}></Route>
@@ -195,8 +196,8 @@ export const App = () => {
             <Route path="/error" element={<ErrorPage />}></Route>
           </Routes>
         </ErrorBoundary>
-      </div>
-    </BrowserRouter>
+      </BrowserRouter>
+    </div>
   );
 }
 
