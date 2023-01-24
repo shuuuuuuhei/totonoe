@@ -133,7 +133,7 @@ export const SearchOption = (props: searchOptionProps) => {
                 <div className="terms-options text-start">
                     {termsList.map((terms, index) => {
                         return (
-                            <div className="terms-option py-1 px-2">
+                            <div className="terms-option py-1 px-2" key={index}>
                                 <input type="checkbox" className="form-check-input pl-2" name="checkBox" id={terms.id} onClick={handleChangeTerms} />
                                 <label htmlFor={"formCheckDefault" + index.toString()} className="px-3 border-bottom">
                                     {terms.name}

@@ -275,9 +275,9 @@ export const SearchResultPage = () => {
                 <div className="border row container" style={{ position: "absolute", top: "45%", left: "20%", backgroundColor: "white", width: "850px", }} onClick={() => setShow(false)}>
                     {areaParams === '' ?
                         // 全国の都道府県を表示
-                        detailAreaPrefectureList?.map((detailArea) => {
+                        detailAreaPrefectureList?.map((detailArea, index) => {
                             return (
-                                <div className="col-1 py-2 text-center">
+                                <div className="col-1 py-2 text-center" key={index}>
                                     <Link
                                         to={`/search?lang=jp&page=${MinPageCount}&area=${detailArea}`}
                                         onClick={() => handlePageCount(MinPageCount)}>
@@ -288,9 +288,9 @@ export const SearchResultPage = () => {
                         })
                         :
                         //　都道府県に所属する市区町村を表示
-                        detailAreaCityList.map((detailAreaCity) => {
+                        detailAreaCityList.map((detailAreaCity, index) => {
                             return (
-                                <div className="col-1 py-2 text-center">
+                                <div className="col-1 py-2 text-center" key={index}>
                                     <Link to={`/search?lang=jp&page=${MinPageCount}&area=${areaParams}${detailAreaCity.name}`} onClick={() => handlePageCount(MinPageCount)}><p className="m-0 py-1" style={{ fontSize: "10px", fontWeight: 'bold' }}>{detailAreaCity.name}</p></Link>
                                 </div>
                             )

@@ -10,6 +10,7 @@ import { toast } from 'react-toastify';
 import { useErrorHandler } from 'react-error-boundary';
 import { ErrorPageProps } from '../@types/ErrorPage';
 import { useNavigate } from 'react-router-dom';
+import { useIsSavedCookieOfUserID } from '../common/Check';
 
 type profileProps = {
     profile: Profile | undefined
@@ -22,10 +23,13 @@ export const ProfileComponent: React.VFC<profileProps> = ({ profile, setProfile 
 
     const handleError = useErrorHandler();
     const handleFollow = async () => {
-        if (!cookies.userID) {
-            toast.warning("ログインしてください")
-            return;
-        }
+
+        // // クッキー情報がない場合はトップ画面に遷移する
+        // if (!useIsSavedCookieOfUserID) {
+        //     navigate("/");
+        //     return;
+        // }
+
         try {
             const uri = "http://localhost:4000/follow";
             let accessToken = ""
@@ -118,7 +122,7 @@ export const ProfileComponent: React.VFC<profileProps> = ({ profile, setProfile 
                         <div className="row">
                             <div className="user-name">
                                 <div className="name">
-                                    {profile?.name}
+                                    @{profile?.name}
                                 </div>
                             </div>
                         </div>

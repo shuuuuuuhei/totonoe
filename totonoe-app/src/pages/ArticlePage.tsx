@@ -7,7 +7,6 @@ import { Article } from '../@types/article/Article';
 import { Comment } from '../@types/article/Comment';
 import { DetailArticle } from '../components/Article/Article';
 import { Comments } from '../components/Comment';
-import { ConvertErrorMessageToErrorPageProps } from '../common/Convert';
 
 export const ArticlePage = () => {
     const [article, setArticle] = useState<Article>();
@@ -48,10 +47,7 @@ export const ArticlePage = () => {
                     setArticle(resData)
                 })
                 .catch(err => {
-                    // エラーメッセージを受け取りエラーページの引数を設定する
-                    const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
-                    navigate('/error', { state: errorInfo });
-                    return;
+                    console.log(err)
                 });
         }
         const fetchComment = async () => {
@@ -71,10 +67,10 @@ export const ArticlePage = () => {
             await fetch(uri, requestOption)
                 .then((response) => {
                     if (!response.ok) {
-                        // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
-                        const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
-                        navigate('/error', { state: errorInfo });
-                        return;
+                        const err = new Error;
+                        console.log(response);
+                        err.message = "記事コメントの取得に失敗しました, articleID: " + params.articleID + ", レスポンスコード：" + response.status;
+                        throw err;
                     }
                     return response.json();
                 })
@@ -82,10 +78,7 @@ export const ArticlePage = () => {
                     setComments(resData);
                 })
                 .catch(err => {
-                    // エラーメッセージを受け取りエラーページの引数を設定する
-                    const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
-                    navigate('/error', { state: errorInfo });
-                    return;
+                    console.log(err)
                 });
         }
         fetchComment();

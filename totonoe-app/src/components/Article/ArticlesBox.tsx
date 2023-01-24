@@ -57,9 +57,9 @@ export const ArticlesBox = () => {
                 <h5>人気の投稿</h5>
                 <div className="articles-box">
                     <div className="row py-3 ">
-                        {articles.map((article) => {
+                        {articles.map((article, index) => {
                             return (
-                                <ArticleBox article={article} />
+                                <ArticleBox article={article} key={index} />
                             )
                         })}
                     </div>

@@ -17,6 +17,7 @@ import { isAdminUser } from '../common/Check';
 import { Chip } from '@mui/material';
 import AppIcon from '../images/Totonoe.png'
 import { ErrorPageProps } from '../@types/ErrorPage';
+import { ConvertErrorMessageToErrorPageProps } from '../common/Convert';
 
 
 export const Header = () => {
@@ -73,11 +74,6 @@ export const Header = () => {
             });
         } catch (error) {
             console.log(error);
-
-        }
-
-        if (!accessToken) {
-            throw Error("アクセストークンがありません。");
         }
 
         const requestOption: RequestInit = {
@@ -94,51 +90,6 @@ export const Header = () => {
             .then((response) => {
                 if (!response.ok) {
                     // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
-                    // handleError({ statusCode: response.status, message: response.statusText });
-                    const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
-                    navigate('/error', { state: errorInfo });
-                    return;
-                }
-                return response.json();
-            })
-            .then((resData: AuthState) => {
-                setAuthState(resData)
-            })
-            .catch(err => {
-                console.log(err)
-            });
-    }
-
-    /**
-     * ユーザー名取得
-     */
-    const getUserName = async () => {
-        const userID = cookies.userID;
-        const uri = "http://localhost:4000/authorization";
-        const accessToken = await getAccessTokenWithPopup({
-            audience: 'https://totonoe-app.com',
-            scope: 'read:posts',
-        });
-
-        if (!accessToken) {
-            throw Error("アクセストークンがありません。");
-        }
-
-        const requestOption: RequestInit = {
-            method: "POST",
-            mode: "cors",
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-                "Content-Type": "application/json",
-                "User-ID": userID,
-            },
-            body: JSON.stringify({ 'user_id': userID, })
-        };
-        await fetch(uri, requestOption)
-            .then((response) => {
-                if (!response.ok) {
-                    // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
-                    // handleError({ statusCode: response.status, message: response.statusText });
                     const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
                     navigate('/error', { state: errorInfo });
                     return;
@@ -181,54 +132,20 @@ export const Header = () => {
                                         // ログイン済み
                                         isShowedUserContents &&
 
-                                        <div className="row border py-3 px-4 text-center" style={{ position: "absolute", right: "20px", width: "250px", backgroundColor: "white" }} onClick={() => setIsShowedUserContents(!isShowedUserContents)}>
-                                            <div className="row p-0">
-                                                <div className="col-4 text-center">
-                                                    <CgProfile size={40} />
-                                                </div>
-                                                <div className="col-8 text-start py-2 px-0">
-                                                    {/* ↓今はauth0のユーザ名を表示している */}
-                                                    <p className="overflow-hidden" style={{ fontSize: "12px" }}></p>
-                                                </div>
-                                            </div>
+                                        <div className="row border py-3 px-4 text-center" style={{ position: "absolute", right: "20px", width: "200px", backgroundColor: "white" }} onClick={() => setIsShowedUserContents(!isShowedUserContents)}>
                                             <Link to={"profile/" + cookies.userID}>
-                                                <Button
-                                                    variant="outline-warning"
-                                                    className="my-2"
-                                                    style={{ width: "150px" }}
-                                                >
-                                                    マイページ
-                                                </Button>
+                                                マイページ
                                             </Link>
                                             <Link to={"setting/profile"}>
-                                                <Button
-                                                    variant="outline-warning"
-                                                    className="my-2"
-                                                    style={{ width: "150px" }}
-                                                >
-                                                    設定
-                                                </Button>
+                                                設定
                                             </Link>
                                             {isAdminUser(authState) &&
-                                                <Link to={"admin/"}>
-                                                    <Button
-                                                        variant="outline-warning"
-                                                        className="my-2"
-                                                        style={{ width: "150px" }}
-                                                    >
-                                                        管理者用ページ
-                                                    </Button>
+                                                <Link to={"admin/"} style={{ width: "150px" }}>
+                                                    管理者用ページ
                                                 </Link>
                                             }
-                                            <div className="row text-center mx-0 px-4">
-                                                <Button
-                                                    onClick={logoutUser}
-                                                    variant="outline-warning"
-                                                    className="my-2"
-                                                    style={{ width: "150px" }}
-                                                >
-                                                    ログアウト
-                                                </Button>
+                                            <div className="row text-center mx-0 px-4" onClick={logoutUser}>
+                                                ログアウト
                                             </div>
                                         </div>
                                     }

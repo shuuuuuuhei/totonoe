@@ -116,7 +116,6 @@ export const SelectFilterBox = () => {
                         )
                     })}
                 </div>
-
                 <div className="row py-2">
                     <p style={filterTitleStyle}>サウナオプション</p>
                     {saunaOptions.map((saunaOption, index) => {
@@ -144,7 +143,7 @@ export const SelectFilterBox = () => {
             </div>
             <div className="row justify-content-center">
                 <Button variant="contained" className="col-3" onClick={handleCheckBoxClear}>クリア</Button>
-                <Link to={`/search?page=1`} state={{ "saunaOptionState": saunaOptionState, "termsState": termsListState, "saunaTypeState": saunaTypeState }} className=" text-center col-6">
+                <Link to={`/search?page=1`} state={{ "saunaOptionState": saunaOptionState, "termsState": termsListState, "saunaTypeState": saunaTypeState }} className="text-center col-6">
                     <Button variant="contained" color="warning" fullWidth>
                         検索
                     </Button>

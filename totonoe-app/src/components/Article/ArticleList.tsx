@@ -25,9 +25,9 @@ export const ArticleList: React.VFC<ArticlesProps> = ({ articles }) => {
                     </>
                     :
                     <>
-                        {articles?.map((article, key) => {
+                        {articles?.map((article, index) => {
                             return (
-                                <DetailArticle article={article} />
+                                <DetailArticle article={article} key={index} />
                             )
                         })}
 

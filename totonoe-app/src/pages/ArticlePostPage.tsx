@@ -259,7 +259,7 @@ export const ArticlePostPage = () => {
                     <div className="text-start">
                         {ratingList.map((rating, index) => {
                             return (
-                                <div className="row py-3">
+                                <div className="row py-3" key={index}>
                                     <div className="col-2">
                                         <p>{rating.name}</p>
                                     </div>

@@ -96,9 +96,9 @@ export const Comments: React.VFC<CommentProps> = (props) => {
             <div className="comment-wrap container p-5">
                 <h4 className="comment">コメント</h4>
                 <div className="comments">
-                    {props.comments?.map((comment) => {
+                    {props.comments?.map((comment, index) => {
                         return (
-                            <Fragment>
+                            <div key={index}>
                                 <div className="comment-header row">
                                     <div className="col-1 user-icon">
                                         <MdInsertEmoticon size={30} />
@@ -110,7 +110,7 @@ export const Comments: React.VFC<CommentProps> = (props) => {
                                 <div className="comment-content row-cols-1">
                                     <p className="col-3">{comment.content}</p>
                                 </div>
-                            </Fragment>
+                            </div>
                         )
                     })}
                 </div>

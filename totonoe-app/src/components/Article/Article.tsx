@@ -49,6 +49,10 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
         }
         const articleID = article?.id;
 
+        if (cookies.userID) {
+            return;
+        }
+
         // 未いいねの場合
         if (!article?.is_liked) {
             const fetchLike = async () => {
@@ -88,7 +92,10 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
                         }
                     })
                     .catch(err => {
-                        toast.error("いいねに失敗しました。")
+                        // エラーメッセージを受け取りエラーページの引数を設定する
+                        const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
+                        navigate('/error', { state: errorInfo });
+                        return;
                     });
             }
             fetchLike();
@@ -238,7 +245,7 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
                             <p>評価</p>
                             {ratingList.map((rating, index) => {
                                 return (
-                                    <div className="row py-2">
+                                    <div className="row py-2" key={index}>
                                         <div className="col-3">
                                             <p style={{ fontSize: "9px" }}>{rating.name}</p>
                                         </div>
@@ -262,7 +269,7 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
                             </div>
                             <div className="text-start py-3">
                                 {/* 改行コードを含む場合は<br/>に変換する */}
-                                <p>{article?.content.split('\n').map(t => (<span>{t}<br /></span>))}</p>
+                                <p>{article?.content.split('\n').map((t, index) => (<span key={index}>{t}<br /></span>))}</p>
                             </div>
                         </div>
                     </div>

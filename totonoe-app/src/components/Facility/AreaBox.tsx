@@ -18,7 +18,7 @@ export const AreaBox = () => {
                             <div className="col-9 px-0">
                                 {prefectureListPerArea["北海道・東北"].map((prefecture, index) => {
                                     return (
-                                        <><Link to={searchLink + prefecture} style={{ fontSize: 13 }}>{prefecture}</Link><span> </span></>
+                                        <div key={index}><Link to={searchLink + prefecture} style={{ fontSize: 13 }}>{prefecture}</Link><span> </span></div>
                                     )
                                 })}
                             </div>
@@ -32,7 +32,7 @@ export const AreaBox = () => {
                             <div className="col-9 px-0">
                                 {prefectureListPerArea.関東.map((prefecture, index) => {
                                     return (
-                                        <><Link to={searchLink + prefecture} style={{ fontSize: 13 }}>{prefecture}</Link><span> </span></>
+                                        <div key={index}><Link to={searchLink + prefecture} style={{ fontSize: 13 }}>{prefecture}</Link><span> </span></div>
                                     )
                                 })}
                             </div>
@@ -46,7 +46,7 @@ export const AreaBox = () => {
                             <div className="col-9 px-0">
                                 {prefectureListPerArea.中部.map((prefecture, index) => {
                                     return (
-                                        <><Link to={searchLink + prefecture} style={{ fontSize: 13 }}>{prefecture}</Link><span> </span></>
+                                        <div key={index}><Link to={searchLink + prefecture} style={{ fontSize: 13 }}>{prefecture}</Link><span> </span></div>
                                     )
                                 })}
                             </div>
@@ -60,7 +60,7 @@ export const AreaBox = () => {
                             <div className="col-9 px-0">
                                 {prefectureListPerArea.近畿.map((prefecture, index) => {
                                     return (
-                                        <><Link to={searchLink + prefecture} style={{ fontSize: 13 }}>{prefecture}</Link><span> </span></>
+                                        <div key={index}><Link to={searchLink + prefecture} style={{ fontSize: 13 }}>{prefecture}</Link><span> </span></div>
                                     )
                                 })}
                             </div>
@@ -74,7 +74,7 @@ export const AreaBox = () => {
                             <div className="col-9 px-0">
                                 {prefectureListPerArea["中国・四国"].map((prefecture, index) => {
                                     return (
-                                        <><Link to={searchLink + prefecture} style={{ fontSize: 13 }}>{prefecture}</Link><span> </span></>
+                                        <div key={index}><Link to={searchLink + prefecture} style={{ fontSize: 13 }}>{prefecture}</Link><span> </span></div>
                                     )
                                 })}
                             </div>
@@ -88,7 +88,7 @@ export const AreaBox = () => {
                             <div className="col-9 px-0">
                                 {prefectureListPerArea["九州・沖縄"].map((prefecture, index) => {
                                     return (
-                                        <><Link to={searchLink + prefecture} style={{ fontSize: 13 }}>{prefecture}</Link><span> </span></>
+                                        <div key={index}><Link to={searchLink + prefecture} style={{ fontSize: 13 }}>{prefecture}</Link><span> </span></div>
                                     )
                                 })}
                             </div>

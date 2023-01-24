@@ -75,7 +75,7 @@ export const SaunaDetail = (props: SaunaDetailProps) => {
                             props.facility.saunas.map((sauna, index) => {
                                 console.log("saunas", sauna)
                                 return (
-                                    <div className="sauna-contents container text-center py-5">
+                                    <div className="sauna-contents container text-center py-5" key={index}>
                                         <div className="sauna-basic-info">
                                             <h4>サウナ{index + 1}</h4>
                                             <p>{sauna.sauna_type}</p>
@@ -124,7 +124,7 @@ export const SaunaDetail = (props: SaunaDetailProps) => {
                             :
                             props.facility.water_baths?.map((waterbath, index) => {
                                 return (
-                                    <div className="water-bath container text-center py-5">
+                                    <div className="water-bath container text-center py-5" key={index}>
                                         <div className="waterbath-basic-info">
                                             <h4>水風呂{index + 1}</h4>
                                             <p>温度　{waterbath.temperature}度</p>
