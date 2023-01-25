@@ -7,12 +7,8 @@ export const Home: React.VFC = () => {
     return (
         <Fragment>
             <SearchBox />
-            <div className="container text-center">
-                <div className="row my-5">
-                    <AreaBox />
-                </div>
-            </div>
 
+            <AreaBox />
             <TotonoeDescription />
             <ArticlesBox />
             {/* <FacilityBox /> */}
