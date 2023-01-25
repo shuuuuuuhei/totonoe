@@ -151,48 +151,52 @@ export const ArticlePostPage = () => {
     const handleSubmit = async (evt: any) => {
         evt.preventDefault();
 
-        if (useIsSavedCookieOfUserID) {
-            loginWithRedirect();
+        // ログイン確認
+        let accessToken = ""
+        try {
+            accessToken = await getAccessTokenSilently({
+                audience: 'https://totonoe-app.com',
+                scope: 'read:posts',
+            })
+            if (IsNullOrUndefinedOrEmpty(cookies.userID)) {
+                throw new Error("クッキー情報がありません")
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error("ログインしてください")
         }
 
         // facilityIDが空文字もしくはUndefinedなら処理終了
         if (IsNullOrUndefinedOrEmpty(facilityID)) return
 
-        try {
-            const uri = baseUri + "articles/new";
-            const accessToken = await getAccessTokenSilently({
-                audience: 'https://totonoe-app.com',
-                scope: 'read:posts',
+        const uri = baseUri + "articles/new";
+        const requestOption: RequestInit = {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ article, 'user_id': cookies.userID, "facility_id": parseInt(UndefinedOrNullConvertToEmpty(facilityID)), "rating": rating })
+        }
+        await fetch(uri, requestOption)
+            .then((response) => {
+                if (!response.ok) {
+                    // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                    const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                    navigate('/error', { state: errorInfo });
+                    return;
+                }
+                return response.json()
             })
-            const requestOption: RequestInit = {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ article, 'user_id': cookies.userID, "facility_id": parseInt(UndefinedOrNullConvertToEmpty(facilityID)), "rating": rating })
-            }
-            await fetch(uri, requestOption)
-                .then((response) => {
-                    if (!response.ok) {
-                        // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
-                        const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
-                        navigate('/error', { state: errorInfo });
-                        return;
-                    }
-                    return response.json()
-                })
-                .then(data => {
-                    toast.success('ととのい日記を投稿しました！');
-                    navigate(`/articles/${data.id}`);
-                })
-                .catch(error => {
-                    toast.warning(error);
-                })
-        }
-        catch (error) {
-            toast.warning(error);
-        }
+            .then((posted: Article) => {
+                console.log(posted);
+                navigate(`/articles/${posted.id}`,
+                    { state: { toast: { status: "success", message: "記事を投稿しました！" } } }
+                );
+            })
+            .catch(error => {
+                toast.warning(error);
+            })
     }
 
     registerLocale('ja', ja);
