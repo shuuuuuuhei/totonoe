@@ -106,7 +106,7 @@ export const precisionScore = 0.5;
  */
 export const ratingList: RatingProperty[] = [
     {
-        name: "ととのい度",
+        name: "ととのい",
         id: 'totonoi_score',
     },
     {
@@ -114,7 +114,7 @@ export const ratingList: RatingProperty[] = [
         id: 'relax_score',
     },
     {
-        name: "価格満足度",
+        name: "価格満足",
         id: 'price_score',
     },
     {
