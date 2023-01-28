@@ -86,11 +86,10 @@ export const ConvertErrorMessageToErrorPageProps = (errMessage: string): ErrorPa
  */
 export const ConvertErrorCodeToErrorMessage = (statusCode: number): ErrorPageProps => {
 
-    const errorInfo: ErrorPageProps[] = ErrorCodeWithMessage.map((value) => {
-        if (statusCode === value.statusCode) {
-            return value
-        }
+    const errorInfo: ErrorPageProps = ErrorCodeWithMessage.find((value) => {
+        return statusCode === value.statusCode;
     });
 
-    return errorInfo.at(0);
+
+    return errorInfo;
 }
