@@ -25,6 +25,7 @@ export const App = () => {
   const { user, getIdTokenClaims, getAccessTokenWithPopup, isAuthenticated, logout } = useAuth0();
   const [cookies, setCookie, removeCookie] = useCookies();
   const userID = user?.sub?.split('|').at(1);
+  const [isLoggined, setIsLoggined] = useState(false);
 
   console.log("ログイン情報：", userID, cookies);
 
@@ -52,9 +53,12 @@ export const App = () => {
 
       // サインアップ処理が成功したらメッセージを表示して処理を終了する
       toast.success('ユーザ登録が完了しました！');
+      setIsLoggined(true);
       return;
     } catch (error) {
       toast.error('ユーザー登録に失敗しました。');
+      // リダイレクトするとメッセージ表示が消えるため、3秒後にログアウト処理を実施する
+      setTimeout(() => logout({ returnTo: window.location.origin }), 3000);
       return;
     }
   }
@@ -137,6 +141,8 @@ export const App = () => {
       })
       .then(() => {
         toast.success('おかえりなさい！');
+        // ログイン済みにして再レンダリングを防ぐ
+        setIsLoggined(true);
       })
       .catch(err => {
         console.log(err);
@@ -160,26 +166,35 @@ export const App = () => {
 
   // 画面ロード時
   useEffect(() => {
-    // ログイン回数が初回の場合はユーザ新規登録を行う
-    if (user?.loginCount === 1 && IsNullOrUndefinedOrEmpty(cookies.userID)) {
-      // サインアップ
-      signupUser();
-    } else if (IsNullOrUndefinedOrEmpty(cookies.userID) && isAuthenticated) {
+    if (!isLoggined) {
 
-      // アカウント情報取得
-      getAccountInfo();
+      try {
+        // ログイン回数が初回の場合はユーザ新規登録を行う
+        if (user?.loginCount === 1 && IsNullOrUndefinedOrEmpty(cookies.userID)) {
+          // サインアップ
+          signupUser();
+        } else if (IsNullOrUndefinedOrEmpty(cookies.userID) && isAuthenticated) {
 
-      // ログイン時にcookieが未発行の場合
-      setUserInfoCookie();
+          // アカウント情報取得
+          getAccountInfo();
+
+          // ログイン時にcookieが未発行の場合
+          setUserInfoCookie();
+
+        }
+      }
+      catch (error) {
+        setIsLoggined(false);
+      }
+
     }
-
   }, [user])
 
   return (
     <div>
       <BrowserRouter>
         <ErrorBoundary FallbackComponent={ErrorFallback}>
-          <Header />
+          <Header isLoggined={isLoggined} setIsLoggined={setIsLoggined} />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/profile/:userID" element={<ProfilePage />}></Route>
