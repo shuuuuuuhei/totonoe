@@ -5,11 +5,9 @@ const InterpolateHtmlPlugin = require('interpolate-html-plugin');
 const {
     CleanWebpackPlugin
 } = require('clean-webpack-plugin');
-const Dotenv = require('dotenv-webpack');
+const Dotenv = require('dotenv-webpack')
+// モード共通
 module.exports = {
-    // モード値を production に設定すると最適化された状態で、
-    // development に設定するとソースマップ有効でJSファイルが出力される
-    mode: 'development',
     module: {
         rules: [{
                 test: /\.(ts|js)x?$/,
@@ -35,16 +33,7 @@ module.exports = {
             },
         ],
     },
-    devServer: {
-        port: "3000",
-        open: true,
-        watchFiles: ['src/**/*', 'public/**/*'],
-        static: {
-            directory: path.join(__dirname, 'public'),
-        },
-        hot: true,
-        historyApiFallback: true,
-    },
+
     // メインとなるjsファイル（エントリーポイント）
     entry: './src/index.tsx',
 
