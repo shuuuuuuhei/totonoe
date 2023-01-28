@@ -1,19 +1,22 @@
 package presenter
 
 import (
-	"errors"
 	"net/http"
 
 	"gorm.io/gorm"
 )
 
-// toHTTPStatusCode　エラーコード生成
-func toHTTPStatusCode(err error) int {
+// toHTTPResponse　エラーコードとメッセージを生成
+func toHTTPResponse(err error) (int, string) {
 
-	// レコードが見つからなかったケース
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return http.StatusNotFound
+	switch err.Error() {
+	case "403":
+		// 権限がなかったケース
+		return http.StatusForbidden, "Forbin"
+	case gorm.ErrRecordNotFound.Error():
+		// レコードが見つからなかったケース
+		return http.StatusNotFound, "Not Found"
+	default:
+		return http.StatusInternalServerError, err.Error()
 	}
-
-	return http.StatusInternalServerError
 }

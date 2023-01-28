@@ -29,10 +29,11 @@ func (a *Authorization) RenderAuthorization(authorization *Domain.Authorization)
 	a.c.JSON(http.StatusOK, authorization)
 }
 
-// RenderError implements port.AuthorizationOutputPort
+// RenderError エラーによってコードを変更する
 func (a *Authorization) RenderError(err error) {
-	fmt.Println(err)
-	a.c.JSON(500, err)
+	errCode, errMessage := toHTTPResponse(err)
+	a.c.JSON(errCode, gin.H{"msg": errMessage})
+	fmt.Printf("エラーコード：%d, メッセージ：%s", errCode, errMessage)
 }
 
 // RenderOK implements port.AuthorizationOutputPort

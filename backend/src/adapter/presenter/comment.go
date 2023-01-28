@@ -1,6 +1,7 @@
 package presenter
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -24,7 +25,9 @@ func (c Comment) RenderOK() {
 }
 
 func (c Comment) RenderErr(err error) {
-	c.ctx.JSON(500, err)
+	errCode, errMessage := toHTTPResponse(err)
+	c.ctx.JSON(errCode, gin.H{"msg": errMessage})
+	fmt.Printf("エラーコード：%d, メッセージ：%s", errCode, errMessage)
 }
 
 func (c Comment) RenderComments(comments *[]ValueObject.CommentVO) {

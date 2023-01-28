@@ -25,8 +25,9 @@ func (f Facility) RenderOK() {
 }
 
 func (f Facility) RenderError(err error) {
-	fmt.Println(err)
-	f.c.JSON(500, err)
+	errCode, errMessage := toHTTPResponse(err)
+	f.c.JSON(errCode, gin.H{"msg": errMessage})
+	fmt.Printf("エラーコード：%d, メッセージ：%s", errCode, errMessage)
 }
 
 // RenderFacilities implements port.FacilityOutputPort

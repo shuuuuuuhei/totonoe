@@ -20,8 +20,9 @@ func (a *Account) RenderAccountInfo(c *gin.Context, accountInfo *ValueObject.Acc
 
 // RenderError implements port.AccountOutputPort
 func (a *Account) RenderError(err error) {
-	fmt.Println(err)
-	a.c.JSON(toHTTPStatusCode(err), gin.H{"msg": err.Error()})
+	errCode, errMessage := toHTTPResponse(err)
+	a.c.JSON(errCode, gin.H{"msg": errMessage})
+	fmt.Printf("エラーコード：%d, メッセージ：%s", errCode, errMessage)
 }
 
 // RenderOK implements port.AccountOutputPort

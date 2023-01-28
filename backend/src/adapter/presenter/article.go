@@ -36,8 +36,9 @@ func (a *Article) RenderArticles(articles *[]ValueObject.ArticleVO) {
 
 // RenderError はErrorを返す
 func (a *Article) RenderError(err error) {
-	fmt.Println(err)
-	a.c.JSON(500, err)
+	errCode, errMessage := toHTTPResponse(err)
+	a.c.JSON(errCode, gin.H{"msg": errMessage})
+	fmt.Printf("エラーコード：%d, メッセージ：%s", errCode, errMessage)
 }
 
 // RenderOK レスポンス200のみ返す
