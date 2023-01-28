@@ -3,9 +3,6 @@ import { Input } from '../components/form-components/Input'
 import { FacilitySubmitComponent } from '../components/Facility/FacilitySubmitComponent'
 
 export const SaunaSubmitPage = () => {
-    const handleChange = () => {
-
-    }
 
     return (
         <Fragment>

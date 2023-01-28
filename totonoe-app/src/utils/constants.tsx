@@ -1,3 +1,4 @@
+import { ErrorPageProps } from "../@types/ErrorPage";
 import { RatingProperty } from "../@types/article/Rating";
 
 /**
@@ -105,7 +106,7 @@ export const precisionScore = 0.5;
  */
 export const ratingList: RatingProperty[] = [
     {
-        name: "ととのい度",
+        name: "ととのい",
         id: 'totonoi_score',
     },
     {
@@ -113,7 +114,7 @@ export const ratingList: RatingProperty[] = [
         id: 'relax_score',
     },
     {
-        name: "価格満足度",
+        name: "価格満足",
         id: 'price_score',
     },
     {
@@ -168,3 +169,16 @@ export type Libraries = ("drawing" | "geometry" | "localContext" | "places" | "v
  * 最小ページ
  */
 export const MinPageCount = 1;
+
+/**
+ * Totonoeテーマカラー
+ */
+export const themeColor = "#ffd54f";
+
+/**
+ * エラーコード/エラーメッセージ
+*/
+export const ErrorCodeWithMessage: ErrorPageProps[] = [
+    { statusCode: 404, message: "このページはすでに削除されているか、URLが間違っている可能性があります。" },
+    { statusCode: 403, message: "Forbidden" },
+]

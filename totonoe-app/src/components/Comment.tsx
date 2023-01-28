@@ -6,6 +6,8 @@ import { Comment } from '../@types/article/Comment';
 import { NewComment } from '../@types/article/NewComment';
 import { Textarea } from './form-components/Textarea';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import { ErrorPageProps } from '../@types/ErrorPage';
 
 type CommentProps = {
     comments: Comment[] | undefined
@@ -20,6 +22,7 @@ export const Comments: React.VFC<CommentProps> = (props) => {
     });
     const { getAccessTokenSilently } = useAuth0();
     const [cookies, setCookie, removeCookie] = useCookies();
+    const navigate = useNavigate();
 
     const handleChange: React.ChangeEventHandler<HTMLSelectElement> = (event) => {
         const value = event.target.value;
@@ -62,7 +65,10 @@ export const Comments: React.VFC<CommentProps> = (props) => {
                 fetch(uri, requestOption)
                     .then((response) => {
                         if (!response.ok) {
-                            throw Error("コメントを作成できませんでした。");
+                            // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                            const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                            navigate('/error', { state: errorInfo });
+                            return;
                         }
                         return response.json()
                     })
@@ -90,9 +96,9 @@ export const Comments: React.VFC<CommentProps> = (props) => {
             <div className="comment-wrap container p-5">
                 <h4 className="comment">コメント</h4>
                 <div className="comments">
-                    {props.comments?.map((comment) => {
+                    {props.comments?.map((comment, index) => {
                         return (
-                            <Fragment>
+                            <div key={index}>
                                 <div className="comment-header row">
                                     <div className="col-1 user-icon">
                                         <MdInsertEmoticon size={30} />
@@ -104,7 +110,7 @@ export const Comments: React.VFC<CommentProps> = (props) => {
                                 <div className="comment-content row-cols-1">
                                     <p className="col-3">{comment.content}</p>
                                 </div>
-                            </Fragment>
+                            </div>
                         )
                     })}
                 </div>

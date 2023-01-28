@@ -10,6 +10,18 @@ type Authorization struct {
 	Repository port.AuthorizationRepository
 }
 
+// CheckAuthorization 権限チェック
+func (a *Authorization) CheckAuthorization(c *gin.Context) {
+	err := a.Repository.CheckAuthorization(c)
+
+	if err != nil {
+		a.Outputport.RenderError(err)
+		return
+	}
+
+	a.Outputport.RenderOK()
+}
+
 // DeleteAuthorization 権限情報削除
 func (a *Authorization) DeleteAuthorization(c *gin.Context) {
 	err := a.Repository.DeleteAuthorization(c)

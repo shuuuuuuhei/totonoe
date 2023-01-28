@@ -1,12 +1,14 @@
 import { GoogleMap, InfoWindow, LoadScript, Marker } from "@react-google-maps/api";
-import React, { Fragment, useState, useRef, useEffect, useCallback } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { Fragment, useState, useCallback } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FacilityMapInfo } from '../@types/sauna/Facility';
-import { UndefinedConvertToZero, UndefinedOrNullConvertToEmpty } from '../common/Convert';
+import { ConvertErrorCodeToErrorMessage, ConvertErrorMessageToErrorPageProps, UndefinedConvertToZero, UndefinedOrNullConvertToEmpty } from '../common/Convert';
 import "../style/Map.css";
 import { Button } from "@mui/material";
 import { Libraries } from "../utils/constants";
 import LoadingButton from "@mui/lab/LoadingButton";
+import { ErrorPageProps } from "../@types/ErrorPage";
+import { IsNullOrUndefinedOrEmpty } from "../common/Check";
 
 type Position = {
     latlng_literal: google.maps.LatLngLiteral,
@@ -28,6 +30,7 @@ export const MapComponent = () => {
     const areaParams = UndefinedOrNullConvertToEmpty(queryParams.get("area"));
     const [facilityMapInfoList, setFacilityMapInfoList] = useState<FacilityMapInfo[]>();
     const [infoStyle, setInfoStyle] = useState<google.maps.Size>();
+    const navigate = useNavigate();
     /**
      * 検索したエリアの経度緯度
     */
@@ -54,6 +57,13 @@ export const MapComponent = () => {
      */
     const onMapLoad = useCallback((map: google.maps.Map) => {
 
+        // エリアパラメータが入力されていない場合はエラーページに遷移する
+        if (IsNullOrUndefinedOrEmpty(areaParams)) {
+            // 404エラーページへ遷移する
+            const errorInfo: ErrorPageProps = ConvertErrorCodeToErrorMessage(404);
+            navigate('/error', { state: errorInfo });
+            return;
+        };
         setMapLoad(true);
         // 初回ロード
         if (!isInitialLoaded) {
@@ -140,9 +150,10 @@ export const MapComponent = () => {
             await fetch(uri, requestOption)
                 .then((response) => {
                     if (!response.ok) {
-                        const err = new Error;
-                        err.message = "施設情報の取得に失敗しました" + response.status;
-                        throw err;
+                        // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                        const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                        navigate('/error', { state: errorInfo });
+                        return;
                     }
                     return response.json();
                 })
@@ -150,7 +161,10 @@ export const MapComponent = () => {
                     setFacilityMapInfoList(resData)
                 })
                 .catch(err => {
-                    console.log(err)
+                    // エラーメッセージを受け取りエラーページの引数を設定する
+                    const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
+                    navigate('/error', { state: errorInfo });
+                    return;
                 });
         }
 

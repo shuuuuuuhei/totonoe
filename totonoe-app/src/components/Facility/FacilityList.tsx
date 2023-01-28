@@ -27,9 +27,9 @@ export const FacilityList = (props: FacilityListProps) => {
     }
     return (
         <Fragment>
-            {props.facilities.map((facility) => {
+            {props.facilities.map((facility, index) => {
                 return (
-                    <div className="facility py-4">
+                    <div className="facility py-4" key={index}>
                         <div className="row facility-top">
                             <div className="col-10 facility-name">
                                 {/* サウナ施設詳細ページリンク */}

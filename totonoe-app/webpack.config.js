@@ -39,10 +39,11 @@ module.exports = {
         port: "3000",
         open: true,
         watchFiles: ['src/**/*', 'public/**/*'],
-        compress: true,
         static: {
             directory: path.join(__dirname, 'public'),
         },
+        hot: true,
+        historyApiFallback: true,
     },
     // メインとなるjsファイル（エントリーポイント）
     entry: './src/index.tsx',

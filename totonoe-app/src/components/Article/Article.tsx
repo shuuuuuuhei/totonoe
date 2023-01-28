@@ -8,11 +8,13 @@ import { MdInsertEmoticon } from 'react-icons/md'
 import { Link, useNavigate } from 'react-router-dom'
 import { Article } from '../../@types/article/Article'
 import { RatingScore } from '../../@types/article/Rating'
-import { precisionScore, ratingList } from '../../utils/constants'
+import { precisionScore, ratingList, themeColor } from '../../utils/constants'
 import { SetDateFormat } from '../../common/Convert'
 import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { toast } from 'react-toastify'
+import { useErrorHandler } from 'react-error-boundary';
+import { ErrorPageProps } from '../../@types/ErrorPage';
 
 type ArticleProps = {
     article: Article | undefined
@@ -32,6 +34,7 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
     const [showDeleteButton, setShowDeleteButton] = useState(false);
     const navigate = useNavigate();
     const [isMyArticle, setIsMyArticle] = useState(false);
+    const handleError = useErrorHandler();
 
     const handleLike = async () => {
         let accessToken = ""
@@ -45,6 +48,10 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
             return;
         }
         const articleID = article?.id;
+
+        if (cookies.userID) {
+            return;
+        }
 
         // 未いいねの場合
         if (!article?.is_liked) {
@@ -62,12 +69,12 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
                 await fetch(uri, requestOption)
                     .then((response) => {
                         if (!response.ok) {
-                            const err = new Error;
-                            console.log(response);
-                            err.message = "いいねに失敗しました" + response.status;
-                            throw err;
+                            // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                            const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                            navigate('/error', { state: errorInfo });
+                            return;
                         }
-                        return;
+                        return response.json();
                     })
                     .then(() => {
                         if (!article.like_count) {
@@ -85,7 +92,10 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
                         }
                     })
                     .catch(err => {
-                        console.log(err)
+                        // エラーメッセージを受け取りエラーページの引数を設定する
+                        const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
+                        navigate('/error', { state: errorInfo });
+                        return;
                     });
             }
             fetchLike();
@@ -105,10 +115,10 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
             await fetch(uri, requestOption)
                 .then((response) => {
                     if (!response.ok) {
-                        const err = new Error;
-                        console.log(response);
-                        err.message = "いいね解除に失敗しました" + response.status;
-                        throw err;
+                        // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                        const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                        navigate('/error', { state: errorInfo });
+                        return;
                     }
                     return;
                 })
@@ -149,10 +159,10 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
             await fetch(uri, requestOption)
                 .then((response) => {
                     if (!response.ok) {
-                        const err = new Error;
-                        console.log(response);
-                        err.message = "記事削除に失敗しました。" + response.status;
-                        throw err;
+                        // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                        const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                        navigate('/error', { state: errorInfo });
+                        return;
                     }
                     return;
                 })
@@ -162,8 +172,7 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
                     );
                 })
                 .catch(err => {
-                    toast.warning(err)
-                    console.log(err)
+                    toast.error("いいね解除に失敗しました。")
                 });
             return
         }
@@ -231,12 +240,13 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="article-bottom row">
-                        <div className="col-5 article-rating py-3">
+                    {/* 施設評価 */}
+                    <div className="article-bottom row py-3">
+                        <div className="col-4 article-rating py-5 px-0">
                             <p>評価</p>
                             {ratingList.map((rating, index) => {
                                 return (
-                                    <div className="row py-2">
+                                    <div className="row py-2" key={index}>
                                         <div className="col-3">
                                             <p style={{ fontSize: "9px" }}>{rating.name}</p>
                                         </div>
@@ -247,20 +257,27 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
                                                 readOnly
                                             />
                                         </div>
-                                        <div className="col-4">
+                                        <div className="col-5">
                                             {ratingScore[rating.id]}
                                         </div>
                                     </div>
                                 )
                             })}
                         </div>
-                        <div className="col-7 article-content">
-                            <div className="facility text-start">
-                                <Link to={`/saunas/${article?.facility_id}`}><p className="m-0">{article?.facility_name}</p></Link>
+                        {/* 記事メイン部 */}
+                        <div className="col-8 article-content">
+                            {/* 施設名 */}
+                            <div className="facility text-center">
+                                <Link to={`/saunas/${article?.facility_id}`}>
+                                    <h3 style={{ width: "300px" }} className="border-bottom">
+                                        {article?.facility_name}
+                                    </h3>
+                                </Link>
                             </div>
+                            {/* 記事本文 */}
                             <div className="text-start py-3">
                                 {/* 改行コードを含む場合は<br/>に変換する */}
-                                <p>{article?.content.split('\n').map(t => (<span>{t}<br /></span>))}</p>
+                                <p>{article?.content.split('\n').map((t, index) => (<span key={index}>{t}<br /></span>))}</p>
                             </div>
                         </div>
                     </div>

@@ -5,12 +5,16 @@ import { useCookies } from 'react-cookie';
 import { ApplyingUser } from '../../@types/ApplyingUser';
 import { TableHead, TableRow, TableCell, Checkbox, TableSortLabel, Button } from '@mui/material';
 import { toast } from 'react-toastify';
+import { ErrorPageProps } from '../../@types/ErrorPage';
+import { useNavigate } from 'react-router-dom';
+import { ConvertErrorMessageToErrorPageProps } from '../../common/Convert';
 
 export const ApplyingUserMangeComponent = () => {
     const [applyingUserList, setApplyingUser] = useState<ApplyingUser[]>();
     const { getAccessTokenSilently } = useAuth0();
     const [cookies, setCookie, removeCookie] = useCookies();
     const [selectedAuthIDs, setSelectedAuthID] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         getApplyingAuthList();
@@ -52,9 +56,10 @@ export const ApplyingUserMangeComponent = () => {
         await fetch(uri, requestOption)
             .then((response) => {
                 if (!response.ok) {
-                    const err = new Error;
-                    err.message = "申請中ユーザーリストが取得できませんでした" + response.text + response.status;
-                    throw err;
+                    // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                    const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                    navigate('/error', { state: errorInfo });
+                    return;
                 }
                 return response.json();
             })
@@ -63,7 +68,10 @@ export const ApplyingUserMangeComponent = () => {
                 setApplyingUser(data)
             })
             .catch(err => {
-                console.log(err)
+                // エラーメッセージを受け取りエラーページの引数を設定する
+                const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
+                navigate('/error', { state: errorInfo });
+                return;
             });
     }
 
@@ -105,9 +113,10 @@ export const ApplyingUserMangeComponent = () => {
         await fetch(uri, requestOption)
             .then((response) => {
                 if (!response.ok) {
-                    const err = new Error;
-                    err.message = "投稿権限承認に失敗しました" + response.status + response.text.toString();
-                    throw err;
+                    // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                    const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                    navigate('/error', { state: errorInfo });
+                    return;
                 }
                 return response.json();
             })
@@ -116,8 +125,10 @@ export const ApplyingUserMangeComponent = () => {
                 getApplyingAuthList();
             })
             .catch(err => {
-                console.log(err)
-                toast.warn("権限更新に失敗しました。");
+                // エラーメッセージを受け取りエラーページの引数を設定する
+                const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
+                navigate('/error', { state: errorInfo });
+                return;
             });
     }
 

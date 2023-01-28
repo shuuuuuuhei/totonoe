@@ -11,16 +11,21 @@ import { Home } from './pages/HomePage';
 import { ProfilePage } from './pages/ProfilePage';
 import { SearchMapPage } from './pages/SearchMapPage';
 import { SearchResultPage } from './pages/SearchResultPage';
-import { SignUpPage } from './pages/SignUpPage';
 import { toast } from 'react-toastify'
 import { UserSettingPage } from './pages/UserSettingPage';
 import { AdminPage } from './pages/AdminPage';
 import { IsNullOrUndefinedOrEmpty } from './common/Check';
+import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
+import { ErrorFallback } from './pages/Error/ErrorComponent';
+import { ErrorPage404 } from './pages/Error/Page404';
+import { ErrorPage } from './pages/Error/ErrorPage';
+import { Button } from '@mui/material';
 
 export const App = () => {
   const { user, getIdTokenClaims, getAccessTokenWithPopup, isAuthenticated, logout } = useAuth0();
   const [cookies, setCookie, removeCookie] = useCookies();
   const userID = user?.sub?.split('|').at(1);
+  const [isLoggined, setIsLoggined] = useState(false);
 
   console.log("ログイン情報：", userID, cookies);
 
@@ -48,9 +53,12 @@ export const App = () => {
 
       // サインアップ処理が成功したらメッセージを表示して処理を終了する
       toast.success('ユーザ登録が完了しました！');
+      setIsLoggined(true);
       return;
     } catch (error) {
       toast.error('ユーザー登録に失敗しました。');
+      // リダイレクトするとメッセージ表示が消えるため、3秒後にログアウト処理を実施する
+      setTimeout(() => logout({ returnTo: window.location.origin }), 3000);
       return;
     }
   }
@@ -125,7 +133,6 @@ export const App = () => {
           // Auth0にユーザー情報が存在するがDB側に存在しなかったケース(App管理者がユーザーをAuth0ユーザーを削除する必要がある)
           if (response.status === 404) {
             toast.error('このアカウントは使用できません。');
-            // await new Promise(resolve => setTimeout(resolve, 3000)) // 3秒待つ
             throw err;
           }
           toast.error('アカウント情報が取得できませんでした。');
@@ -134,6 +141,8 @@ export const App = () => {
       })
       .then(() => {
         toast.success('おかえりなさい！');
+        // ログイン済みにして再レンダリングを防ぐ
+        setIsLoggined(true);
       })
       .catch(err => {
         console.log(err);
@@ -157,41 +166,53 @@ export const App = () => {
 
   // 画面ロード時
   useEffect(() => {
-    // ログイン回数が初回の場合はユーザ新規登録を行う
-    if (user?.loginCount === 1 && IsNullOrUndefinedOrEmpty(cookies.userID)) {
-      // サインアップ
-      signupUser();
-    } else if (IsNullOrUndefinedOrEmpty(cookies.userID) && isAuthenticated) {
+    if (!isLoggined) {
 
-      // アカウント情報取得
-      getAccountInfo();
+      try {
+        // ログイン回数が初回の場合はユーザ新規登録を行う
+        if (user?.loginCount === 1 && IsNullOrUndefinedOrEmpty(cookies.userID)) {
+          // サインアップ
+          signupUser();
+        } else if (IsNullOrUndefinedOrEmpty(cookies.userID) && isAuthenticated) {
 
-      // ログイン時にcookieが未発行の場合
-      setUserInfoCookie();
+          // アカウント情報取得
+          getAccountInfo();
+
+          // ログイン時にcookieが未発行の場合
+          setUserInfoCookie();
+
+        }
+      }
+      catch (error) {
+        setIsLoggined(false);
+      }
+
     }
-
   }, [user])
 
   return (
-    <BrowserRouter>
-      <Header />
-      <div>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/profile/:userID" element={<ProfilePage />}></Route>
-          <Route path="/articles/new" element={<ArticlePostPage />}></Route>
-          <Route path="/saunas/:facilityID/articles/new" element={<ArticlePostPage />}></Route>
-          <Route path="/articles/:articleID" element={<ArticlePage />}></Route>
-          <Route path="/search" element={<SearchResultPage />}></Route>
-          <Route path="/saunas/:facilityID" element={<SaunaPage />}></Route>
-          <Route path="/saunas/new/" element={<SaunaSubmitPage />}></Route>
-          <Route path="/map" element={<SearchMapPage />}></Route>
-          <Route path="/signup" element={<SignUpPage />}></Route>
-          <Route path="/setting/profile" element={<UserSettingPage />}></Route>
-          <Route path="/admin" element={<AdminPage />}></Route>
-        </Routes>
-      </div>
-    </BrowserRouter>
+    <div>
+      <BrowserRouter>
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <Header isLoggined={isLoggined} setIsLoggined={setIsLoggined} />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/profile/:userID" element={<ProfilePage />}></Route>
+            <Route path="/articles/new" element={<ArticlePostPage />}></Route>
+            <Route path="/saunas/:facilityID/articles/new" element={<ArticlePostPage />}></Route>
+            <Route path="/articles/:articleID" element={<ArticlePage />}></Route>
+            <Route path="/search" element={<SearchResultPage />}></Route>
+            <Route path="/saunas/:facilityID" element={<SaunaPage />}></Route>
+            <Route path="/saunas/new/" element={<SaunaSubmitPage />}></Route>
+            <Route path="/map" element={<SearchMapPage />}></Route>
+            <Route path="/setting/profile" element={<UserSettingPage />}></Route>
+            <Route path="/admin" element={<AdminPage />}></Route>
+            <Route path="*" element={<ErrorPage404 />}></Route>
+            <Route path="/error" element={<ErrorPage />}></Route>
+          </Routes>
+        </ErrorBoundary>
+      </BrowserRouter>
+    </div>
   );
 }
 

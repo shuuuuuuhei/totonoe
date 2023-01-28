@@ -10,12 +10,13 @@ import DatePicker, { registerLocale } from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { ErrorPageProps } from '../@types/ErrorPage'
 import { Article } from '../@types/article/Article'
 import { NewArticle } from '../@types/article/NewArticle'
 import { RatingOptionProps, RatingScore } from '../@types/article/Rating'
 import { Facility } from '../@types/sauna/Facility'
 import { IsNullOrUndefinedOrEmpty, useIsSavedCookieOfUserID } from '../common/Check'
-import { UndefinedOrNullConvertToEmpty } from '../common/Convert'
+import { ConvertErrorCodeToErrorMessage, ConvertErrorMessageToErrorPageProps, UndefinedOrNullConvertToEmpty } from '../common/Convert'
 import { defaultScore, precisionScore, ratingList } from '../utils/constants'
 
 
@@ -58,7 +59,10 @@ export const ArticlePostPage = () => {
     const getFacilityName = (id: string | undefined) => {
 
         if (IsNullOrUndefinedOrEmpty(id)) {
-            return "";
+            // 施設IDが指定されていないので404ページに遷移する
+            const errorInfo: ErrorPageProps = ConvertErrorCodeToErrorMessage(404)
+            navigate('/error', { state: errorInfo });
+            return;
         }
 
         const fetchGetFacilityName = async () => {
@@ -73,7 +77,10 @@ export const ArticlePostPage = () => {
             await fetch(uri, requestOption)
                 .then((response) => {
                     if (!response.ok) {
-                        throw new Error(response.status + "施設名の取得に失敗しました。")
+                        // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                        const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                        navigate('/error', { state: errorInfo });
+                        return;
                     }
                     return response.json();
                 })
@@ -81,7 +88,10 @@ export const ArticlePostPage = () => {
                     setFacilityName(facility.name)
                 })
                 .catch(err => {
-                    console.log(err)
+                    // エラーメッセージを受け取りエラーページの引数を設定する
+                    const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
+                    navigate('/error', { state: errorInfo });
+                    return;
                 });
         }
 
@@ -141,45 +151,52 @@ export const ArticlePostPage = () => {
     const handleSubmit = async (evt: any) => {
         evt.preventDefault();
 
-        if (useIsSavedCookieOfUserID) {
-            loginWithRedirect();
+        // ログイン確認
+        let accessToken = ""
+        try {
+            accessToken = await getAccessTokenSilently({
+                audience: 'https://totonoe-app.com',
+                scope: 'read:posts',
+            })
+            if (IsNullOrUndefinedOrEmpty(cookies.userID)) {
+                throw new Error("クッキー情報がありません")
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error("ログインしてください")
         }
 
         // facilityIDが空文字もしくはUndefinedなら処理終了
         if (IsNullOrUndefinedOrEmpty(facilityID)) return
 
-        try {
-            const uri = baseUri + "articles/new";
-            const accessToken = await getAccessTokenSilently({
-                audience: 'https://totonoe-app.com',
-                scope: 'read:posts',
+        const uri = baseUri + "articles/new";
+        const requestOption: RequestInit = {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ article, 'user_id': cookies.userID, "facility_id": parseInt(UndefinedOrNullConvertToEmpty(facilityID)), "rating": rating })
+        }
+        await fetch(uri, requestOption)
+            .then((response) => {
+                if (!response.ok) {
+                    // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                    const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                    navigate('/error', { state: errorInfo });
+                    return;
+                }
+                return response.json()
             })
-            const requestOption: RequestInit = {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ article, 'user_id': cookies.userID, "facility_id": parseInt(UndefinedOrNullConvertToEmpty(facilityID)), "rating": rating })
-            }
-            await fetch(uri, requestOption)
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error("記事投稿に失敗しました。" + response.json() + response.status)
-                    }
-                    return response.json()
-                })
-                .then(data => {
-                    toast.success('ととのい日記を投稿しました！');
-                    navigate(`/articles/${data.id}`);
-                })
-                .catch(error => {
-                    toast.warning(error);
-                })
-        }
-        catch (error) {
-            toast.warning(error);
-        }
+            .then((posted: Article) => {
+                console.log(posted);
+                navigate(`/articles/${posted.id}`,
+                    { state: { toast: { status: "success", message: "記事を投稿しました！" } } }
+                );
+            })
+            .catch(error => {
+                toast.warning(error);
+            })
     }
 
     registerLocale('ja', ja);
@@ -246,7 +263,7 @@ export const ArticlePostPage = () => {
                     <div className="text-start">
                         {ratingList.map((rating, index) => {
                             return (
-                                <div className="row py-3">
+                                <div className="row py-3" key={index}>
                                     <div className="col-2">
                                         <p>{rating.name}</p>
                                     </div>

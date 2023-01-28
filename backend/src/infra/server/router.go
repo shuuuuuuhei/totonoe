@@ -175,6 +175,9 @@ func (r *Routing) setRouting() {
 	// 権限承認済ユーザー情報取得
 	r.Gin.POST("/authorization/applied", authorizationController.GetAppliedAuthorization)
 
+	// 権限チェック
+	r.Gin.POST("/authorization/check", authorizationController.CheckAuthorization)
+
 	// アカウント情報登録
 	r.Gin.POST("/account/new", accountController.NewAccount)
 
@@ -183,6 +186,7 @@ func (r *Routing) setRouting() {
 
 	// アカウント情報取得
 	r.Gin.GET("/account/:userID", accountController.GetAccountInfo)
+
 }
 
 // corsMiddleware CORSの設定

@@ -1,11 +1,14 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import React, { Fragment, useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
-import { useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { ErrorPageProps } from '../@types/ErrorPage';
 import { Article } from '../@types/article/Article';
 import { Comment } from '../@types/article/Comment';
 import { DetailArticle } from '../components/Article/Article';
 import { Comments } from '../components/Comment';
+import { IsNullOrUndefinedOrEmpty } from '../common/Check';
+import { toast } from 'react-toastify';
 
 export const ArticlePage = () => {
     const [article, setArticle] = useState<Article>();
@@ -13,12 +16,31 @@ export const ArticlePage = () => {
     const params = useParams();
     const { getAccessTokenSilently, loginWithRedirect } = useAuth0();
     const [cookies, setCookie, removeCookie] = useCookies();
+    const navigate = useNavigate();
+    /* 
+        toast表示を管理
+    */
+    const [isShowedToast, setIsShowedToast] = useState(false);
+    const location = useLocation();
 
     useEffect(() => {
         if (!params.articleID) {
             console.log("articleIDなし")
             return
         }
+
+        // 遷移元のメッセージを確認
+        if (!isShowedToast && !IsNullOrUndefinedOrEmpty(location.state?.toast)) {
+
+            if (location.state?.toast.status === 'success') {
+                // 遷移元で設定したメッセージを表示する
+                toast.success(location.state?.toast.message);
+
+                // toastを表示済にする
+                setIsShowedToast(true);
+            }
+        }
+
         const fetchArticle = async () => {
             const uri = "http://localhost:4000/articles/" + params.articleID;
 
@@ -35,10 +57,10 @@ export const ArticlePage = () => {
             await fetch(uri, requestOption)
                 .then((response) => {
                     if (!response.ok) {
-                        const err = new Error;
-                        console.log(response);
-                        err.message = "記事が見つかりませんでした。記事ID：" + params.articleID + ", レスポンスコード：" + response.status;
-                        throw err;
+                        // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                        const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                        navigate('/error', { state: errorInfo });
+                        return;
                     }
                     return response.json();
                 })

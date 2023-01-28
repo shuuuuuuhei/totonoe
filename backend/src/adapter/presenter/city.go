@@ -25,8 +25,9 @@ func (c *City) RenderCities(city *[]ValueObject.CityVO) {
 
 // RenderError エラーをレスポンスする
 func (c *City) RenderError(err error) {
-	fmt.Println(err)
-	c.c.JSON(500, err)
+	errCode, errMessage := toHTTPResponse(err)
+	c.c.JSON(errCode, gin.H{"msg": errMessage})
+	fmt.Printf("エラーコード：%d, メッセージ：%s", errCode, errMessage)
 }
 
 func NewCityOutputPort(c *gin.Context) port.CityOutputPort {

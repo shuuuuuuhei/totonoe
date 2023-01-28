@@ -3,12 +3,16 @@ import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useCookies } from 'react-cookie';
 import { AppliedUser } from '../../@types/AppliedUser';
+import { ErrorPageProps } from '../../@types/ErrorPage';
+import { useNavigate } from 'react-router-dom';
+import { ConvertErrorMessageToErrorPageProps } from '../../common/Convert';
 
 export const AppliedUserMangeComponent = () => {
 
     const { getAccessTokenSilently } = useAuth0();
     const [cookies, setCookie, removeCookie] = useCookies();
     const [appliedUserList, setAppliedUser] = useState<AppliedUser[]>();
+    const navigate = useNavigate();
 
     const columns: GridColDef[] = [
         { field: 'id', headerName: 'ID', width: 70 },
@@ -51,9 +55,10 @@ export const AppliedUserMangeComponent = () => {
         await fetch(uri, requestOption)
             .then((response) => {
                 if (!response.ok) {
-                    const err = new Error;
-                    err.message = "申請中ユーザーリストが取得できませんでした" + response.text + response.status;
-                    throw err;
+                    // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                    const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                    navigate('/error', { state: errorInfo });
+                    return;
                 }
                 return response.json();
             })
@@ -62,7 +67,10 @@ export const AppliedUserMangeComponent = () => {
                 setAppliedUser(data)
             })
             .catch(err => {
-                console.log(err)
+                // エラーメッセージを受け取りエラーページの引数を設定する
+                const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
+                navigate('/error', { state: errorInfo });
+                return;
             });
     }
 

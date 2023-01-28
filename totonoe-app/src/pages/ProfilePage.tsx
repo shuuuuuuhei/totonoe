@@ -1,7 +1,7 @@
 import { useAuth0 } from '@auth0/auth0-react'
 import React, { Fragment, useEffect, useState } from 'react'
 import { useCookies } from "react-cookie"
-import { Navigate, useParams, useLocation } from 'react-router-dom'
+import { Navigate, useParams, useLocation, useNavigate } from 'react-router-dom'
 import { Article } from '../@types/article/Article'
 import { Profile } from '../@types/Profile'
 import { ArticleList } from '../components/Article/ArticleList'
@@ -9,12 +9,15 @@ import { ProfileComponent } from '../components/ProfileComponent'
 import { useIsSavedCookieOfUserID, IsNullOrUndefinedOrEmpty } from '../common/Check'
 import { toast } from 'react-toastify'
 import { Stack } from '@mui/material'
+import { ErrorBoundary, FallbackProps } from "react-error-boundary";
+import { ErrorPageProps } from '../@types/ErrorPage'
+import { ConvertErrorMessageToErrorPageProps } from '../common/Convert'
 
 export const ProfilePage = () => {
     const [profile, setProfile] = useState<Profile | null>();
     const [articles, setArticles] = useState<[Article]>();
     const [cookies, setCookie, removeCookie] = useCookies();
-
+    const navigate = useNavigate();
     /* 
         toast表示を管理
     */
@@ -54,9 +57,10 @@ export const ProfilePage = () => {
             await fetch(uri, requestOption)
                 .then((response) => {
                     if (!response.ok) {
-                        const err = new Error;
-                        err.message = "記事が見つかりませんでした。" + response.status;
-                        throw err;
+                        // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                        const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                        navigate('/error', { state: errorInfo });
+                        return;
                     }
                     return response.json();
                 })
@@ -64,7 +68,10 @@ export const ProfilePage = () => {
                     setArticles(resData);
                 })
                 .catch(err => {
-                    console.log(err)
+                    // エラーメッセージを受け取りエラーページの引数を設定する
+                    const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
+                    navigate('/error', { state: errorInfo });
+                    return;
                 });
         }
         const fetchProfile = async () => {
@@ -85,9 +92,10 @@ export const ProfilePage = () => {
             await fetch(uri, requestOption)
                 .then((response) => {
                     if (!response.ok) {
-                        const err = new Error;
-                        err.message = "プロフィールが見つかりませんでした。" + response.status;
-                        throw err;
+                        // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                        const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                        navigate('/error', { state: errorInfo });
+                        return;
                     }
                     return response.json();
                 })
@@ -95,9 +103,10 @@ export const ProfilePage = () => {
                     setProfile(resData);
                 })
                 .catch(err => {
-                    return (
-                        <Navigate to="/" />
-                    )
+                    // エラーメッセージを受け取りエラーページの引数を設定する
+                    const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
+                    navigate('/error', { state: errorInfo });
+                    return;
                 });
         }
         fetchProfile();

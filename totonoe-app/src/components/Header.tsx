@@ -6,23 +6,30 @@ import { IconContext } from 'react-icons';
 import { CgProfile } from "react-icons/cg";
 import { GiHotSpices } from "react-icons/gi";
 import { HiOutlineLogin, HiOutlinePencilAlt } from "react-icons/hi";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "../style/Header.css";
 import { MdOutlineLogin } from 'react-icons/md';
 import { toast } from 'react-toastify'
 import { AuthState } from '../@types/Authorization';
-import { isAdminUser } from '../common/Check';
+import { isAdminUser, IsNullOrUndefinedOrEmpty } from '../common/Check';
 import { Chip } from '@mui/material';
 import AppIcon from '../images/Totonoe.png'
+import { ErrorPageProps } from '../@types/ErrorPage';
+import { ConvertErrorMessageToErrorPageProps } from '../common/Convert';
 
+type headerProps = {
+    isLoggined: boolean,
+    setIsLoggined: React.Dispatch<React.SetStateAction<boolean>>
+}
 
-export const Header = () => {
+export const Header: React.VFC<headerProps> = (props) => {
     const { getAccessTokenWithPopup, loginWithRedirect, logout, isAuthenticated } = useAuth0();
     const [cookies, setCookie, removeCookie] = useCookies();
     const [isShowedUserContents, setIsShowedUserContents] = useState(false);
     const [authState, setAuthState] = useState<AuthState>();
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -51,6 +58,7 @@ export const Header = () => {
     const logoutUser = () => {
         try {
             removeCookie("userID", { path: '/' });
+            props.setIsLoggined(false);
             logout({ returnTo: window.location.origin });
         } catch (err) {
             console.log(err)
@@ -71,11 +79,6 @@ export const Header = () => {
             });
         } catch (error) {
             console.log(error);
-
-        }
-
-        if (!accessToken) {
-            throw Error("アクセストークンがありません。");
         }
 
         const requestOption: RequestInit = {
@@ -91,51 +94,10 @@ export const Header = () => {
         await fetch(uri, requestOption)
             .then((response) => {
                 if (!response.ok) {
-                    const err = new Error;
-                    err.message = "権限情報が取得できませんでした" + response.text + response.status;
-                    throw err;
-                }
-                return response.json();
-            })
-            .then((resData: AuthState) => {
-                setAuthState(resData)
-            })
-            .catch(err => {
-                console.log(err)
-            });
-    }
-
-    /**
-     * ユーザー名取得
-     */
-    const getUserName = async () => {
-        const userID = cookies.userID;
-        const uri = "http://localhost:4000/authorization";
-        const accessToken = await getAccessTokenWithPopup({
-            audience: 'https://totonoe-app.com',
-            scope: 'read:posts',
-        });
-
-        if (!accessToken) {
-            throw Error("アクセストークンがありません。");
-        }
-
-        const requestOption: RequestInit = {
-            method: "POST",
-            mode: "cors",
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-                "Content-Type": "application/json",
-                "User-ID": userID,
-            },
-            body: JSON.stringify({ 'user_id': userID, })
-        };
-        await fetch(uri, requestOption)
-            .then((response) => {
-                if (!response.ok) {
-                    const err = new Error;
-                    err.message = "権限情報が取得できませんでした" + response.text + response.status;
-                    throw err;
+                    // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                    const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                    navigate('/error', { state: errorInfo });
+                    return;
                 }
                 return response.json();
             })
@@ -168,61 +130,27 @@ export const Header = () => {
                     </div>
                     <div className="row text-end">
                         <IconContext.Provider value={{ color: '#000000', size: '50' }}>
-                            {typeof cookies.userID != 'undefined' ?
+                            {props.isLoggined ?
                                 <div>
                                     <CgProfile onClick={() => setIsShowedUserContents(!isShowedUserContents)} style={{ cursor: "pointer" }} />
                                     {
                                         // ログイン済み
                                         isShowedUserContents &&
 
-                                        <div className="row border py-3 px-4 text-center" style={{ position: "absolute", right: "20px", width: "250px", backgroundColor: "white" }} onClick={() => setIsShowedUserContents(!isShowedUserContents)}>
-                                            <div className="row p-0">
-                                                <div className="col-4 text-center">
-                                                    <CgProfile size={40} />
-                                                </div>
-                                                <div className="col-8 text-start py-2 px-0">
-                                                    {/* ↓今はauth0のユーザ名を表示している */}
-                                                    <p className="overflow-hidden" style={{ fontSize: "12px" }}></p>
-                                                </div>
-                                            </div>
-                                            <Link to={"profile/" + cookies.userID}>
-                                                <Button
-                                                    variant="outline-warning"
-                                                    className="my-2"
-                                                    style={{ width: "150px" }}
-                                                >
-                                                    マイページ
-                                            </Button>
+                                        <div className="row border py-3 px-4 text-center" style={{ position: "absolute", right: "20px", width: "200px", backgroundColor: "white" }} onClick={() => setIsShowedUserContents(!isShowedUserContents)}>
+                                            <Link to={"profile/" + cookies.userID} className="border py-2">
+                                                マイページ
                                             </Link>
-                                            <Link to={"setting/profile"}>
-                                                <Button
-                                                    variant="outline-warning"
-                                                    className="my-2"
-                                                    style={{ width: "150px" }}
-                                                >
-                                                    設定
-                                                </Button>
+                                            <Link to={"setting/profile"} className="border py-2">
+                                                設定
                                             </Link>
                                             {isAdminUser(authState) &&
-                                                <Link to={"admin/"}>
-                                                    <Button
-                                                        variant="outline-warning"
-                                                        className="my-2"
-                                                        style={{ width: "150px" }}
-                                                    >
-                                                        管理者用ページ
-                                                    </Button>
+                                                <Link to={"admin/"} style={{ width: "150px" }} className="border py-2">
+                                                    管理者用ページ
                                                 </Link>
                                             }
-                                            <div className="row text-center mx-0 px-4">
-                                                <Button
-                                                    onClick={logoutUser}
-                                                    variant="outline-warning"
-                                                    className="my-2"
-                                                    style={{ width: "150px" }}
-                                                >
-                                                    ログアウト
-                                                </Button>
+                                            <div className="text-center border py-2" onClick={logoutUser} style={{ cursor: 'pointer' }}>
+                                                ログアウト
                                             </div>
                                         </div>
                                     }

@@ -1,13 +1,14 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { DropdownButton, Pagination } from 'react-bootstrap';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Facility } from '../@types/sauna/Facility';
-import { ConvertNaNToOne, UndefinedOrNullConvertToEmpty } from '../common/Convert';
+import { ConvertErrorMessageToErrorPageProps, ConvertNaNToOne, UndefinedOrNullConvertToEmpty } from '../common/Convert';
 import { FacilityList } from '../components/Facility/FacilityList';
 import { SearchOption } from '../components/Facility/SearchOption';
 import { prefectureList, MinPageCount } from '../utils/constants';
 import { IsNullOrUndefinedOrEmpty } from '../common/Check';
+import { ErrorPageProps } from '../@types/ErrorPage';
 
 const baseUri = 'http://localhost:4000/facilities?';
 const facilityCountPerPage = 20;
@@ -28,6 +29,7 @@ interface SearchFilterState {
 export const SearchResultPage = () => {
     const { search } = useLocation();
     const location = useLocation();
+    const navigate = useNavigate();
     const searchFilterState = location.state as SearchFilterState;
     const queryParams = new URLSearchParams(search);
     const areaParams = UndefinedOrNullConvertToEmpty(queryParams.get("area"));
@@ -100,9 +102,10 @@ export const SearchResultPage = () => {
             await fetch(uri, requestOption)
                 .then((response) => {
                     if (!response.ok) {
-                        const err = new Error;
-                        err.message = "サウナ施設一覧取得に失敗しました" + response.status + response.statusText;
-                        throw err;
+                        // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                        const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                        navigate('/error', { state: errorInfo });
+                        return;
                     }
                     return response.json();
                 })
@@ -115,7 +118,10 @@ export const SearchResultPage = () => {
                     handlePageCountInitialized();
                 })
                 .catch(err => {
-                    console.log(err)
+                    // エラーメッセージを受け取りエラーページの引数を設定する
+                    const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
+                    navigate('/error', { state: errorInfo });
+                    return;
                 });
         }
         fetchFacilities();
@@ -126,7 +132,6 @@ export const SearchResultPage = () => {
      * 遷移元のサウナ条件を指定してサウナを取得する
      */
     const fetchSaunasFilterSearch = async () => {
-        console.log(searchFilterState);
 
         const uri = `${baseUri}`;
         const requestOption: RequestInit = {
@@ -141,9 +146,10 @@ export const SearchResultPage = () => {
         await fetch(uri, requestOption)
             .then((response) => {
                 if (!response.ok) {
-                    const err = new Error;
-                    err.message = "サウナ施設一覧取得に失敗しました" + response.status;
-                    throw err;
+                    // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                    const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                    navigate('/error', { state: errorInfo });
+                    return;
                 }
                 return response.json();
             })
@@ -152,7 +158,10 @@ export const SearchResultPage = () => {
                 setMaxPage(ConvertNaNToOne(calculateMaxPageCount(resData[0]?.full_count)));
             })
             .catch(err => {
-                console.log(err)
+                // エラーメッセージを受け取りエラーページの引数を設定する
+                const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
+                navigate('/error', { state: errorInfo });
+                return;
             });
     }
     const fetchSaunas = async () => {
@@ -168,9 +177,10 @@ export const SearchResultPage = () => {
         await fetch(uri, requestOption)
             .then((response) => {
                 if (!response.ok) {
-                    const err = new Error;
-                    err.message = "サウナ施設一覧取得に失敗しました" + response.status;
-                    throw err;
+                    // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                    const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                    navigate('/error', { state: errorInfo });
+                    return;
                 }
                 return response.json();
             })
@@ -179,7 +189,10 @@ export const SearchResultPage = () => {
                 setMaxPage(ConvertNaNToOne(calculateMaxPageCount(resData[0]?.full_count)));
             })
             .catch(err => {
-                console.log(err)
+                // エラーメッセージを受け取りエラーページの引数を設定する
+                const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
+                navigate('/error', { state: errorInfo });
+                return;
             });
     }
 
@@ -215,9 +228,10 @@ export const SearchResultPage = () => {
             await fetch(fetchAreaDetailUri, requestOption)
                 .then((response) => {
                     if (!response.ok) {
-                        const err = new Error;
-                        err.message = "市区町村取得に失敗しました" + response.status;
-                        throw err;
+                        // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                        const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                        navigate('/error', { state: errorInfo });
+                        return;
                     }
                     return response.json();
                 })
@@ -225,7 +239,10 @@ export const SearchResultPage = () => {
                     setDetailAreaCityList(resData);
                 })
                 .catch(err => {
-                    console.log(err)
+                    // エラーメッセージを受け取りエラーページの引数を設定する
+                    const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
+                    navigate('/error', { state: errorInfo });
+                    return;
                 });
         }
 
@@ -258,9 +275,9 @@ export const SearchResultPage = () => {
                 <div className="border row container" style={{ position: "absolute", top: "45%", left: "20%", backgroundColor: "white", width: "850px", }} onClick={() => setShow(false)}>
                     {areaParams === '' ?
                         // 全国の都道府県を表示
-                        detailAreaPrefectureList?.map((detailArea) => {
+                        detailAreaPrefectureList?.map((detailArea, index) => {
                             return (
-                                <div className="col-1 py-2 text-center">
+                                <div className="col-1 py-2 text-center" key={index}>
                                     <Link
                                         to={`/search?lang=jp&page=${MinPageCount}&area=${detailArea}`}
                                         onClick={() => handlePageCount(MinPageCount)}>
@@ -271,9 +288,9 @@ export const SearchResultPage = () => {
                         })
                         :
                         //　都道府県に所属する市区町村を表示
-                        detailAreaCityList.map((detailAreaCity) => {
+                        detailAreaCityList.map((detailAreaCity, index) => {
                             return (
-                                <div className="col-1 py-2 text-center">
+                                <div className="col-1 py-2 text-center" key={index}>
                                     <Link to={`/search?lang=jp&page=${MinPageCount}&area=${areaParams}${detailAreaCity.name}`} onClick={() => handlePageCount(MinPageCount)}><p className="m-0 py-1" style={{ fontSize: "10px", fontWeight: 'bold' }}>{detailAreaCity.name}</p></Link>
                                 </div>
                             )

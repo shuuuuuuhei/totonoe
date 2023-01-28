@@ -9,6 +9,9 @@ import { APPLY_AUTH_KB, ADMIN_AUTH_KB, AUTH_REQUESTED_STATE } from '../utils/con
 import { isAdminUser, isAppliedUser, isApplyingUser, IsNullOrUndefinedOrEmpty, isUnAuthorizedUser, isGeneralUser } from '../common/Check';
 import AuthConfig from "../json/auth_config.json";
 import { ManagementClient } from 'auth0';
+import { ErrorPageProps } from '../@types/ErrorPage';
+import { useNavigate } from 'react-router-dom';
+import { ConvertErrorMessageToErrorPageProps } from '../common/Convert';
 
 // ButtonState
 const generalState = 0;
@@ -20,7 +23,7 @@ export const SettingAccountComponent = () => {
     const { getAccessTokenSilently, logout } = useAuth0();
     const [cookies, setCookie, removeCookie] = useCookies();
     const [authState, setAuthState] = useState<AuthState>();
-
+    const navigate = useNavigate();
     useEffect(() => {
 
         // 権限情報取得
@@ -56,9 +59,10 @@ export const SettingAccountComponent = () => {
         await fetch(uri, requestOption)
             .then((response) => {
                 if (!response.ok) {
-                    const err = new Error;
-                    err.message = "権限情報が取得できませんでした" + response.text + response.status;
-                    throw err;
+                    // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                    const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                    navigate('/error', { state: errorInfo });
+                    return;
                 }
                 return response.json();
             })
@@ -66,7 +70,10 @@ export const SettingAccountComponent = () => {
                 setAuthState(resData)
             })
             .catch(err => {
-                console.log(err)
+                // エラーメッセージを受け取りエラーページの引数を設定する
+                const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
+                navigate('/error', { state: errorInfo });
+                return;
             });
     }
 
@@ -101,9 +108,10 @@ export const SettingAccountComponent = () => {
         await fetch(uri, requestOption)
             .then((response) => {
                 if (!response.ok) {
-                    const err = new Error;
-                    err.message = "申請登録ができませんでした" + response.text + response.status;
-                    throw err;
+                    // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                    const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                    navigate('/error', { state: errorInfo });
+                    return;
                 }
                 return response.json();
             })
@@ -111,7 +119,10 @@ export const SettingAccountComponent = () => {
                 toast.success('施設投稿権限を申請が完了しました。申請承認までお待ちください。');
             })
             .catch(err => {
-                console.log(err)
+                // エラーメッセージを受け取りエラーページの引数を設定する
+                const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
+                navigate('/error', { state: errorInfo });
+                return;
             });
     }
 
@@ -153,9 +164,10 @@ export const SettingAccountComponent = () => {
         fetch(uri, requestOption)
             .then((response) => {
                 if (!response.ok) {
-                    const err = new Error;
-                    err.message = "アカウント情報を削除できませんでした。" + response.text + response.status;
-                    throw err;
+                    // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                    const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                    navigate('/error', { state: errorInfo });
+                    return;
                 }
             })
             .then(() => {
@@ -163,8 +175,10 @@ export const SettingAccountComponent = () => {
                 logout({ returnTo: window.location.origin });
             })
             .catch(err => {
-                console.log("退会処理に失敗しました。エラー：" + err);
-                toast.error("退会処理に失敗しました。");
+                // エラーメッセージを受け取りエラーページの引数を設定する
+                const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
+                navigate('/error', { state: errorInfo });
+                return;
             });
     }
 
