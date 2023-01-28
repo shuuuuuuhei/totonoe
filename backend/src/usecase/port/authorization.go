@@ -13,6 +13,7 @@ type AuthorizationInputPort interface {
 	GetApplyingAuthorization(c *gin.Context)
 	GetAppliedAuthorization(c *gin.Context)
 	DeleteAuthorization(c *gin.Context)
+	CheckAuthorization(c *gin.Context)
 }
 
 type AuthorizationOutputPort interface {
@@ -30,4 +31,5 @@ type AuthorizationRepository interface {
 	GetApplyingAuthorization(c *gin.Context) (*[]ValueObject.ApplyingAuthorization, error)
 	GetAppliedAuthorization(c *gin.Context) (*[]ValueObject.AppliedAuthorization, error)
 	DeleteAuthorization(c *gin.Context) error
+	CheckAuthorization(c *gin.Context) error
 }

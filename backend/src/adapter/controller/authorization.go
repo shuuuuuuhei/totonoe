@@ -43,6 +43,11 @@ func (a *Authorization) DeleteAuthorization(c *gin.Context) {
 	inputPort.DeleteAuthorization(c)
 }
 
+func (a *Authorization) CheckAuthorization(c *gin.Context) {
+	inputPort := a.newInputPort(c)
+	inputPort.CheckAuthorization(c)
+}
+
 func (a Authorization) newInputPort(c *gin.Context) port.AuthorizationInputPort {
 	output := a.OutputPortFactory(c)
 	repository := a.RepositoryFactory(a.Conn)

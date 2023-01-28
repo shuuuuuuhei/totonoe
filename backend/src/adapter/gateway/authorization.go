@@ -18,6 +18,7 @@ import (
 type Authorization struct {
 	conn *gorm.DB
 }
+
 type authorizationParams struct {
 	UserID string `json:"user_id,omitempty"`
 	AuthKB string `json:"auth_kb,omitempty"`
@@ -55,6 +56,27 @@ const (
 	// 管理者
 	ADMIN_AUTH_KB = "999"
 )
+
+// CheckAuthorization 権限チェック
+func (a *Authorization) CheckAuthorization(c *gin.Context) error {
+	conn := a.conn
+
+	params := authorizationParams{}
+
+	// パラメータ取得
+	json.NewDecoder(c.Request.Body).Decode(&params)
+
+	if err := conn.Debug().Where("user_id=? and auth_kb=?", params.UserID, params.AuthKB).First(&Domain.Authorization{}).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// レコードがないので権限なし
+			return fmt.Errorf("403")
+		}
+		return errors.New("Internal Server Error. adapter/common/CreateArticle")
+	}
+
+	// 権限チェック成功
+	return nil
+}
 
 // DeleteAuthorization 権限情報削除処理
 func (a *Authorization) DeleteAuthorization(c *gin.Context) error {

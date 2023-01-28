@@ -22,8 +22,9 @@ func NewUserOutputPort(c *gin.Context) port.UserOutputPort {
 
 // RenderError 500 エラーを返す
 func (u *User) RenderError(err error) {
-	fmt.Println(err)
-	u.c.JSON(500, err)
+	errCode, errMessage := toHTTPResponse(err)
+	u.c.JSON(errCode, gin.H{"msg": errMessage})
+	fmt.Printf("エラーコード：%d, メッセージ：%s", errCode, errMessage)
 }
 
 // RenderOK 200 のみ返す
