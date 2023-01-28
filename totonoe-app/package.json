@@ -24,7 +24,6 @@
     "bootstrap": "^5.2.3",
     "config": "^3.3.8",
     "date-fns": "^2.29.3",
-    "dotenv-webpack": "^8.0.1",
     "entities": "^4.4.0",
     "fs": "^0.0.1-security",
     "google-maps-api-loader": "^1.1.1",
@@ -49,10 +48,11 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "webpack --mode development",
+    "build:development": "webpack --mode=development --config webpack.dev.js",
+    "build:production": "webpack --mode=production --config webpack.prod.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "serve": "webpack serve"
+    "serve": "webpack serve --mode=development --config webpack.dev.js"
   },
   "eslintConfig": {
     "extends": [
@@ -84,6 +84,8 @@
     "buffer": "^6.0.3",
     "clean-webpack-plugin": "^4.0.0",
     "css-loader": "^6.7.3",
+    "dotenv": "^16.0.3",
+    "dotenv-webpack": "^8.0.1",
     "hard-source-webpack-plugin": "^0.13.1",
     "html-webpack-plugin": "^5.5.0",
     "interpolate-html-plugin": "^4.0.0",
@@ -101,11 +103,13 @@
     "ts-loader": "^9.4.2",
     "typescript": "^4.9.4",
     "url": "^0.11.0",
+    "vercel": "^28.14.0",
     "webpack": "^5.74.0",
     "webpack-bundle-analyzer": "^4.6.1",
     "webpack-cli": "^4.10.0",
     "webpack-dev-middleware": "^6.0.1",
     "webpack-dev-server": "^4.11.1",
+    "webpack-merge": "^5.8.0",
     "webpack-visualizer-plugin": "^0.1.11",
     "webpack-visualizer-plugin2": "^1.0.0"
   }

@@ -7,7 +7,6 @@ import { toast } from 'react-toastify';
 import { AuthState } from '../@types/Authorization';
 import { APPLY_AUTH_KB, ADMIN_AUTH_KB, AUTH_REQUESTED_STATE } from '../utils/constants';
 import { isAdminUser, isAppliedUser, isApplyingUser, IsNullOrUndefinedOrEmpty, isUnAuthorizedUser, isGeneralUser } from '../common/Check';
-import AuthConfig from "../json/auth_config.json";
 import { ManagementClient } from 'auth0';
 import { ErrorPageProps } from '../@types/ErrorPage';
 import { useNavigate } from 'react-router-dom';
