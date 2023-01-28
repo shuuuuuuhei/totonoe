@@ -18,7 +18,7 @@ const areaStyleProperty: React.CSSProperties = {
  */
 const prefectureStyleProperty: React.CSSProperties = {
     color: "#06c",
-    fontSize: '10px',
+    fontSize: '11px',
     width: '100%',
 }
 export const AreaBox = () => {
