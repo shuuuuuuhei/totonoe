@@ -39,7 +39,7 @@ module.exports = {
 
     output: {
         filename: "index.js",
-        path: __dirname + ".src/dist"
+        path: __dirname + "src/dist"
     },
     // import 文で .ts ファイルを解決するため
     // これを定義しないと import 文で拡張子を書く必要が生まれる。
@@ -71,7 +71,7 @@ module.exports = {
         new HtmlWebpackPlugin({
             title: 'My Test App',
             favicon: 'public/favicon.ico',
-            template: 'public/index.html',
+            template: path.resolve(__dirname, 'public/index.html'),
         }),
         new CleanWebpackPlugin(),
         new webpack.ProvidePlugin({
