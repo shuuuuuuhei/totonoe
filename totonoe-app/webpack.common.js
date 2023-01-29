@@ -69,9 +69,7 @@ module.exports = {
     target: ['web'],
     plugins: [
         new HtmlWebpackPlugin({
-            title: 'My Test App',
-            favicon: 'public/favicon.ico',
-            template: 'public/index.html',
+            template: './public/index.html',
         }),
         new CleanWebpackPlugin(),
         new webpack.ProvidePlugin({
