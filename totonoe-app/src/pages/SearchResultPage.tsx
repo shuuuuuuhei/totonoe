@@ -326,22 +326,6 @@ export const SearchResultPage = () => {
                                         {/* 表示件数 */}
                                         <p>{facilities[0].full_count}件({(pageCount.targetPage - 1) * facilityCountPerPage + 1}~{facilities.length < facilityCountPerPage ? facilities[0].full_count : facilityCountPerPage * pageCount.targetPage})</p>
                                     </div>
-                                    <div className="list-option col-4 text-end">
-                                        <DropdownButton
-                                            id="dropdown-basic-button"
-                                            variant="info"
-                                            className="floatRight"
-                                            title={selected?.key || list[0].key}
-                                        >
-                                            {list.map((item, index) => {
-                                                return (
-                                                    <DropdownItem key={index} eventKey={item.key}>
-                                                        {item.value}
-                                                    </DropdownItem>
-                                                )
-                                            })}
-                                        </DropdownButton>
-                                    </div>
                                 </>
                             }
                         </div>
