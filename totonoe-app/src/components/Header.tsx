@@ -38,6 +38,8 @@ export const Header: React.VFC<headerProps> = (props) => {
         }
     }, [])
 
+    console.log(props.isLoggined, isAuthenticated);
+
     /**
      * ユーザ認証機能
      */
@@ -130,7 +132,7 @@ export const Header: React.VFC<headerProps> = (props) => {
                     </div>
                     <div className="row text-end">
                         <IconContext.Provider value={{ color: '#000000', size: '50' }}>
-                            {props.isLoggined ?
+                            {isAuthenticated ?
                                 <div>
                                     <CgProfile onClick={() => setIsShowedUserContents(!isShowedUserContents)} style={{ cursor: "pointer" }} />
                                     {
