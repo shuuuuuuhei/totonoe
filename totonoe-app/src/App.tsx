@@ -24,10 +24,9 @@ import { Button } from '@mui/material';
 export const App = () => {
   const { user, getIdTokenClaims, getAccessTokenWithPopup, isAuthenticated, logout } = useAuth0();
   const [cookies, setCookie, removeCookie] = useCookies();
-  const userID = user?.sub?.split('|').at(1);
   const [isLoggined, setIsLoggined] = useState(false);
 
-  console.log("ログイン情報：", userID, cookies);
+  console.log("ログイン情報：", user?.sub?.split('|').at(1), cookies.userID, user?.sub);
 
   /**
    * ユーザを新規登録する
@@ -53,7 +52,6 @@ export const App = () => {
 
       // サインアップ処理が成功したらメッセージを表示して処理を終了する
       toast.success('ユーザ登録が完了しました！');
-      setIsLoggined(true);
       return;
     } catch (error) {
       toast.error('ユーザー登録に失敗しました。');
@@ -69,7 +67,7 @@ export const App = () => {
   const fetchSubmitUser = (accessToken: string): Promise<Error> => {
     const fetchSubmitUserPromise: Promise<Error> = new Promise((resolve, reject) => {
       const submitUser = {
-        id: userID,
+        id: user?.sub?.split('|').at(1),
         name: user?.name,
         email: user?.email,
       }
@@ -105,6 +103,14 @@ export const App = () => {
     return fetchSubmitUserPromise;
   }
 
+  const loginUser = () => {
+    // アカウント情報取得
+    getAccountInfo();
+
+    // ログイン時にcookieが未発行の場合
+    setUserInfoCookie();
+  }
+
   /**
    * アカウント情報取得処理
    */
@@ -124,7 +130,7 @@ export const App = () => {
       },
     };
 
-    const uri = "http://localhost:4000/account/" + userID;
+    const uri = "http://localhost:4000/account/" + user?.sub?.split('|').at(1);
     fetch(uri, requestOption)
       .then((response) => {
         if (!response.ok) {
@@ -142,7 +148,6 @@ export const App = () => {
       .then(() => {
         toast.success('おかえりなさい！');
         // ログイン済みにして再レンダリングを防ぐ
-        setIsLoggined(true);
       })
       .catch(err => {
         console.log(err);
@@ -161,32 +166,29 @@ export const App = () => {
   const setUserInfoCookie = () => {
     var now = new Date();
     now.setTime(now.getTime() + 1 * 3600 * 1000);
-    setCookie("userID", userID, { expires: now, path: '/' });
+    setCookie("userID", user?.sub?.split('|').at(1), { expires: now, path: '/' });
   }
 
   // 画面ロード時
   useEffect(() => {
-    if (!isLoggined) {
+    // Auth0ログイン済かつログイン処理未完了の場合
+    if (isAuthenticated && !isLoggined) {
 
       try {
         // ログイン回数が初回の場合はユーザ新規登録を行う
-        if (user?.loginCount === 1 && IsNullOrUndefinedOrEmpty(cookies.userID)) {
+        if (user?.loginCount === 1) {
           // サインアップ
           signupUser();
-        } else if (IsNullOrUndefinedOrEmpty(cookies.userID) && isAuthenticated) {
-
-          // アカウント情報取得
-          getAccountInfo();
-
-          // ログイン時にcookieが未発行の場合
-          setUserInfoCookie();
-
+        } else {
+          // ログイン処理
+          loginUser();
         }
+        // ログイン済状態に更新する
+        setIsLoggined(true);
       }
       catch (error) {
-        setIsLoggined(false);
-      }
 
+      }
     }
   }, [user])
 

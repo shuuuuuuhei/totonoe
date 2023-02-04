@@ -53,7 +53,6 @@ var SearchResultPage_1 = require("./pages/SearchResultPage");
 var react_toastify_1 = require("react-toastify");
 var UserSettingPage_1 = require("./pages/UserSettingPage");
 var AdminPage_1 = require("./pages/AdminPage");
-var Check_1 = require("./common/Check");
 var react_error_boundary_1 = require("react-error-boundary");
 var ErrorComponent_1 = require("./pages/Error/ErrorComponent");
 var Page404_1 = require("./pages/Error/Page404");
@@ -62,9 +61,8 @@ exports.App = function () {
     var _a;
     var _b = auth0_react_1.useAuth0(), user = _b.user, getIdTokenClaims = _b.getIdTokenClaims, getAccessTokenWithPopup = _b.getAccessTokenWithPopup, isAuthenticated = _b.isAuthenticated, logout = _b.logout;
     var _c = react_cookie_1.useCookies(), cookies = _c[0], setCookie = _c[1], removeCookie = _c[2];
-    var userID = (_a = user === null || user === void 0 ? void 0 : user.sub) === null || _a === void 0 ? void 0 : _a.split('|').at(1);
     var _d = react_1.useState(false), isLoggined = _d[0], setIsLoggined = _d[1];
-    console.log("ログイン情報：", userID, cookies);
+    console.log("ログイン情報：", (_a = user === null || user === void 0 ? void 0 : user.sub) === null || _a === void 0 ? void 0 : _a.split('|').at(1), cookies.userID, user === null || user === void 0 ? void 0 : user.sub);
     /**
      * ユーザを新規登録する
      */
@@ -92,14 +90,11 @@ exports.App = function () {
                     _a.sent();
                     // ユーザーIDをクッキーに保存する
                     setUserInfoCookie();
-                    window.alert("aaaa");
                     // サインアップ処理が成功したらメッセージを表示して処理を終了する
                     react_toastify_1.toast.success('ユーザ登録が完了しました！');
-                    setIsLoggined(true);
                     return [2 /*return*/];
                 case 4:
                     error_1 = _a.sent();
-                    window.alert("aaaa");
                     react_toastify_1.toast.error('ユーザー登録に失敗しました。');
                     // リダイレクトするとメッセージ表示が消えるため、3秒後にログアウト処理を実施する
                     setTimeout(function () { return logout({ returnTo: window.location.origin }); }, 3000);
@@ -113,8 +108,9 @@ exports.App = function () {
      */
     var fetchSubmitUser = function (accessToken) {
         var fetchSubmitUserPromise = new Promise(function (resolve, reject) {
+            var _a;
             var submitUser = {
-                id: userID,
+                id: (_a = user === null || user === void 0 ? void 0 : user.sub) === null || _a === void 0 ? void 0 : _a.split('|').at(1),
                 name: user === null || user === void 0 ? void 0 : user.name,
                 email: user === null || user === void 0 ? void 0 : user.email
             };
@@ -145,19 +141,26 @@ exports.App = function () {
         });
         return fetchSubmitUserPromise;
     };
+    var loginUser = function () {
+        // アカウント情報取得
+        getAccountInfo();
+        // ログイン時にcookieが未発行の場合
+        setUserInfoCookie();
+    };
     /**
      * アカウント情報取得処理
      */
     var getAccountInfo = function () { return __awaiter(void 0, void 0, void 0, function () {
         var accessToken, requestOption, uri;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0: return [4 /*yield*/, getAccessTokenWithPopup({
                         audience: 'https://totonoe-app.com',
                         scope: 'read:current_user'
                     })];
                 case 1:
-                    accessToken = _a.sent();
+                    accessToken = _b.sent();
                     requestOption = {
                         method: "GET",
                         mode: "cors",
@@ -167,7 +170,7 @@ exports.App = function () {
                             "User-ID": cookies.userID
                         }
                     };
-                    uri = "http://localhost:4000/account/" + userID;
+                    uri = "http://localhost:4000/account/" + ((_a = user === null || user === void 0 ? void 0 : user.sub) === null || _a === void 0 ? void 0 : _a.split('|').at(1));
                     fetch(uri, requestOption)
                         .then(function (response) {
                         if (!response.ok) {
@@ -185,7 +188,6 @@ exports.App = function () {
                         .then(function () {
                         react_toastify_1.toast.success('おかえりなさい！');
                         // ログイン済みにして再レンダリングを防ぐ
-                        setIsLoggined(true);
                     })["catch"](function (err) {
                         console.log(err);
                         // クッキー情報を削除する
@@ -201,32 +203,32 @@ exports.App = function () {
      * ユーザIDをクッキー情報として登録する
      */
     var setUserInfoCookie = function () {
+        var _a;
         var now = new Date();
         now.setTime(now.getTime() + 1 * 3600 * 1000);
-        setCookie("userID", userID, { expires: now, path: '/' });
+        setCookie("userID", (_a = user === null || user === void 0 ? void 0 : user.sub) === null || _a === void 0 ? void 0 : _a.split('|').at(1), { expires: now, path: '/' });
     };
     // 画面ロード時
     react_1.useEffect(function () {
-        if (!isLoggined) {
+        // Auth0ログイン済かつログイン処理未完了の場合
+        if (isAuthenticated && !isLoggined) {
             try {
                 // ログイン回数が初回の場合はユーザ新規登録を行う
-                if ((user === null || user === void 0 ? void 0 : user.loginCount) === 1 && Check_1.IsNullOrUndefinedOrEmpty(cookies.userID)) {
+                if ((user === null || user === void 0 ? void 0 : user.loginCount) === 1) {
                     // サインアップ
                     signupUser();
                 }
-                else if (Check_1.IsNullOrUndefinedOrEmpty(cookies.userID) && isAuthenticated) {
-                    // アカウント情報取得
-                    getAccountInfo();
-                    // ログイン時にcookieが未発行の場合
-                    setUserInfoCookie();
+                else {
+                    // ログイン処理
+                    loginUser();
                 }
+                // ログイン済状態に更新する
+                setIsLoggined(true);
             }
             catch (error) {
-                setIsLoggined(false);
             }
         }
     }, [user]);
-    console.log("ログイン(app)：", isLoggined);
     return (react_1["default"].createElement("div", null,
         react_1["default"].createElement(react_router_dom_1.BrowserRouter, null,
             react_1["default"].createElement(react_error_boundary_1.ErrorBoundary, { FallbackComponent: ErrorComponent_1.ErrorFallback },
