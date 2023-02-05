@@ -9,6 +9,7 @@ import { IsNullOrUndefinedOrEmpty } from '../common/Check';
 import { toast } from 'react-toastify';
 import { ErrorPageProps } from '../@types/ErrorPage';
 import { useNavigate } from 'react-router-dom';
+import { BaseURI } from '../utils/constants';
 
 export const SettingProfileComponent = () => {
     const [introduction, setIntroduction] = useState("");

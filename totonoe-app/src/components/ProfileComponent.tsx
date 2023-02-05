@@ -10,6 +10,7 @@ import { toast } from 'react-toastify';
 import { useErrorHandler } from 'react-error-boundary';
 import { ErrorPageProps } from '../@types/ErrorPage';
 import { useNavigate } from 'react-router-dom';
+import { BaseURI } from '../utils/constants';
 
 
 

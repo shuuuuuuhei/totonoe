@@ -5,7 +5,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { useCookies } from 'react-cookie';
 import { toast } from 'react-toastify';
 import { AuthState } from '../@types/Authorization';
-import { APPLY_AUTH_KB, ADMIN_AUTH_KB, AUTH_REQUESTED_STATE } from '../utils/constants';
+import { APPLY_AUTH_KB, ADMIN_AUTH_KB, AUTH_REQUESTED_STATE, BaseURI } from '../utils/constants';
 import { isAdminUser, isAppliedUser, isApplyingUser, IsNullOrUndefinedOrEmpty, isUnAuthorizedUser, isGeneralUser } from '../common/Check';
 import { ManagementClient } from 'auth0';
 import { ErrorPageProps } from '../@types/ErrorPage';
