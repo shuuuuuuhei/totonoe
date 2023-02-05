@@ -35,7 +35,7 @@ export const SettingAccountComponent = () => {
      */
     const getAuthorization = async () => {
         const userID = cookies.userID;
-        const uri = "http://localhost:4000/authorization";
+        const uri = BaseURI + "/authorization";
         const accessToken = await getAccessTokenSilently({
             audience: 'https://totonoe-app.com',
             scope: 'read:posts',
@@ -81,7 +81,7 @@ export const SettingAccountComponent = () => {
      */
     const handleSubmitApply = async () => {
 
-        const uri = "http://localhost:4000/authorization/post/facilities";
+        const uri = BaseURI + "/authorization/post/facilities";
         const accessToken = await getAccessTokenSilently({
             audience: 'https://totonoe-app.com',
             scope: 'read:posts',
@@ -149,7 +149,7 @@ export const SettingAccountComponent = () => {
             audience: 'https://totonoe-app.com',
             scope: 'read:posts',
         });
-        const uri = "http://localhost:4000/account";
+        const uri = BaseURI + "/account";
         const requestOption: RequestInit = {
             method: "DELETE",
             mode: "cors",

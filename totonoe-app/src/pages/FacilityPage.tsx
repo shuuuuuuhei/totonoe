@@ -9,6 +9,7 @@ import { ArticleList } from '../components/Article/ArticleList';
 import { SaunaDetail } from '../components/Facility/SaunaDetail';
 import { Valuation } from '../components/Valuation';
 import { ConvertErrorMessageToErrorPageProps } from '../common/Convert';
+import { BaseURI } from '../utils/constants';
 
 export const SaunaPage = () => {
 
@@ -31,7 +32,7 @@ export const SaunaPage = () => {
 
     useEffect(() => {
         const fetchSauna = async () => {
-            const uri = "http://localhost:4000/facility/" + facilityID;
+            const uri = BaseURI + "/facility/" + facilityID;
             const requestOption: RequestInit = {
                 method: "GET",
                 mode: "cors",
@@ -61,7 +62,7 @@ export const SaunaPage = () => {
                 });
         }
         const fetchGetArticlesByFacilityID = async () => {
-            const uri = "http://localhost:4000/facilities/" + facilityID + "/articles";
+            const uri = BaseURI + "/facilities/" + facilityID + "/articles";
             const requestOption: RequestInit = {
                 method: "GET",
                 mode: "cors",

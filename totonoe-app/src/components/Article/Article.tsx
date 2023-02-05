@@ -8,13 +8,14 @@ import { MdInsertEmoticon } from 'react-icons/md'
 import { Link, useNavigate } from 'react-router-dom'
 import { Article } from '../../@types/article/Article'
 import { RatingScore } from '../../@types/article/Rating'
-import { precisionScore, ratingList, themeColor } from '../../utils/constants'
-import { SetDateFormat } from '../../common/Convert'
+import { BaseURI, precisionScore, ratingList, themeColor } from '../../utils/constants'
+import { ConvertErrorMessageToErrorPageProps, SetDateFormat } from '../../common/Convert'
 import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { toast } from 'react-toastify'
 import { useErrorHandler } from 'react-error-boundary';
 import { ErrorPageProps } from '../../@types/ErrorPage';
+import { IsNullOrUndefinedOrEmpty } from '../../common/Check';
 
 type ArticleProps = {
     article: Article | undefined
@@ -34,7 +35,6 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
     const [showDeleteButton, setShowDeleteButton] = useState(false);
     const navigate = useNavigate();
     const [isMyArticle, setIsMyArticle] = useState(false);
-    const handleError = useErrorHandler();
 
     const handleLike = async () => {
         let accessToken = ""
@@ -49,14 +49,15 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
         }
         const articleID = article?.id;
 
-        if (cookies.userID) {
+        if (IsNullOrUndefinedOrEmpty(cookies.userID)) {
+            toast.warning("ログインしてください")
             return;
         }
 
         // 未いいねの場合
         if (!article?.is_liked) {
             const fetchLike = async () => {
-                const uri = "http://localhost:4000/articles/" + articleID + "/like";
+                const uri = BaseURI + "/articles/" + articleID + "/like";
                 const requestOption: RequestInit = {
                     method: "POST",
                     mode: "cors",
@@ -102,7 +103,7 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
             return
         }
         const fetchUnLike = async () => {
-            const uri = "http://localhost:4000/articles/" + articleID + "/like";
+            const uri = BaseURI + "/articles/" + articleID + "/like";
             const requestOption: RequestInit = {
                 method: "DELETE",
                 mode: "cors",
@@ -146,7 +147,7 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
         }
 
         const fetchDeleteArticle = async () => {
-            const uri = "http://localhost:4000/articles/" + articleID;
+            const uri = BaseURI + "/articles/" + articleID;
             const requestOption: RequestInit = {
                 method: "DELETE",
                 mode: "cors",

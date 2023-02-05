@@ -20,6 +20,7 @@ import { ErrorFallback } from './pages/Error/ErrorComponent';
 import { ErrorPage404 } from './pages/Error/Page404';
 import { ErrorPage } from './pages/Error/ErrorPage';
 import { Button } from '@mui/material';
+import { BaseURI } from './utils/constants';
 
 export const App = () => {
   const { user, getIdTokenClaims, getAccessTokenWithPopup, isAuthenticated, logout } = useAuth0();
@@ -84,7 +85,7 @@ export const App = () => {
         body: JSON.stringify({ 'user_id': submitUser.id, 'name': submitUser.name, 'email': submitUser.email })
       };
 
-      const uri = "http://localhost:4000/account/new";
+      const uri = BaseURI + "/account/new";
       fetch(uri, requestOption)
         .then((response) => {
           if (!response.ok) {
@@ -130,7 +131,7 @@ export const App = () => {
       },
     };
 
-    const uri = "http://localhost:4000/account/" + user?.sub?.split('|').at(1);
+    const uri = BaseURI + "/account/" + user?.sub?.split('|').at(1);
     fetch(uri, requestOption)
       .then((response) => {
         if (!response.ok) {

@@ -10,7 +10,8 @@ import { toast } from 'react-toastify';
 import { useErrorHandler } from 'react-error-boundary';
 import { ErrorPageProps } from '../@types/ErrorPage';
 import { useNavigate } from 'react-router-dom';
-import { useIsSavedCookieOfUserID } from '../common/Check';
+
+
 
 type profileProps = {
     profile: Profile | undefined
@@ -31,7 +32,7 @@ export const ProfileComponent: React.VFC<profileProps> = ({ profile, setProfile 
         // }
 
         try {
-            const uri = "http://localhost:4000/follow";
+            const uri = BaseURI + "/follow";
             let accessToken = ""
             try {
                 accessToken = await getAccessTokenSilently({
@@ -77,7 +78,7 @@ export const ProfileComponent: React.VFC<profileProps> = ({ profile, setProfile 
         }
 
         try {
-            const uri = "http://localhost:4000/unfollow";
+            const uri = BaseURI + "/unfollow";
             let accessToken = ""
             try {
                 accessToken = await getAccessTokenSilently({
@@ -109,47 +110,49 @@ export const ProfileComponent: React.VFC<profileProps> = ({ profile, setProfile 
     }
 
 
+
+
+
     return (
         <Fragment>
-            <div className="border py-5 text-center">
-                <div className="container profile-wrap">
-                    <div className="user-info">
-                        <div className="row">
-                            <div className="user-image">
-                                <MdInsertEmoticon size={50} />
-                            </div>
+            <div className="container profile-wrap">
+                <div className="user-info">
+                    <div className="row">
+                        <div className="user-image">
+                            <MdInsertEmoticon size={50} />
                         </div>
-                        <div className="row">
-                            <div className="user-name">
-                                <div className="name">
-                                    @{profile?.name}
-                                </div>
-                            </div>
-                        </div>
-                        <div className="row py-3 border-bottom">
-                            {profile?.is_me
-                                ? ""
-                                :
-                                profile?.is_following ?
-                                    <div className="follow-btn">
-                                        <Button onClick={handleUnfollow}>フォロー中</Button>
-                                    </div>
-                                    :
-                                    <div className="follow-btn">
-                                        <Button onClick={handleFollow}>フォローする</Button>
-                                    </div>
-                            }
-                        </div>
-                        <div className="follow-info row py-3 ">
-                            <p className="col-6">フォロワー{profile?.followed_count ? profile?.followed_count : 0}人</p>
-                            <p className="col-6">フォロー{profile?.following_count ? profile?.following_count : 0}人</p>
-                        </div>
-                        <div className="row">
-                            <div className="user-introduce">
-                                {profile?.introduction}
+                    </div>
+                    <div className="row">
+                        <div className="user-name">
+                            <div className="name">
+                                @{profile?.name}
                             </div>
                         </div>
                     </div>
+                    <div className="row py-3 border-bottom">
+                        {profile?.is_me
+                            ? ""
+                            :
+                            profile?.is_following ?
+                                <div className="follow-btn">
+                                    <Button onClick={handleUnfollow}>フォロー中</Button>
+                                </div>
+                                :
+                                <div className="follow-btn">
+                                    <Button onClick={handleFollow}>フォローする</Button>
+                                </div>
+                        }
+                    </div>
+                    <div className="follow-info row py-3 ">
+                        <p className="col-6">フォロワー{profile?.followed_count ? profile?.followed_count : 0}人</p>
+                        <p className="col-6">フォロー{profile?.following_count ? profile?.following_count : 0}人</p>
+                    </div>
+                    <div className="row">
+                        <div className="user-introduce">
+                            {profile?.introduction}
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </Fragment>

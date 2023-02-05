@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import { ErrorPageProps } from '../../@types/ErrorPage';
 import { useNavigate } from 'react-router-dom';
 import { ConvertErrorMessageToErrorPageProps } from '../../common/Convert';
+import { BaseURI } from '../../utils/constants';
 
 export const ApplyingUserMangeComponent = () => {
     const [applyingUserList, setApplyingUser] = useState<ApplyingUser[]>();
@@ -31,7 +32,7 @@ export const ApplyingUserMangeComponent = () => {
      * 投稿権限申請中ユーザーリストを取得する
      */
     const getApplyingAuthList = async () => {
-        const uri = "http://localhost:4000/authorization/applying";
+        const uri = BaseURI + "/authorization/applying";
         const accessToken = await getAccessTokenSilently({
             audience: 'https://totonoe-app.com',
             scope: 'read:posts',
@@ -81,7 +82,7 @@ export const ApplyingUserMangeComponent = () => {
 
     // 投稿権限一括承認処理
     const handleCertificate = async () => {
-        const uri = "http://localhost:4000/authorization/certification";
+        const uri = BaseURI + "/authorization/certification";
         const accessToken = await getAccessTokenSilently({
             audience: 'https://totonoe-app.com',
             scope: 'read:posts',

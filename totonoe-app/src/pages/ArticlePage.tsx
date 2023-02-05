@@ -9,6 +9,7 @@ import { DetailArticle } from '../components/Article/Article';
 import { Comments } from '../components/Comment';
 import { IsNullOrUndefinedOrEmpty } from '../common/Check';
 import { toast } from 'react-toastify';
+import { BaseURI } from '../utils/constants';
 
 export const ArticlePage = () => {
     const [article, setArticle] = useState<Article>();
@@ -42,7 +43,7 @@ export const ArticlePage = () => {
         }
 
         const fetchArticle = async () => {
-            const uri = "http://localhost:4000/articles/" + params.articleID;
+            const uri = BaseURI + "/articles/" + params.articleID;
 
             const requestOption: RequestInit = {
                 method: "GET",
@@ -72,7 +73,7 @@ export const ArticlePage = () => {
                 });
         }
         const fetchComment = async () => {
-            const uri = "http://localhost:4000/articles/" + params.articleID + "/comments";
+            const uri = BaseURI + "/articles/" + params.articleID + "/comments";
             const accessToken = await getAccessTokenSilently({
                 audience: 'https://totonoe-app.com',
                 scope: 'read:posts',

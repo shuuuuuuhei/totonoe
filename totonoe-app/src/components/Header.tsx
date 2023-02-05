@@ -18,6 +18,7 @@ import { Chip } from '@mui/material';
 import AppIcon from '../images/Totonoe.png'
 import { ErrorPageProps } from '../@types/ErrorPage';
 import { ConvertErrorMessageToErrorPageProps } from '../common/Convert';
+import { BaseURI } from '../utils/constants';
 
 type headerProps = {
     isLoggined: boolean,
@@ -72,7 +73,7 @@ export const Header: React.VFC<headerProps> = (props) => {
      */
     const getAuthorization = async () => {
         const userID = cookies.userID;
-        const uri = "http://localhost:4000/authorization";
+        const uri = BaseURI + "/authorization";
         let accessToken = "";
         try {
             accessToken = await getAccessTokenWithPopup({

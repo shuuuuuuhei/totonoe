@@ -10,6 +10,7 @@ import { useCookies } from 'react-cookie';
 import { ErrorPageProps } from '../@types/ErrorPage';
 import { useNavigate } from 'react-router-dom';
 import { ConvertErrorMessageToErrorPageProps, ConvertErrorCodeToErrorMessage } from '../common/Convert';
+import { BaseURI } from '../utils/constants';
 
 // 権限申請中
 const applyingActiveMode = 1;
@@ -19,7 +20,6 @@ const applyingActiveMode = 1;
  */
 const appliedActiveMode = 2;
 
-const baseUri = "http://localhost:4000"
 export const AdminPage = () => {
     // アクティブコンポーネント管理
     const [activeMode, setActiveMode] = useState(applyingActiveMode);
@@ -56,7 +56,7 @@ export const AdminPage = () => {
             navigate('/error', { state: errorInfo });
             return;
         }
-        const uri = baseUri + "/authorization/check";
+        const uri = BaseURI + "/authorization/check";
         const requestOption: RequestInit = {
             method: "POST",
             headers: {

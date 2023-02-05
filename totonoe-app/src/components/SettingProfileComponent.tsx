@@ -22,7 +22,7 @@ export const SettingProfileComponent = () => {
      * プロフィール情報取得
      */
     const getFetchProfile = async () => {
-        const uri = "http://localhost:4000/profile";
+        const uri = BaseURI + "/profile";
         const accessToken = await getAccessTokenSilently({
             audience: 'https://totonoe-app.com',
             scope: 'read:posts',
@@ -145,7 +145,7 @@ export const SettingProfileComponent = () => {
      * プロフィール更新処理
      */
     const updateFetchProfile = async () => {
-        const uri = "http://localhost:4000/profile";
+        const uri = BaseURI + "/profile";
         const accessToken = await getAccessTokenSilently({
             audience: 'https://totonoe-app.com',
             scope: 'read:posts',

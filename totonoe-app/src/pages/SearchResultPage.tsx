@@ -6,11 +6,11 @@ import { Facility } from '../@types/sauna/Facility';
 import { ConvertErrorMessageToErrorPageProps, ConvertNaNToOne, UndefinedOrNullConvertToEmpty } from '../common/Convert';
 import { FacilityList } from '../components/Facility/FacilityList';
 import { SearchOption } from '../components/Facility/SearchOption';
-import { prefectureList, MinPageCount } from '../utils/constants';
+import { prefectureList, MinPageCount, BaseURI } from '../utils/constants';
 import { IsNullOrUndefinedOrEmpty } from '../common/Check';
 import { ErrorPageProps } from '../@types/ErrorPage';
 
-const baseUri = 'http://localhost:4000/facilities?';
+const baseUri = BaseURI + '/facilities?';
 const facilityCountPerPage = 20;
 
 type city = {
@@ -217,7 +217,7 @@ export const SearchResultPage = () => {
         const fetchAreaDetail = async () => {
             // 「県」を省いた検索になるので前方一致で検索をかける
             const prefectureID = prefectureList.findIndex(prefecture => prefecture.startsWith(areaParams)) + 1;
-            const fetchAreaDetailUri = `http://localhost:4000/prefecture/${prefectureID}/cities`;
+            const fetchAreaDetailUri = `${BaseURI}/prefecture/${prefectureID}/cities`;
             const requestOption: RequestInit = {
                 method: "GET",
                 mode: "cors",

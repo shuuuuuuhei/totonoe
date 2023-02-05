@@ -16,6 +16,7 @@ import { ConvertErrorMessageToErrorPageProps, ConvertPrefectureNameToIndex } fro
 import { AddressTextBox } from '../AddressTextBox'
 import { SaunaSubmitComponent } from './SaunaSubmitComponent'
 import { ErrorPageProps } from '../../@types/ErrorPage'
+import { BaseURI } from '../../utils/constants'
 const MinPrice = 1;
 interface MapInfo {
     map_name: string | null,
@@ -386,7 +387,7 @@ export const FacilitySubmitComponent = () => {
 
         const fetchPostFacility = async () => {
             try {
-                const uri = "http://localhost:4000/facilities/new";
+                const uri = BaseURI + "/facilities/new";
                 const accessToken = await getAccessTokenSilently({
                     audience: 'https://totonoe-app.com',
                     scope: 'read:posts',
@@ -449,7 +450,7 @@ export const FacilitySubmitComponent = () => {
      * */
     const fetchCityInfo = async (prefectureID: number, cityName: string) => {
         try {
-            const uri = "http://localhost:4000/prefecture/" + prefectureID + "/cities/" + cityName;
+            const uri = BaseURI + "/prefecture/" + prefectureID + "/cities/" + cityName;
             console.log(uri)
             const requestOption: RequestInit = {
                 method: "GET",
