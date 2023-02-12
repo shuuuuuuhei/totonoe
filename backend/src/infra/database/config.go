@@ -1,5 +1,7 @@
 package database
 
+import "os"
+
 //Config DB型宣言
 type Config struct {
 	DB struct {
@@ -25,10 +27,10 @@ type Config struct {
 func NewConfig() *Config {
 	c := Config{}
 
-	c.DB.Production.Host = "totonoe"
-	c.DB.Production.Username = "postgres"
-	c.DB.Production.Password = "postgres"
-	c.DB.Production.DBName = "totonoe"
-	c.Routing.Port = "5432"
+	c.DB.Production.Host = os.Getenv("DB_HOST")
+	c.DB.Production.Username = os.Getenv("DB_USER_NAME")
+	c.DB.Production.Password = os.Getenv("DB_PASSWORD")
+	c.DB.Production.DBName = os.Getenv("DB_NAME")
+	c.Routing.Port = os.Getenv("DB_PORT")
 	return &c
 }

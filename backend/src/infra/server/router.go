@@ -32,7 +32,7 @@ func Init(db *database.DB) *Routing {
 	r := &Routing{
 		DB:   db,
 		Gin:  gin.Default(),
-		Port: ":4000",
+		Port: ":80",
 	}
 	r.setRouting()
 	return r
