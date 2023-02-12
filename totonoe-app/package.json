@@ -48,7 +48,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build:development": "webpack --mode=development NODE_ENV=development --config webpack.dev.js",
+    "build:development": "webpack --mode=development  --config webpack.dev.js",
     "build:production": "webpack --mode=production --config webpack.prod.js --output public",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
