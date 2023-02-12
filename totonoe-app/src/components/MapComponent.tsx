@@ -5,7 +5,7 @@ import { FacilityMapInfo } from '../@types/sauna/Facility';
 import { ConvertErrorCodeToErrorMessage, ConvertErrorMessageToErrorPageProps, UndefinedConvertToZero, UndefinedOrNullConvertToEmpty } from '../common/Convert';
 import "../style/Map.css";
 import { Button } from "@mui/material";
-import { Libraries } from "../utils/constants";
+import { BaseURI, Libraries } from "../utils/constants";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { ErrorPageProps } from "../@types/ErrorPage";
 import { IsNullOrUndefinedOrEmpty } from "../common/Check";
@@ -135,7 +135,7 @@ export const MapComponent = () => {
     const getFacilitiesInfo = (placeList: Position[]) => {
 
         const fetchGetFacilitiesByMapInfo = async () => {
-            const uri = "http://localhost:4000/facilities/map_infomation";
+            const uri = BaseURI + "/facilities/map_infomation";
 
             const requestOption: RequestInit = {
                 method: "POST",

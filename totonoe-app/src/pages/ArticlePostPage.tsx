@@ -17,16 +17,13 @@ import { RatingOptionProps, RatingScore } from '../@types/article/Rating'
 import { Facility } from '../@types/sauna/Facility'
 import { IsNullOrUndefinedOrEmpty, useIsSavedCookieOfUserID } from '../common/Check'
 import { ConvertErrorCodeToErrorMessage, ConvertErrorMessageToErrorPageProps, UndefinedOrNullConvertToEmpty } from '../common/Convert'
-import { defaultScore, precisionScore, ratingList } from '../utils/constants'
+import { BaseURI, defaultScore, precisionScore, ratingList } from '../utils/constants'
 
 
 type Data = {
     article: Article,
     user_id: string | undefined,
 }
-
-const baseUri = "http://localhost:4000/"
-
 
 const labels: { [index: string]: string } = {
     0.5: 'Useless',
@@ -66,7 +63,7 @@ export const ArticlePostPage = () => {
         }
 
         const fetchGetFacilityName = async () => {
-            const uri = baseUri + `facility/${id}/facilityName`;
+            const uri = BaseURI + `/facility/${id}/facilityName`;
             const requestOption: RequestInit = {
                 method: "GET",
                 headers: {
@@ -169,7 +166,7 @@ export const ArticlePostPage = () => {
         // facilityIDが空文字もしくはUndefinedなら処理終了
         if (IsNullOrUndefinedOrEmpty(facilityID)) return
 
-        const uri = baseUri + "articles/new";
+        const uri = BaseURI + "/articles/new";
         const requestOption: RequestInit = {
             method: "POST",
             headers: {

@@ -1,23 +1,19 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import React, { Fragment, useState, useEffect } from 'react';
-import { Button } from "react-bootstrap";
 import { useCookies } from 'react-cookie';
 import { IconContext } from 'react-icons';
 import { CgProfile } from "react-icons/cg";
 import { GiHotSpices } from "react-icons/gi";
-import { HiOutlineLogin, HiOutlinePencilAlt } from "react-icons/hi";
 import { Link, useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "../style/Header.css";
 import { MdOutlineLogin } from 'react-icons/md';
-import { toast } from 'react-toastify'
 import { AuthState } from '../@types/Authorization';
 import { isAdminUser, IsNullOrUndefinedOrEmpty } from '../common/Check';
-import { Chip } from '@mui/material';
 import AppIcon from '../images/Totonoe.png'
 import { ErrorPageProps } from '../@types/ErrorPage';
-import { ConvertErrorMessageToErrorPageProps } from '../common/Convert';
+import { BaseURI } from '../utils/constants';
 
 type headerProps = {
     isLoggined: boolean,
@@ -72,7 +68,7 @@ export const Header: React.VFC<headerProps> = (props) => {
      */
     const getAuthorization = async () => {
         const userID = cookies.userID;
-        const uri = "http://localhost:4000/authorization";
+        const uri = BaseURI + "/authorization";
         let accessToken = "";
         try {
             accessToken = await getAccessTokenWithPopup({

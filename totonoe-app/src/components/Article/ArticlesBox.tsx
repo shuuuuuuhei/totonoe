@@ -5,14 +5,16 @@ import type { Article } from '../../@types/article/Article';
 import { ArticleBox } from './ArticleBox';
 import { useNavigate } from 'react-router-dom';
 import { ConvertErrorMessageToErrorPageProps } from '../../common/Convert';
+import { BaseURI } from '../../utils/constants';
 
 export const ArticlesBox = () => {
     const [articles, setArticles] = useState<[Article]>();
     const navigate = useNavigate();
+
     useEffect(() => {
         const fetchArticle = async () => {
 
-            const uri = "http://localhost:4000/articles";
+            const uri = BaseURI + "/articles";
 
             const requestOption: RequestInit = {
                 method: "GET",

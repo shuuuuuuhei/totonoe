@@ -4,6 +4,7 @@ const {
 const common = require('./webpack.common.js') // 汎用設定をインポート
 const webpack = require('webpack');
 const path = require("path");
+const Dotenv = require('dotenv-webpack')
 
 // 開発用
 module.exports = merge(common, {
@@ -19,4 +20,9 @@ module.exports = merge(common, {
         hot: true,
         historyApiFallback: true,
     },
+    plugins: [
+        new Dotenv({
+            path: path.resolve(__dirname, '.env.development'),
+        })
+    ]
 })

@@ -12,6 +12,8 @@ import { Stack } from '@mui/material'
 import { ErrorBoundary, FallbackProps } from "react-error-boundary";
 import { ErrorPageProps } from '../@types/ErrorPage'
 import { ConvertErrorMessageToErrorPageProps } from '../common/Convert'
+import { CalenderComponent } from '../components/CalenderComponent'
+import { BaseURI } from '../utils/constants'
 
 export const ProfilePage = () => {
     const [profile, setProfile] = useState<Profile | null>();
@@ -44,7 +46,7 @@ export const ProfilePage = () => {
         const fetchGetArticle = async () => {
 
 
-            const uri = "http://localhost:4000/users/" + userID + "/articles/";
+            const uri = BaseURI + "/users/" + userID + "/articles/";
 
             const requestOption: RequestInit = {
                 method: "GET",
@@ -76,7 +78,7 @@ export const ProfilePage = () => {
         }
         const fetchProfile = async () => {
 
-            const uri = "http://localhost:4000/profile";
+            const uri = BaseURI + "/profile";
 
             const requestOption: RequestInit = {
                 method: "POST",
@@ -126,7 +128,10 @@ export const ProfilePage = () => {
             <div className="container">
                 <div className="row py-5">
                     <div className="col-4 py-5">
-                        <ProfileComponent profile={profile} setProfile={setProfile} />
+                        <div className="px-2 py-5 border text-center">
+                            <ProfileComponent profile={profile} setProfile={setProfile} />
+                            <CalenderComponent articles={articles} />
+                        </div>
                     </div>
                     <div className="col-8">
                         <ArticleList articles={articles} />

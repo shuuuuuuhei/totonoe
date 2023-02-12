@@ -3,7 +3,7 @@ import { Form } from 'react-bootstrap'
 import { useAuth0 } from '@auth0/auth0-react';
 import { useCookies } from 'react-cookie';
 import { Input } from './Input';
-import { prefectureList } from '../../utils/constants';
+import { BaseURI, prefectureList } from '../../utils/constants';
 import { AddressState } from '../Facility/FacilitySubmitComponent';
 import { toast } from 'react-toastify';
 import { ErrorPageProps } from '../../@types/ErrorPage';
@@ -58,7 +58,7 @@ export const SelectAddress = () => {
      * */
     const fetchCityInfo = async (prefectureID: number) => {
         try {
-            const uri = "http://localhost:4000/prefecture/" + prefectureID + "/cities";
+            const uri = BaseURI + "/prefecture/" + prefectureID + "/cities";
             console.log(uri)
             const requestOption: RequestInit = {
                 method: "GET",

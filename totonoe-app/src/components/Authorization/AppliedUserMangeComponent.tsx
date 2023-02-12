@@ -6,6 +6,7 @@ import { AppliedUser } from '../../@types/AppliedUser';
 import { ErrorPageProps } from '../../@types/ErrorPage';
 import { useNavigate } from 'react-router-dom';
 import { ConvertErrorMessageToErrorPageProps } from '../../common/Convert';
+import { BaseURI } from '../../utils/constants';
 
 export const AppliedUserMangeComponent = () => {
 
@@ -30,7 +31,7 @@ export const AppliedUserMangeComponent = () => {
      */
     const getAppliedAuthList = async () => {
 
-        const uri = "http://localhost:4000/authorization/applied";
+        const uri = BaseURI + "/authorization/applied";
         const accessToken = await getAccessTokenSilently({
             audience: 'https://totonoe-app.com',
             scope: 'read:posts',

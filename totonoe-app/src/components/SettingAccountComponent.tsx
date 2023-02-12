@@ -5,7 +5,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { useCookies } from 'react-cookie';
 import { toast } from 'react-toastify';
 import { AuthState } from '../@types/Authorization';
-import { APPLY_AUTH_KB, ADMIN_AUTH_KB, AUTH_REQUESTED_STATE } from '../utils/constants';
+import { APPLY_AUTH_KB, ADMIN_AUTH_KB, AUTH_REQUESTED_STATE, BaseURI } from '../utils/constants';
 import { isAdminUser, isAppliedUser, isApplyingUser, IsNullOrUndefinedOrEmpty, isUnAuthorizedUser, isGeneralUser } from '../common/Check';
 import { ManagementClient } from 'auth0';
 import { ErrorPageProps } from '../@types/ErrorPage';
@@ -35,7 +35,7 @@ export const SettingAccountComponent = () => {
      */
     const getAuthorization = async () => {
         const userID = cookies.userID;
-        const uri = "http://localhost:4000/authorization";
+        const uri = BaseURI + "/authorization";
         const accessToken = await getAccessTokenSilently({
             audience: 'https://totonoe-app.com',
             scope: 'read:posts',
@@ -81,7 +81,7 @@ export const SettingAccountComponent = () => {
      */
     const handleSubmitApply = async () => {
 
-        const uri = "http://localhost:4000/authorization/post/facilities";
+        const uri = BaseURI + "/authorization/post/facilities";
         const accessToken = await getAccessTokenSilently({
             audience: 'https://totonoe-app.com',
             scope: 'read:posts',
@@ -149,7 +149,7 @@ export const SettingAccountComponent = () => {
             audience: 'https://totonoe-app.com',
             scope: 'read:posts',
         });
-        const uri = "http://localhost:4000/account";
+        const uri = BaseURI + "/account";
         const requestOption: RequestInit = {
             method: "DELETE",
             mode: "cors",

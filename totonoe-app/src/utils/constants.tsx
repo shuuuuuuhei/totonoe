@@ -182,3 +182,8 @@ export const ErrorCodeWithMessage: ErrorPageProps[] = [
     { statusCode: 404, message: "このページはすでに削除されているか、URLが間違っている可能性があります。" },
     { statusCode: 403, message: "Forbidden" },
 ]
+
+/**
+ * TotonoeAPI
+ */
+export const BaseURI = process.env.TOTONOE_BASE_API; 
