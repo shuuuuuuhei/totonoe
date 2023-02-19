@@ -99,7 +99,7 @@ func (a *ArticleRepository) GetArticlesByUserID(c *gin.Context) (*[]ValueObject.
 		Joins("left join article_like likes_count on likes_count.article_id = article.id").
 		Joins("left join article_like liked on liked.article_id = article.id AND liked.user_id=?", loginUserID).
 		Joins("left join comment on comment.article_id = article.id").
-		Where("article.user_id = ?", userID).
+		Where("article.user_id = ?", userID).Order("article.created_at desc").
 		Group(`article.id, "user".name, facility.name, liked.id`).
 		Scan(&articles).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
