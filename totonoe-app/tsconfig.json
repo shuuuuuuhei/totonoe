@@ -20,7 +20,7 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "strict": false,
-    "typeRoots": ["src/@types", "node_modules/@types"],
+    "typeRoots": ["src/@types/*", "node_modules/@types"],
   },
   // exclude を明示的に指定
   "exclude": ["node_modules"]
