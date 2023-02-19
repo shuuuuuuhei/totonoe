@@ -2,14 +2,14 @@ import { useAuth0 } from '@auth0/auth0-react';
 import React, { Fragment, useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { ErrorPageProps } from '../@types/ErrorPage';
-import { Article } from '../@types/article/Article';
-import { Comment } from '../@types/article/Comment';
-import { DetailArticle } from '../components/Article/Article';
-import { Comments } from '../components/Comment';
-import { IsNullOrUndefinedOrEmpty } from '../common/Check';
+import { ErrorPageProps } from '../../@types/ErrorPage';
+import { Article } from '../../@types/article/Article';
+import { Comment } from '../../@types/article/Comment';
+import { DetailArticle } from '../../components/Article/Article';
+import { Comments } from '../../components/Article/Comment';
+import { IsNullOrUndefinedOrEmpty } from '../../common/Check';
 import { toast } from 'react-toastify';
-import { BaseURI } from '../utils/constants';
+import { BaseURI } from '../../utils/constants';
 
 export const ArticlePage = () => {
     const [article, setArticle] = useState<Article>();

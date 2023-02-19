@@ -1,15 +1,15 @@
 import React, { Component, Fragment, useState, useEffect, ChangeEvent } from 'react'
 import { Form } from 'react-bootstrap'
-import { Profile } from '../@types/Profile';
-import { ConvertErrorMessageToErrorPageProps, UndefinedOrNullConvertToEmpty } from '../common/Convert';
+import { Profile } from '../../@types/Profile';
+import { ConvertErrorMessageToErrorPageProps, UndefinedOrNullConvertToEmpty } from '../../common/Convert';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useCookies } from 'react-cookie';
 import { Button } from '@mui/material';
-import { IsNullOrUndefinedOrEmpty } from '../common/Check';
+import { IsNullOrUndefinedOrEmpty } from '../../common/Check';
 import { toast } from 'react-toastify';
-import { ErrorPageProps } from '../@types/ErrorPage';
+import { ErrorPageProps } from '../../@types/ErrorPage';
 import { useNavigate } from 'react-router-dom';
-import { BaseURI } from '../utils/constants';
+import { BaseURI } from '../../utils/constants';
 
 export const SettingProfileComponent = () => {
     const [introduction, setIntroduction] = useState("");

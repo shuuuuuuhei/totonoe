@@ -1,7 +1,7 @@
 import React, { Component, Fragment, useState } from 'react'
-import { IsNullOrUndefinedOrEmpty } from '../common/Check';
+import { IsNullOrUndefinedOrEmpty } from '../../common/Check';
 import { LoadScript, GoogleMap, Marker } from '@react-google-maps/api';
-import { Libraries } from '../utils/constants';
+import { Libraries } from '../../utils/constants';
 
 type FacilityMapComponentProps = {
     lat: number,
@@ -55,8 +55,8 @@ export const FacilityMapComponent = (props: FacilityMapComponentProps) => {
                         // onMouseDown={indicateMapChangeButton}
                         >
                             return (
-                                <Marker position={currentLocation} />
-                                )
+                            <Marker position={currentLocation} />
+                            )
                             <br />
                         </GoogleMap>
                     </LoadScript>

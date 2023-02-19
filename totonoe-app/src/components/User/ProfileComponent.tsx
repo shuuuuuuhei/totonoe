@@ -4,13 +4,13 @@ import { Button } from 'react-bootstrap';
 import { useCookies } from 'react-cookie';
 import { CgDetailsMore } from 'react-icons/cg';
 import { MdInsertEmoticon } from 'react-icons/md';
-import { Profile } from '../@types/Profile';
-import { UndefinedConvertToZero } from '../common/Convert';
+import { Profile } from '../../@types/Profile';
+import { UndefinedConvertToZero } from '../../common/Convert';
 import { toast } from 'react-toastify';
 import { useErrorHandler } from 'react-error-boundary';
-import { ErrorPageProps } from '../@types/ErrorPage';
+import { ErrorPageProps } from '../../@types/ErrorPage';
 import { useNavigate } from 'react-router-dom';
-import { BaseURI } from '../utils/constants';
+import { BaseURI } from '../../utils/constants';
 
 
 

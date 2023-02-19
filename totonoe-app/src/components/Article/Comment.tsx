@@ -2,13 +2,13 @@ import { useAuth0 } from '@auth0/auth0-react';
 import React, { Fragment, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { MdInsertEmoticon } from 'react-icons/md';
-import { Comment } from '../@types/article/Comment';
-import { NewComment } from '../@types/article/NewComment';
-import { Textarea } from './form-components/Textarea';
+import { Comment } from '../../@types/article/Comment';
+import { NewComment } from '../../@types/article/NewComment';
+import { Textarea } from '../form-components/Textarea';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import { ErrorPageProps } from '../@types/ErrorPage';
-import { BaseURI } from '../utils/constants';
+import { ErrorPageProps } from '../../@types/ErrorPage';
+import { BaseURI } from '../../utils/constants';
 
 type CommentProps = {
     comments: Comment[] | undefined
