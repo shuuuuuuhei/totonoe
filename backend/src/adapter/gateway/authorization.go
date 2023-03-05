@@ -66,7 +66,13 @@ func (a *Authorization) CheckAuthorization(c *gin.Context) error {
 	// パラメータ取得
 	json.NewDecoder(c.Request.Body).Decode(&params)
 
+	// 管理者であれば権限チェック成功
+	if err := isAdminUser(params.UserID, conn); err == nil {
+		return nil
+	}
+
 	if err := conn.Debug().Where("user_id=? and auth_kb=?", params.UserID, params.AuthKB).First(&Domain.Authorization{}).Error; err != nil {
+
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			// レコードがないので権限なし
 			return fmt.Errorf("403")
