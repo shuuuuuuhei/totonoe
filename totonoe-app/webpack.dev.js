@@ -20,4 +20,7 @@ module.exports = merge(common, {
         hot: true,
         historyApiFallback: true,
     },
+    plugins: [
+        new Dotenv()
+    ],
 })
