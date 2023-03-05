@@ -1,6 +1,7 @@
+import { User } from "./User"
+
 export type Profile = {
     id: string
-    user_id: string
     name: string
     following_count: number
     followed_count: number
@@ -8,5 +9,13 @@ export type Profile = {
     is_following: boolean
     introduction: string
     family_name: string
-    last_name: string
+    last_name: string,
+    /**
+     * フォローリスト
+     */
+    following_list: User[]
+    /**
+     * フォロワーリスト
+     */
+    follower_list: User[]
 }
