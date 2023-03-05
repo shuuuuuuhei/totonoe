@@ -8,7 +8,7 @@ import { MdInsertEmoticon } from 'react-icons/md'
 import { Link, useNavigate } from 'react-router-dom'
 import { Article } from '../../@types/article/Article'
 import { RatingScore } from '../../@types/article/Rating'
-import { BaseURI, precisionScore, ratingList, themeColor } from '../../utils/constants'
+import { BaseURI, GetTokenSilentlyParams, precisionScore, ratingList, themeColor } from '../../utils/constants'
 import { ConvertErrorMessageToErrorPageProps, SetDateFormat } from '../../common/Convert'
 import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -39,10 +39,7 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
     const handleLike = async () => {
         let accessToken = ""
         try {
-            accessToken = await getAccessTokenSilently({
-                audience: 'https://totonoe-app.com',
-                scope: 'read:posts',
-            });
+            accessToken = await getAccessTokenSilently({ authorizationParams: GetTokenSilentlyParams });
         } catch (error) {
             toast.warning("ログインしてください")
             return;
@@ -136,10 +133,9 @@ export const DetailArticle: React.VFC<ArticleProps> = (props) => {
     }
 
     const handleDeleteArticle = async () => {
-        const accessToken = await getAccessTokenSilently({
-            audience: 'https://totonoe-app.com',
-            scope: 'read:posts',
-        });
+        const accessToken = await getAccessTokenSilently(
+            { authorizationParams: GetTokenSilentlyParams }
+        );
         const articleID = article?.id;
 
         if (!accessToken) {

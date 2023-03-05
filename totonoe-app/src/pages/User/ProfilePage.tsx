@@ -20,6 +20,8 @@ export const ProfilePage = () => {
     const [articles, setArticles] = useState<[Article]>();
     const [cookies, setCookie, removeCookie] = useCookies();
     const navigate = useNavigate();
+    console.log(profile);
+
     /* 
         toast表示を管理
     */
@@ -130,7 +132,7 @@ export const ProfilePage = () => {
                     <div className="col-4 py-5">
                         <div className="px-2 py-5 border text-center">
                             <ProfileComponent profile={profile} setProfile={setProfile} />
-                            <CalenderComponent articles={articles} />
+                            {/* <CalenderComponent articles={articles} /> */}
                         </div>
                     </div>
                     <div className="col-8">

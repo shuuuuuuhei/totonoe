@@ -33,67 +33,66 @@ export const AppliedUserMangeComponent = () => {
 
         const uri = BaseURI + "/authorization/applied";
         const accessToken = await getAccessTokenSilently({
-            audience: 'https://totonoe-app.com',
-            scope: 'read:posts',
+            { authorizationParams: GetTokenSilentlyParams }
         });
 
-        if (!accessToken) {
-            throw Error("アクセストークンがありません。");
-        }
+    if (!accessToken) {
+        throw Error("アクセストークンがありません。");
+    }
 
-        const requestOption: RequestInit = {
-            method: "POST",
-            mode: "cors",
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-                "Content-Type": "application/json",
-                "User-ID": cookies.userID,
-            },
-            body: JSON.stringify({
-                user_id: cookies.userID,
-            })
-        };
-        await fetch(uri, requestOption)
-            .then((response) => {
-                if (!response.ok) {
-                    // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
-                    const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
-                    navigate('/error', { state: errorInfo });
-                    return;
-                }
-                return response.json();
-            })
-            .then((data: AppliedUser[]) => {
-                console.log(data)
-                setAppliedUser(data)
-            })
-            .catch(err => {
-                // エラーメッセージを受け取りエラーページの引数を設定する
-                const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
+    const requestOption: RequestInit = {
+        method: "POST",
+        mode: "cors",
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+            "User-ID": cookies.userID,
+        },
+        body: JSON.stringify({
+            user_id: cookies.userID,
+        })
+    };
+    await fetch(uri, requestOption)
+        .then((response) => {
+            if (!response.ok) {
+                // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
                 navigate('/error', { state: errorInfo });
                 return;
-            });
-    }
+            }
+            return response.json();
+        })
+        .then((data: AppliedUser[]) => {
+            console.log(data)
+            setAppliedUser(data)
+        })
+        .catch(err => {
+            // エラーメッセージを受け取りエラーページの引数を設定する
+            const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
+            navigate('/error', { state: errorInfo });
+            return;
+        });
+}
 
-    if (!appliedUserList) {
-        return (
-            <Fragment>
-                承認中ユーザはいません。
-            </Fragment>
-        )
-    }
-
+if (!appliedUserList) {
     return (
         <Fragment>
-            承認済み
-            <div style={{ height: 600, width: '100%' }} className="py-3">
-                <DataGrid
-                    rows={appliedUserList}
-                    columns={columns}
-                    pageSize={20}
-                    rowsPerPageOptions={[5]}
-                />
-            </div>
+            承認中ユーザはいません。
         </Fragment>
     )
+}
+
+return (
+    <Fragment>
+        承認済み
+        <div style={{ height: 600, width: '100%' }} className="py-3">
+            <DataGrid
+                rows={appliedUserList}
+                columns={columns}
+                pageSize={20}
+                rowsPerPageOptions={[5]}
+            />
+        </div>
+    </Fragment>
+)
 }

@@ -6,6 +6,7 @@ import { StrConvertStrTime } from '../../common/Convert'
 import { Facility } from '../../@types/sauna/Facility'
 import { useAuth0 } from '@auth0/auth0-react'
 import { toast } from 'react-toastify'
+import { GetTokenSilentlyParams } from '../../utils/constants'
 
 type FacilityListProps = {
     facilities: Facility[]
@@ -16,10 +17,7 @@ export const FacilityList = (props: FacilityListProps) => {
     // ログインチェック
     const checkLogin = async () => {
         try {
-            await getAccessTokenSilently({
-                audience: 'https://totonoe-app.com',
-                scope: 'read:posts',
-            });
+            await getAccessTokenSilently({ authorizationParams: GetTokenSilentlyParams });
         } catch (error) {
             toast.warning("ログインしてください")
             return;

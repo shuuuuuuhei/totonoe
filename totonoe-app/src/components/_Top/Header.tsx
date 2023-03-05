@@ -13,7 +13,7 @@ import { AuthState } from '../../@types/Authorization';
 import { isAdminUser, IsNullOrUndefinedOrEmpty } from '../../common/Check';
 import AppIcon from '../../images/Totonoe.png'
 import { ErrorPageProps } from '../../@types/ErrorPage';
-import { BaseURI } from '../../utils/constants';
+import { BaseURI, GetRedirectParams, GetTokenSilentlyParams } from '../../utils/constants';
 
 type headerProps = {
     isLoggined: boolean,
@@ -42,9 +42,7 @@ export const Header: React.VFC<headerProps> = (props) => {
     const authenticateUser = async () => {
         // 認証処理
         try {
-            await loginWithRedirect({
-                redirectUri: "http://localhost:3000/",
-            });
+            await loginWithRedirect({ authorizationParams: GetRedirectParams });
         } catch (err) {
             console.log("Log in failed", err);
         }
@@ -57,7 +55,7 @@ export const Header: React.VFC<headerProps> = (props) => {
         try {
             removeCookie("userID", { path: '/' });
             props.setIsLoggined(false);
-            logout({ returnTo: window.location.origin });
+            logout({ logoutParams: { returnTo: window.location.origin } });
         } catch (err) {
             console.log(err)
         }
@@ -71,10 +69,7 @@ export const Header: React.VFC<headerProps> = (props) => {
         const uri = BaseURI + "/authorization";
         let accessToken = "";
         try {
-            accessToken = await getAccessTokenWithPopup({
-                audience: 'https://totonoe-app.com',
-                scope: 'read:posts',
-            });
+            accessToken = await getAccessTokenWithPopup({ authorizationParams: GetTokenSilentlyParams });
         } catch (error) {
             console.log(error);
         }

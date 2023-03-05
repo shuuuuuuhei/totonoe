@@ -20,9 +20,7 @@ const markerStyle = () => {
 
 export const FacilityMapComponent = (props: FacilityMapComponentProps) => {
 
-    console.log("経度", props.lat, props.lng);
-
-    const currentLocation: google.maps.LatLngLiteral = { lat: props.lat, lng: props.lng }
+    const currentLocation: google.maps.LatLng = new google.maps.LatLng({ lat: props.lat, lng: props.lng })
     const [libraries] = useState<Libraries>(['places'])
     const containerStyle = {
         height: "200px",

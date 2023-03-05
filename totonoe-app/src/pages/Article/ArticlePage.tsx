@@ -74,10 +74,7 @@ export const ArticlePage = () => {
         }
         const fetchComment = async () => {
             const uri = BaseURI + "/articles/" + params.articleID + "/comments";
-            const accessToken = await getAccessTokenSilently({
-                audience: 'https://totonoe-app.com',
-                scope: 'read:posts',
-            });
+            const accessToken = await getAccessTokenSilently();
             const requestOption: RequestInit = {
                 method: "GET",
                 mode: "cors",

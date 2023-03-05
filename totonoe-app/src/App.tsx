@@ -2,17 +2,17 @@ import { useAuth0 } from '@auth0/auth0-react';
 import React, { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { Header } from './components/Header';
-import { ArticlePage } from './pages/ArticlePage';
-import { ArticlePostPage } from './pages/ArticlePostPage';
-import { SaunaPage } from './pages/FacilityPage';
-import { SaunaSubmitPage } from './pages/FacilitySubmitPage';
+import { Header } from './components/_Top/Header';
+import { ArticlePage } from './pages/Article/ArticlePage';
+import { ArticlePostPage } from './pages/Article/ArticlePostPage';
+import { SaunaPage } from './pages/Facility/FacilityPage';
+import { SaunaSubmitPage } from './pages/Facility/FacilitySubmitPage';
 import { Home } from './pages/HomePage';
-import { ProfilePage } from './pages/ProfilePage';
-import { SearchMapPage } from './pages/SearchMapPage';
-import { SearchResultPage } from './pages/SearchResultPage';
+import { ProfilePage } from './pages/User/ProfilePage';
+import { SearchMapPage } from './pages/Map/SearchMapPage';
+import { SearchResultPage } from './pages/Facility/SearchResultPage';
 import { toast } from 'react-toastify'
-import { UserSettingPage } from './pages/UserSettingPage';
+import { UserSettingPage } from './pages/User/UserSettingPage';
 import { AdminPage } from './pages/AdminPage';
 import { IsNullOrUndefinedOrEmpty } from './common/Check';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
@@ -20,7 +20,7 @@ import { ErrorFallback } from './pages/Error/ErrorComponent';
 import { ErrorPage404 } from './pages/Error/Page404';
 import { ErrorPage } from './pages/Error/ErrorPage';
 import { Button } from '@mui/material';
-import { BaseURI } from './utils/constants';
+import { BaseURI, GetTokenSilentlyParams } from './utils/constants';
 
 export const App = () => {
   const { user, getIdTokenClaims, getAccessTokenWithPopup, isAuthenticated, logout } = useAuth0();
@@ -40,10 +40,7 @@ export const App = () => {
 
     // サインアップ処理
     try {
-      const accessToken = await getAccessTokenWithPopup({
-        audience: 'https://totonoe-app.com',
-        scope: 'read:current_user',
-      });
+      const accessToken = await getAccessTokenWithPopup({ authorizationParams: GetTokenSilentlyParams });
 
       // ユーザー登録
       await fetchSubmitUser(accessToken);
@@ -57,7 +54,7 @@ export const App = () => {
     } catch (error) {
       toast.error('ユーザー登録に失敗しました。');
       // リダイレクトするとメッセージ表示が消えるため、3秒後にログアウト処理を実施する
-      setTimeout(() => logout({ returnTo: window.location.origin }), 3000);
+      setTimeout(() => logout(), 3000);
       return;
     }
   }
@@ -116,10 +113,7 @@ export const App = () => {
    * アカウント情報取得処理
    */
   const getAccountInfo = async () => {
-    const accessToken = await getAccessTokenWithPopup({
-      audience: 'https://totonoe-app.com',
-      scope: 'read:current_user',
-    });
+    const accessToken = await getAccessTokenWithPopup({ authorizationParams: GetTokenSilentlyParams });
 
     const requestOption: RequestInit = {
       method: "GET",
@@ -157,7 +151,7 @@ export const App = () => {
         removeCookie("userID", { path: '/' });
 
         // リダイレクトするとメッセージ表示が消えるため、3秒後にログアウト処理を実施する
-        setTimeout(() => logout({ returnTo: window.location.origin }), 3000);
+        setTimeout(() => logout({ logoutParams: { returnTo: window.location.origin } }), 3000);
       });
   }
 
