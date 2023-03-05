@@ -24,10 +24,7 @@ export const SaunaSubmitPage = () => {
 
         let accessToken = "";
         try {
-            accessToken = await getAccessTokenSilently({
-                audience: 'https://totonoe-app.com',
-                scope: 'read:posts',
-            })
+            accessToken = await getAccessTokenSilently()
             if (IsNullOrUndefinedOrEmpty(cookies.userID)) {
                 throw new Error("クッキー情報がありません")
             }

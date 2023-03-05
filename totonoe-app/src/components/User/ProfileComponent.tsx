@@ -10,7 +10,7 @@ import { toast } from 'react-toastify';
 import { useErrorHandler } from 'react-error-boundary';
 import { ErrorPageProps } from '../../@types/ErrorPage';
 import { useNavigate } from 'react-router-dom';
-import { BaseURI } from '../../utils/constants';
+import { BaseURI, GetTokenSilentlyParams } from '../../utils/constants';
 import { FollowUserModal } from './FollowUserModal';
 
 
@@ -34,10 +34,7 @@ export const ProfileComponent: React.VFC<profileProps> = ({ profile, setProfile 
             const uri = BaseURI + "/follow";
             let accessToken = ""
             try {
-                accessToken = await getAccessTokenSilently({
-                    audience: 'https://totonoe-app.com',
-                    scope: 'read:posts',
-                });
+                accessToken = await getAccessTokenSilently({ authorizationParams: GetTokenSilentlyParams });
             } catch (error) {
                 toast.warning("ログインしてください");
                 return;
@@ -80,10 +77,7 @@ export const ProfileComponent: React.VFC<profileProps> = ({ profile, setProfile 
             const uri = BaseURI + "/unfollow";
             let accessToken = ""
             try {
-                accessToken = await getAccessTokenSilently({
-                    audience: 'https://totonoe-app.com',
-                    scope: 'read:posts',
-                });
+                accessToken = await getAccessTokenSilently({ authorizationParams: GetTokenSilentlyParams });
             } catch (error) {
                 toast.warning("ログインしてください")
                 return;

@@ -6,7 +6,7 @@ import { AppliedUser } from '../../@types/AppliedUser';
 import { ErrorPageProps } from '../../@types/ErrorPage';
 import { useNavigate } from 'react-router-dom';
 import { ConvertErrorMessageToErrorPageProps } from '../../common/Convert';
-import { BaseURI } from '../../utils/constants';
+import { BaseURI, GetTokenSilentlyParams } from '../../utils/constants';
 
 export const AppliedUserMangeComponent = () => {
 
@@ -33,66 +33,66 @@ export const AppliedUserMangeComponent = () => {
 
         const uri = BaseURI + "/authorization/applied";
         const accessToken = await getAccessTokenSilently({
-            { authorizationParams: GetTokenSilentlyParams }
+            authorizationParams: GetTokenSilentlyParams
         });
 
-    if (!accessToken) {
-        throw Error("アクセストークンがありません。");
-    }
+        if (!accessToken) {
+            throw Error("アクセストークンがありません。");
+        }
 
-    const requestOption: RequestInit = {
-        method: "POST",
-        mode: "cors",
-        headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-            "User-ID": cookies.userID,
-        },
-        body: JSON.stringify({
-            user_id: cookies.userID,
-        })
-    };
-    await fetch(uri, requestOption)
-        .then((response) => {
-            if (!response.ok) {
-                // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
-                const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+        const requestOption: RequestInit = {
+            method: "POST",
+            mode: "cors",
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+                "User-ID": cookies.userID,
+            },
+            body: JSON.stringify({
+                user_id: cookies.userID,
+            })
+        };
+        await fetch(uri, requestOption)
+            .then((response) => {
+                if (!response.ok) {
+                    // レスポンスコードとエラーメッセージを受け取りエラーページに遷移
+                    const errorInfo: ErrorPageProps = { statusCode: response.status, message: response.statusText };
+                    navigate('/error', { state: errorInfo });
+                    return;
+                }
+                return response.json();
+            })
+            .then((data: AppliedUser[]) => {
+                console.log(data)
+                setAppliedUser(data)
+            })
+            .catch(err => {
+                // エラーメッセージを受け取りエラーページの引数を設定する
+                const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
                 navigate('/error', { state: errorInfo });
                 return;
-            }
-            return response.json();
-        })
-        .then((data: AppliedUser[]) => {
-            console.log(data)
-            setAppliedUser(data)
-        })
-        .catch(err => {
-            // エラーメッセージを受け取りエラーページの引数を設定する
-            const errorInfo: ErrorPageProps = ConvertErrorMessageToErrorPageProps(err.message);
-            navigate('/error', { state: errorInfo });
-            return;
-        });
-}
+            });
+    }
 
-if (!appliedUserList) {
+    if (!appliedUserList) {
+        return (
+            <Fragment>
+                承認中ユーザはいません。
+            </Fragment>
+        )
+    }
+
     return (
         <Fragment>
-            承認中ユーザはいません。
+            承認済み
+            <div style={{ height: 600, width: '100%' }} className="py-3">
+                <DataGrid
+                    rows={appliedUserList}
+                    columns={columns}
+                    pageSize={20}
+                    rowsPerPageOptions={[5]}
+                />
+            </div>
         </Fragment>
     )
-}
-
-return (
-    <Fragment>
-        承認済み
-        <div style={{ height: 600, width: '100%' }} className="py-3">
-            <DataGrid
-                rows={appliedUserList}
-                columns={columns}
-                pageSize={20}
-                rowsPerPageOptions={[5]}
-            />
-        </div>
-    </Fragment>
-)
 }

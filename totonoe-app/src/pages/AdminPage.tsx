@@ -42,10 +42,7 @@ export const AdminPage = () => {
     const checkIsAdminUser = async () => {
         let accessToken = "";
         try {
-            accessToken = await getAccessTokenSilently(
-                {
-                    authorizationParams: GetTokenSilentlyParams
-                })
+            accessToken = await getAccessTokenSilently({ authorizationParams: GetTokenSilentlyParams });
             if (IsNullOrUndefinedOrEmpty(cookies.userID)) {
                 throw new Error("クッキー情報がありません")
             }

@@ -1,9 +1,8 @@
-import React, { Component } from 'react'
+import React from 'react'
 
 
 import { User } from '../../@types/User';
-import { Link, NavLink } from 'react-router-dom';
-import { createStyles, makeStyles, Modal, Theme } from '@mui/material';
+import { Modal } from '@mui/material';
 
 type FollowUserModalProps = {
     isOpenModal: boolean,

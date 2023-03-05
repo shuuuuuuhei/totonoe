@@ -388,10 +388,7 @@ export const FacilitySubmitComponent = () => {
         const fetchPostFacility = async () => {
             try {
                 const uri = BaseURI + "/facilities/new";
-                const accessToken = await getAccessTokenSilently({
-                    audience: 'https://totonoe-app.com',
-                    scope: 'read:posts',
-                })
+                const accessToken = await getAccessTokenSilently()
                 const requestOption: RequestInit = {
                     method: "POST",
                     headers: {

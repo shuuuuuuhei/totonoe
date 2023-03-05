@@ -9,7 +9,7 @@ import { IsNullOrUndefinedOrEmpty } from '../../common/Check';
 import { toast } from 'react-toastify';
 import { ErrorPageProps } from '../../@types/ErrorPage';
 import { useNavigate } from 'react-router-dom';
-import { BaseURI } from '../../utils/constants';
+import { BaseURI, GetTokenSilentlyParams } from '../../utils/constants';
 
 export const SettingProfileComponent = () => {
     const [introduction, setIntroduction] = useState("");
@@ -24,10 +24,7 @@ export const SettingProfileComponent = () => {
      */
     const getFetchProfile = async () => {
         const uri = BaseURI + "/profile";
-        const accessToken = await getAccessTokenSilently({
-            audience: 'https://totonoe-app.com',
-            scope: 'read:posts',
-        });
+        const accessToken = await getAccessTokenSilently({ authorizationParams: GetTokenSilentlyParams });
 
         if (!accessToken) {
             throw Error("アクセストークンがありません。");
@@ -147,10 +144,7 @@ export const SettingProfileComponent = () => {
      */
     const updateFetchProfile = async () => {
         const uri = BaseURI + "/profile";
-        const accessToken = await getAccessTokenSilently({
-            audience: 'https://totonoe-app.com',
-            scope: 'read:posts',
-        });
+        const accessToken = await getAccessTokenSilently({ authorizationParams: GetTokenSilentlyParams });
 
         if (!accessToken) {
             throw Error("アクセストークンがありません。");

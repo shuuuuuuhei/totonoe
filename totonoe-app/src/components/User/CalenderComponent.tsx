@@ -4,7 +4,6 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import jaLocale from '@fullcalendar/core/locales/ja';
 import styled from '@emotion/styled'
 import { Article } from '../../@types/article/Article';
-import { SetDateFormat } from '../../common/Convert';
 
 /**
  * カレンダー用CSS定義

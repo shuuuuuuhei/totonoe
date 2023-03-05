@@ -8,7 +8,7 @@ import { Textarea } from '../form-components/Textarea';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { ErrorPageProps } from '../../@types/ErrorPage';
-import { BaseURI } from '../../utils/constants';
+import { BaseURI, GetTokenSilentlyParams } from '../../utils/constants';
 
 type CommentProps = {
     comments: Comment[] | undefined
@@ -45,10 +45,7 @@ export const Comments: React.VFC<CommentProps> = (props) => {
                 const uri = BaseURI + "/articles/" + newComment.article_id + "/comments/new";
                 let accessToken = ""
                 try {
-                    accessToken = await getAccessTokenSilently({
-                        audience: 'https://totonoe-app.com',
-                        scope: 'read:posts',
-                    });
+                    accessToken = await getAccessTokenSilently({ authorizationParams: GetTokenSilentlyParams });
                 } catch (error) {
                     toast.warning("ログインしてください")
                     return;
