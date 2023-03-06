@@ -195,5 +195,5 @@ export const GetTokenSilentlyParams: GetTokenSilentlyOptions["authorizationParam
 }
 
 export const GetRedirectParams: GetTokenSilentlyOptions["authorizationParams"] = {
-    redirect_uri: process.env.REACT_APP_TOTONOE_BASE_API
+    redirect_uri: process.env.REACT_APP_TOTONOE_URI
 }
