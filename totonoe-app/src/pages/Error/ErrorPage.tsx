@@ -1,7 +1,7 @@
 import React, { Component, Fragment, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { ErrorPageProps } from '../../@types/ErrorPage';
-import { ErrorComponent } from '../../components/ErrorComponent';
+import { ErrorComponent } from '../../components/Error/ErrorComponent';
 
 export const ErrorPage = () => {
     const location = useLocation();

@@ -2,14 +2,13 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { BsHeart } from 'react-icons/bs';
 import { HiOutlinePencilAlt } from 'react-icons/hi';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ErrorPageProps } from '../@types/ErrorPage';
-import { Article } from '../@types/article/Article';
-import { Facility } from '../@types/sauna/Facility';
-import { ArticleList } from '../components/Article/ArticleList';
-import { SaunaDetail } from '../components/Facility/SaunaDetail';
-import { Valuation } from '../components/Valuation';
-import { ConvertErrorMessageToErrorPageProps } from '../common/Convert';
-import { BaseURI } from '../utils/constants';
+import { ErrorPageProps } from '../../@types/ErrorPage';
+import { Article } from '../../@types/article/Article';
+import { Facility } from '../../@types/sauna/Facility';
+import { ArticleList } from '../../components/Article/ArticleList';
+import { SaunaDetail } from '../../components/Facility/SaunaDetail';
+import { ConvertErrorMessageToErrorPageProps } from '../../common/Convert';
+import { BaseURI } from '../../utils/constants';
 
 export const SaunaPage = () => {
 

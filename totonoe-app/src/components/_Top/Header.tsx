@@ -7,13 +7,13 @@ import { GiHotSpices } from "react-icons/gi";
 import { Link, useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import "../style/Header.css";
+import "../../style/Header.css";
 import { MdOutlineLogin } from 'react-icons/md';
-import { AuthState } from '../@types/Authorization';
-import { isAdminUser, IsNullOrUndefinedOrEmpty } from '../common/Check';
-import AppIcon from '../images/Totonoe.png'
-import { ErrorPageProps } from '../@types/ErrorPage';
-import { BaseURI } from '../utils/constants';
+import { AuthState } from '../../@types/Authorization';
+import { isAdminUser, IsNullOrUndefinedOrEmpty } from '../../common/Check';
+import AppIcon from '../../images/Totonoe.png'
+import { ErrorPageProps } from '../../@types/ErrorPage';
+import { BaseURI, GetRedirectParams, GetTokenSilentlyParams } from '../../utils/constants';
 
 type headerProps = {
     isLoggined: boolean,
@@ -42,9 +42,7 @@ export const Header: React.VFC<headerProps> = (props) => {
     const authenticateUser = async () => {
         // 認証処理
         try {
-            await loginWithRedirect({
-                redirectUri: "http://localhost:3000/",
-            });
+            await loginWithRedirect({ authorizationParams: GetRedirectParams });
         } catch (err) {
             console.log("Log in failed", err);
         }
@@ -57,7 +55,7 @@ export const Header: React.VFC<headerProps> = (props) => {
         try {
             removeCookie("userID", { path: '/' });
             props.setIsLoggined(false);
-            logout({ returnTo: window.location.origin });
+            logout({ logoutParams: { returnTo: window.location.origin } });
         } catch (err) {
             console.log(err)
         }
@@ -71,10 +69,7 @@ export const Header: React.VFC<headerProps> = (props) => {
         const uri = BaseURI + "/authorization";
         let accessToken = "";
         try {
-            accessToken = await getAccessTokenWithPopup({
-                audience: 'https://totonoe-app.com',
-                scope: 'read:posts',
-            });
+            accessToken = await getAccessTokenWithPopup({ authorizationParams: GetTokenSilentlyParams });
         } catch (error) {
             console.log(error);
         }
@@ -122,10 +117,10 @@ export const Header: React.VFC<headerProps> = (props) => {
             />
 
             <div className="header row m-0 py-3" style={{ backgroundColor: "#FFCC66" }}>
-                <div className="header-top d-flex justify-content-between">
-                    <div className="header-top-left">
+                <div className="header-top text-end">
+                    {/* <div className="header-top-left">
                         <Link to={'saunas/new'}><GiHotSpices size={50} /></Link>
-                    </div>
+                    </div> */}
                     <div className="row text-end">
                         <IconContext.Provider value={{ color: '#000000', size: '50' }}>
                             {isAuthenticated ?

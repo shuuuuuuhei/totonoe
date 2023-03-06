@@ -1,7 +1,7 @@
 import React, { Component, Fragment, useState } from 'react'
-import { IsNullOrUndefinedOrEmpty } from '../common/Check';
+import { IsNullOrUndefinedOrEmpty } from '../../common/Check';
 import { LoadScript, GoogleMap, Marker } from '@react-google-maps/api';
-import { Libraries } from '../utils/constants';
+import { Libraries } from '../../utils/constants';
 
 type FacilityMapComponentProps = {
     lat: number,
@@ -20,9 +20,7 @@ const markerStyle = () => {
 
 export const FacilityMapComponent = (props: FacilityMapComponentProps) => {
 
-    console.log("経度", props.lat, props.lng);
-
-    const currentLocation: google.maps.LatLngLiteral = { lat: props.lat, lng: props.lng }
+    const currentLocation: google.maps.LatLngLiteral = { lat: props.lat, lng: props.lng };
     const [libraries] = useState<Libraries>(['places'])
     const containerStyle = {
         height: "200px",
@@ -55,8 +53,8 @@ export const FacilityMapComponent = (props: FacilityMapComponentProps) => {
                         // onMouseDown={indicateMapChangeButton}
                         >
                             return (
-                                <Marker position={currentLocation} />
-                                )
+                            <Marker position={currentLocation} />
+                            )
                             <br />
                         </GoogleMap>
                     </LoadScript>

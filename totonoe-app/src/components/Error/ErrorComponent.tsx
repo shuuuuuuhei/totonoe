@@ -1,7 +1,6 @@
 import { Button } from '@mui/material'
-import React, { Component, Fragment } from 'react'
+import React, { Fragment } from 'react'
 import { Link } from 'react-router-dom'
-import { themeColor } from '../utils/dist/constants'
 
 type ErrorComponentProps = {
     errorCode: number,

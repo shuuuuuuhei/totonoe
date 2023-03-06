@@ -1,14 +1,14 @@
 import { GoogleMap, InfoWindow, LoadScript, Marker } from "@react-google-maps/api";
 import React, { Fragment, useState, useCallback } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FacilityMapInfo } from '../@types/sauna/Facility';
-import { ConvertErrorCodeToErrorMessage, ConvertErrorMessageToErrorPageProps, UndefinedConvertToZero, UndefinedOrNullConvertToEmpty } from '../common/Convert';
-import "../style/Map.css";
+import { FacilityMapInfo } from '../../@types/sauna/Facility';
+import { ConvertErrorCodeToErrorMessage, ConvertErrorMessageToErrorPageProps, UndefinedConvertToZero, UndefinedOrNullConvertToEmpty } from '../../common/Convert';
+import "../../style/Map.css";
 import { Button } from "@mui/material";
-import { BaseURI, Libraries } from "../utils/constants";
+import { BaseURI, Libraries } from "../../utils/constants";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { ErrorPageProps } from "../@types/ErrorPage";
-import { IsNullOrUndefinedOrEmpty } from "../common/Check";
+import { ErrorPageProps } from "../../@types/ErrorPage";
+import { IsNullOrUndefinedOrEmpty } from "../../common/Check";
 
 type Position = {
     latlng_literal: google.maps.LatLngLiteral,
@@ -21,8 +21,11 @@ const containerStyle = {
     height: "800px",
 };
 
+type MapComponentProps = {
+    isMapSubmitAuth: boolean
+}
 
-export const MapComponent = () => {
+export const MapComponent: React.VFC<MapComponentProps> = (props) => {
 
     const [libraries] = useState<Libraries>(['places'])
     const { search } = useLocation();
@@ -280,6 +283,8 @@ export const MapComponent = () => {
         onMapLoad(mapState);
     }
 
+    console.log("handleChangeMap", props.isMapSubmitAuth);
+
     return (
         <Fragment>
             {/* <button onClick={fetchMap}>click here!</button> */}
@@ -336,10 +341,16 @@ export const MapComponent = () => {
                                                             :
                                                             <>
                                                                 <p>施設情報なし</p>
-                                                                <Link
-                                                                    to={`/saunas/new`}
-                                                                    state={{ map_name: facility.name, map_lat: facility.latitude, map_lng: facility.longitude }}
-                                                                ><Button>施設を登録する</Button></Link>
+                                                                {/* マップ管理者であれば施設登録ボタンを押下できる */}
+                                                                {
+                                                                    props.isMapSubmitAuth &&
+                                                                    <Link
+                                                                        to={`/saunas/new`}
+                                                                        state={{ map_name: facility.name, map_lat: facility.latitude, map_lng: facility.longitude }}
+                                                                    >
+                                                                        <Button>施設を登録する</Button>
+                                                                    </Link>
+                                                                }
                                                             </>
                                                         }
                                                     </div>

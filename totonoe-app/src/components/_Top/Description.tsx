@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react'
 import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import { HiOutlinePencilAlt } from 'react-icons/hi'
-import { themeColor } from '../utils/constants';
+import { themeColor } from '../../utils/constants';
 
 export const TotonoeDescription = () => {
     return (

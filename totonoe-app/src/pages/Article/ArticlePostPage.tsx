@@ -10,14 +10,14 @@ import DatePicker, { registerLocale } from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { ErrorPageProps } from '../@types/ErrorPage'
-import { Article } from '../@types/article/Article'
-import { NewArticle } from '../@types/article/NewArticle'
-import { RatingOptionProps, RatingScore } from '../@types/article/Rating'
-import { Facility } from '../@types/sauna/Facility'
-import { IsNullOrUndefinedOrEmpty, useIsSavedCookieOfUserID } from '../common/Check'
-import { ConvertErrorCodeToErrorMessage, ConvertErrorMessageToErrorPageProps, UndefinedOrNullConvertToEmpty } from '../common/Convert'
-import { BaseURI, defaultScore, precisionScore, ratingList } from '../utils/constants'
+import { ErrorPageProps } from '../../@types/ErrorPage'
+import { Article } from '../../@types/article/Article'
+import { NewArticle } from '../../@types/article/NewArticle'
+import { RatingOptionProps, RatingScore } from '../../@types/article/Rating'
+import { Facility } from '../../@types/sauna/Facility'
+import { IsNullOrUndefinedOrEmpty, useIsSavedCookieOfUserID } from '../../common/Check'
+import { ConvertErrorCodeToErrorMessage, ConvertErrorMessageToErrorPageProps, UndefinedOrNullConvertToEmpty } from '../../common/Convert'
+import { BaseURI, defaultScore, precisionScore, ratingList } from '../../utils/constants'
 
 
 type Data = {
@@ -151,10 +151,14 @@ export const ArticlePostPage = () => {
         // ログイン確認
         let accessToken = ""
         try {
-            accessToken = await getAccessTokenSilently({
-                audience: 'https://totonoe-app.com',
-                scope: 'read:posts',
-            })
+            accessToken = await getAccessTokenSilently
+                (
+                    {
+                        authorizationParams: {
+                            audience: 'https://totonoe-app.com',
+                        }
+                    }
+                )
             if (IsNullOrUndefinedOrEmpty(cookies.userID)) {
                 throw new Error("クッキー情報がありません")
             }

@@ -1,7 +1,7 @@
 import { Button } from '@mui/material'
 import React, { Component, Fragment } from 'react'
 import { FallbackProps } from 'react-error-boundary'
-import { ErrorComponent } from '../../components/ErrorComponent';
+import { ErrorComponent } from '../../components/Error/ErrorComponent';
 
 const clientUnexpectedError = 400;
 // エラー時のフォールバック用のコンポーネント

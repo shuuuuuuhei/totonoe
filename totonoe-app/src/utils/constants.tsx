@@ -1,5 +1,6 @@
 import { ErrorPageProps } from "../@types/ErrorPage";
 import { RatingProperty } from "../@types/article/Rating";
+import { GetTokenSilentlyOptions } from "@auth0/auth0-react";
 
 /**
 * 都道府県リスト
@@ -186,4 +187,13 @@ export const ErrorCodeWithMessage: ErrorPageProps[] = [
 /**
  * TotonoeAPI
  */
-export const BaseURI = process.env.TOTONOE_BASE_API; 
+export const BaseURI = process.env.REACT_APP_TOTONOE_BASE_API;
+
+export const GetTokenSilentlyParams: GetTokenSilentlyOptions["authorizationParams"] = {
+    audience: 'https://totonoe-app.com',
+    scope: 'read:posts',
+}
+
+export const GetRedirectParams: GetTokenSilentlyOptions["authorizationParams"] = {
+    redirect_uri: process.env.REACT_APP_TOTONOE_URI
+}

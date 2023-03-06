@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react'
 import { Link } from 'react-router-dom'
 import { ErrorCodeWithMessage } from '../../utils/constants';
-import { ErrorComponent } from '../../components/ErrorComponent';
+import { ErrorComponent } from '../../components/Error/ErrorComponent';
 import { ConvertErrorCodeToErrorMessage } from '../../common/Convert';
 import { ErrorPageProps } from '../../@types/ErrorPage';
 

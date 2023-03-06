@@ -2,8 +2,8 @@ import React, { Fragment, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { Modal, Typography, Box } from '@mui/material';
-import { SelectFilterBox } from './form-components/SelectFilterBox';
-import { MinPageCount } from '../utils/constants';
+import { SelectFilterBox } from '../form-components/SelectFilterBox';
+import { MinPageCount } from '../../utils/constants';
 
 const style = {
     position: 'absolute' as 'absolute',

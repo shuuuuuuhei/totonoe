@@ -4,13 +4,13 @@ import { Button, Chip } from '@mui/material'
 import { useAuth0 } from '@auth0/auth0-react';
 import { useCookies } from 'react-cookie';
 import { toast } from 'react-toastify';
-import { AuthState } from '../@types/Authorization';
-import { APPLY_AUTH_KB, ADMIN_AUTH_KB, AUTH_REQUESTED_STATE, BaseURI } from '../utils/constants';
-import { isAdminUser, isAppliedUser, isApplyingUser, IsNullOrUndefinedOrEmpty, isUnAuthorizedUser, isGeneralUser } from '../common/Check';
+import { AuthState } from '../../@types/Authorization';
+import { APPLY_AUTH_KB, ADMIN_AUTH_KB, AUTH_REQUESTED_STATE, BaseURI, GetTokenSilentlyParams } from '../../utils/constants';
+import { isAdminUser, isAppliedUser, isApplyingUser, IsNullOrUndefinedOrEmpty, isUnAuthorizedUser, isGeneralUser } from '../../common/Check';
 import { ManagementClient } from 'auth0';
-import { ErrorPageProps } from '../@types/ErrorPage';
+import { ErrorPageProps } from '../../@types/ErrorPage';
 import { useNavigate } from 'react-router-dom';
-import { ConvertErrorMessageToErrorPageProps } from '../common/Convert';
+import { ConvertErrorMessageToErrorPageProps } from '../../common/Convert';
 
 // ButtonState
 const generalState = 0;
@@ -37,8 +37,7 @@ export const SettingAccountComponent = () => {
         const userID = cookies.userID;
         const uri = BaseURI + "/authorization";
         const accessToken = await getAccessTokenSilently({
-            audience: 'https://totonoe-app.com',
-            scope: 'read:posts',
+            authorizationParams: GetTokenSilentlyParams
         });
 
         if (!accessToken) {
@@ -83,8 +82,7 @@ export const SettingAccountComponent = () => {
 
         const uri = BaseURI + "/authorization/post/facilities";
         const accessToken = await getAccessTokenSilently({
-            audience: 'https://totonoe-app.com',
-            scope: 'read:posts',
+            authorizationParams: GetTokenSilentlyParams
         });
 
         if (!accessToken) {
@@ -146,8 +144,7 @@ export const SettingAccountComponent = () => {
         }
 
         const accessToken = await getAccessTokenSilently({
-            audience: 'https://totonoe-app.com',
-            scope: 'read:posts',
+            authorizationParams: GetTokenSilentlyParams
         });
         const uri = BaseURI + "/account";
         const requestOption: RequestInit = {
@@ -171,7 +168,7 @@ export const SettingAccountComponent = () => {
             })
             .then(() => {
                 removeCookie("userID", { path: '/' });
-                logout({ returnTo: window.location.origin });
+                logout({ logoutParams: { returnTo: window.location.origin } });
             })
             .catch(err => {
                 // エラーメッセージを受け取りエラーページの引数を設定する

@@ -1,7 +1,7 @@
 import React, { Fragment, useState } from 'react'
 import { Accordion, Button } from 'react-bootstrap'
-import { Input } from './form-components/Input'
-import { WaterBath } from '../@types/sauna/Waterbath'
+import { Input } from '../form-components/Input'
+import { WaterBath } from '../../@types/sauna/Waterbath'
 
 type waterBathSubmitComponentProps = {
     waterBath: WaterBath,
@@ -22,28 +22,28 @@ export const WaterBathSubmitComponent = (props: waterBathSubmitComponentProps) =
             [name]: value,
         });
         // number型の更新の場合
-        if(typeof waterBath[name as keyof WaterBath] === 'number') {
+        if (typeof waterBath[name as keyof WaterBath] === 'number') {
             const numValue = parseInt(value);
             setWaterBath((prevState) => (
-                {...prevState, [name]: numValue,}
+                { ...prevState, [name]: numValue, }
             ));
             props.handleSetWaterBath(props.index, name, numValue);
             return
         }
 
         setWaterBath((prevState) => (
-            {...prevState, [name]: value,}
+            { ...prevState, [name]: value, }
         ));
         props.handleSetWaterBath(props.index, name, value);
     }
 
-    return(
+    return (
         <Fragment>
             <Accordion defaultActiveKey="1" className="py-3">
                 <Accordion.Item eventKey={props.index.toString()}>
                     <Accordion.Header>
                         <div className="col-2">
-                            <p className="m-0">水風呂{props.index+1}</p>
+                            <p className="m-0">水風呂{props.index + 1}</p>
                         </div>
                         <div className="col-9 text-end">
                             <Button id={props.index.toString()} onClick={props.handleDeleteWaterBath} variant="outline-danger" size="sm">削除</Button>
@@ -54,30 +54,30 @@ export const WaterBathSubmitComponent = (props: waterBathSubmitComponentProps) =
                             <div className="row">
                                 <div className="temperature col-6">
                                     <label htmlFor="">温度</label>
-                                    <Input 
-                                            type="number"
-                                            className="input-sm"
-                                            name={props.index+":temperature"}
-                                            value={waterBath.temperature.toString()}
-                                            onChange={handleChange}
-                                            placehodlder=""
-                                            errorDiv=""
-                                            errorMsg=""
-                                            required={true}
+                                    <Input
+                                        type="number"
+                                        className="input-sm"
+                                        name={props.index + ":temperature"}
+                                        value={waterBath.temperature.toString()}
+                                        onChange={handleChange}
+                                        placehodlder=""
+                                        errorDiv=""
+                                        errorMsg=""
+                                        required={true}
                                     />
                                 </div>
                                 <div className="capacity col-6">
                                     <label htmlFor="">収容人数</label>
-                                    <Input 
-                                            type="number"
-                                            className="input-sm"
-                                            name={props.index+":capacity"}
-                                            value={waterBath.capacity.toString()}
-                                            onChange={handleChange}
-                                            placehodlder=""
-                                            errorDiv=""
-                                            errorMsg=""
-                                            required={true}
+                                    <Input
+                                        type="number"
+                                        className="input-sm"
+                                        name={props.index + ":capacity"}
+                                        value={waterBath.capacity.toString()}
+                                        onChange={handleChange}
+                                        placehodlder=""
+                                        errorDiv=""
+                                        errorMsg=""
+                                        required={true}
                                     />
                                 </div>
                             </div>
@@ -85,6 +85,6 @@ export const WaterBathSubmitComponent = (props: waterBathSubmitComponentProps) =
                     </Accordion.Body>
                 </Accordion.Item>
             </Accordion>
-    </Fragment>
+        </Fragment>
     )
 }

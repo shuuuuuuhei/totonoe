@@ -1,45 +1,40 @@
 import { useAuth0 } from '@auth0/auth0-react';
-import React, { Fragment } from 'react';
+import React, { Fragment, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { useCookies } from 'react-cookie';
 import { CgDetailsMore } from 'react-icons/cg';
 import { MdInsertEmoticon } from 'react-icons/md';
-import { Profile } from '../@types/Profile';
-import { UndefinedConvertToZero } from '../common/Convert';
+import { Profile } from '../../@types/Profile';
+import { UndefinedConvertToZero } from '../../common/Convert';
 import { toast } from 'react-toastify';
 import { useErrorHandler } from 'react-error-boundary';
-import { ErrorPageProps } from '../@types/ErrorPage';
+import { ErrorPageProps } from '../../@types/ErrorPage';
 import { useNavigate } from 'react-router-dom';
-import { BaseURI } from '../utils/constants';
-
+import { BaseURI, GetTokenSilentlyParams } from '../../utils/constants';
+import { FollowUserModal } from './FollowUserModal';
 
 
 type profileProps = {
     profile: Profile | undefined
     setProfile: React.Dispatch<React.SetStateAction<Profile | null | undefined>>
 }
+
 export const ProfileComponent: React.VFC<profileProps> = ({ profile, setProfile }) => {
+
     const { getAccessTokenSilently } = useAuth0();
     const [cookies, setCookie, removeCookie] = useCookies();
+    const [isOpenFollowing, setIsOpenFollowing] = useState(false);
+    const [isOpenFollower, setIsOpenFollower] = useState(false);
     const navigate = useNavigate();
 
     const handleError = useErrorHandler();
     const handleFollow = async () => {
 
-        // // クッキー情報がない場合はトップ画面に遷移する
-        // if (!useIsSavedCookieOfUserID) {
-        //     navigate("/");
-        //     return;
-        // }
-
         try {
             const uri = BaseURI + "/follow";
             let accessToken = ""
             try {
-                accessToken = await getAccessTokenSilently({
-                    audience: 'https://totonoe-app.com',
-                    scope: 'read:posts',
-                });
+                accessToken = await getAccessTokenSilently({ authorizationParams: GetTokenSilentlyParams });
             } catch (error) {
                 toast.warning("ログインしてください");
                 return;
@@ -50,7 +45,7 @@ export const ProfileComponent: React.VFC<profileProps> = ({ profile, setProfile 
                     Authorization: `Bearer ${accessToken}`,
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ 'user_id': cookies.userID, "following_id": profile?.user_id })
+                body: JSON.stringify({ 'user_id': cookies.userID, "following_id": profile?.id })
             }
             fetch(uri, requestOption)
                 .then((response) => {
@@ -82,10 +77,7 @@ export const ProfileComponent: React.VFC<profileProps> = ({ profile, setProfile 
             const uri = BaseURI + "/unfollow";
             let accessToken = ""
             try {
-                accessToken = await getAccessTokenSilently({
-                    audience: 'https://totonoe-app.com',
-                    scope: 'read:posts',
-                });
+                accessToken = await getAccessTokenSilently({ authorizationParams: GetTokenSilentlyParams });
             } catch (error) {
                 toast.warning("ログインしてください")
                 return;
@@ -96,7 +88,7 @@ export const ProfileComponent: React.VFC<profileProps> = ({ profile, setProfile 
                     Authorization: `Bearer ${accessToken}`,
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ 'user_id': cookies.userID, "following_id": profile?.user_id })
+                body: JSON.stringify({ 'user_id': cookies.userID, "following_id": profile?.id })
             }
             fetch(uri, requestOption)
                 .then((response) => response.json())
@@ -109,10 +101,6 @@ export const ProfileComponent: React.VFC<profileProps> = ({ profile, setProfile 
         catch (err) {
         }
     }
-
-
-
-
 
     return (
         <Fragment>
@@ -145,17 +133,24 @@ export const ProfileComponent: React.VFC<profileProps> = ({ profile, setProfile 
                         }
                     </div>
                     <div className="follow-info row py-3 ">
-                        <p className="col-6">フォロワー{profile?.followed_count ? profile?.followed_count : 0}人</p>
-                        <p className="col-6">フォロー{profile?.following_count ? profile?.following_count : 0}人</p>
+                        <div className="col-6 border" onClick={() => setIsOpenFollower(!isOpenFollower)} style={{ cursor: "pointer" }}>
+                            <p className="m-0">フォロワー</p>
+                            <p className="m-0">{profile?.followed_count ? profile?.followed_count : 0}人</p>
+                        </div>
+                        <div className="col-6 border" onClick={() => setIsOpenFollowing(!isOpenFollowing)} style={{ cursor: "pointer" }}>
+                            <p className="m-0">フォロー</p>
+                            <p className="m-0">{profile?.following_count ? profile?.following_count : 0}人</p>
+                        </div>
                     </div>
                     <div className="row">
                         <div className="user-introduce">
                             {profile?.introduction}
                         </div>
                     </div>
-
                 </div>
             </div>
+            <FollowUserModal isOpenModal={isOpenFollower} setIsOpenModal={setIsOpenFollower} modalTitle="フォロワー" userList={profile.follower_list} />
+            <FollowUserModal isOpenModal={isOpenFollowing} setIsOpenModal={setIsOpenFollowing} modalTitle="フォロー" userList={profile.following_list} />
         </Fragment>
     )
 }

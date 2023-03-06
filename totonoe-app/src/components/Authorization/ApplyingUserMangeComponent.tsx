@@ -1,14 +1,14 @@
-import React, { Component, useState, Fragment, useEffect } from 'react'
-import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
+import React, { useState, Fragment, useEffect } from 'react'
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useCookies } from 'react-cookie';
 import { ApplyingUser } from '../../@types/ApplyingUser';
-import { TableHead, TableRow, TableCell, Checkbox, TableSortLabel, Button } from '@mui/material';
+import { Button } from '@mui/material';
 import { toast } from 'react-toastify';
 import { ErrorPageProps } from '../../@types/ErrorPage';
 import { useNavigate } from 'react-router-dom';
 import { ConvertErrorMessageToErrorPageProps } from '../../common/Convert';
-import { BaseURI } from '../../utils/constants';
+import { BaseURI, GetTokenSilentlyParams } from '../../utils/constants';
 
 export const ApplyingUserMangeComponent = () => {
     const [applyingUserList, setApplyingUser] = useState<ApplyingUser[]>();
@@ -34,8 +34,7 @@ export const ApplyingUserMangeComponent = () => {
     const getApplyingAuthList = async () => {
         const uri = BaseURI + "/authorization/applying";
         const accessToken = await getAccessTokenSilently({
-            audience: 'https://totonoe-app.com',
-            scope: 'read:posts',
+            authorizationParams: GetTokenSilentlyParams
         });
 
         if (!accessToken) {
@@ -84,8 +83,7 @@ export const ApplyingUserMangeComponent = () => {
     const handleCertificate = async () => {
         const uri = BaseURI + "/authorization/certification";
         const accessToken = await getAccessTokenSilently({
-            audience: 'https://totonoe-app.com',
-            scope: 'read:posts',
+            authorizationParams: GetTokenSilentlyParams
         });
         const userID = cookies.userID;
 

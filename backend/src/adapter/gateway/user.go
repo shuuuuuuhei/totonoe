@@ -85,13 +85,13 @@ func (u *User) UpdateProfile(c *gin.Context) error {
 	return nil
 }
 
-// GetProfile メールアドレスからユーザを検索し、パスワード照合を行う
+// GetProfile プロフィール取得
 func (u *User) GetProfile(c *gin.Context) (*ValueObject.ProfileVO, error) {
 	conn := u.conn
 	var params userParams
 	json.NewDecoder(c.Request.Body).Decode(&params)
-	token := c.Request.Header.Get("User-ID")
-	if token == "" {
+	myUserID := c.Request.Header.Get("User-ID")
+	if myUserID == "" {
 		return nil, errors.New("認証情報がありません")
 	}
 
@@ -107,28 +107,70 @@ func (u *User) GetProfile(c *gin.Context) (*ValueObject.ProfileVO, error) {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("プロフィールが見つかりませんでした。 user_id = %s", params.UserID)
 		}
-		log.Println(err)
-		return nil, errors.New("Internal Server Error. adapter/gateway/Login")
+		return nil, errors.New("Internal Server Error. /User/GetProfile")
 	}
 
 	// Me?
-	profile.IsMe = common.IsMe(profile.ID, token)
+	profile.IsMe = common.IsMe(profile.ID, myUserID)
 
 	// フォローチェック
 	if !profile.IsMe {
-		var count int64
-		if err := conn.Debug().Table(`"user_relation_ship"`).
-			Select(`"Count(1) AS count"`).
-			Where(`user_relation_ship.user_id = ? AND user_relation_ship.following_id = ?`, token, params.UserID).
-			Count(&count).Error; err != nil {
-			return nil, errors.New("Internal Server Error. adapter/gateway/Login")
+		profile.IsFollowing = isFollowUser(conn, myUserID, params.UserID)
+	}
+
+	if profile.FollowingCount > 0 {
+		followingList, err := getFollowingUser(conn, params.UserID)
+		if err != nil {
+			return nil, errors.New("Internal Server Error." + conn.Error.Error())
 		}
 
-		if count > 0 {
-			profile.IsFollowing = true
-		}
+		profile.FollowingList = followingList
 	}
+
+	if profile.FollowedCount > 0 {
+		followerList, err := getFollowerUser(conn, params.UserID)
+		if err != nil {
+			return nil, errors.New("Internal Server Error." + conn.Error.Error())
+		}
+
+		profile.FollowerList = followerList
+	}
+
 	return &profile, nil
+}
+
+// getFollowerUser フォロワーユーザーを取得する
+func getFollowerUser(conn *gorm.DB, userID string) ([]ValueObject.Follower, error) {
+	followerUserList := []ValueObject.Follower{}
+
+	if err := conn.Debug().Table("user_relation_ship follower_tbl").
+		Select(`follower_tbl.user_id as user_id, "user".name`).
+		Joins(`inner join "user" on "user".id = follower_tbl.user_id`).
+		Where("following_id = ?", userID).
+		Scan(&followerUserList).
+		Error; err != nil {
+		return nil, fmt.Errorf("フォロワーの取得に失敗")
+	}
+
+	// 取得したフォロワーユーザーを返却する
+	return followerUserList, nil
+}
+
+// getFollowingUser フォロー中のユーザーを取得する
+func getFollowingUser(conn *gorm.DB, userID string) ([]ValueObject.Following, error) {
+	followingUserList := []ValueObject.Following{}
+
+	if err := conn.Debug().Table("user_relation_ship following_tbl").
+		Select(`following_tbl.following_id as user_id, "user".name`).
+		Joins(`inner join "user" on "user".id = following_tbl.following_id`).
+		Where("user_id = ?", userID).
+		Scan(&followingUserList).
+		Error; err != nil {
+		return nil, fmt.Errorf("フォローユーザーの取得に失敗")
+	}
+
+	// 取得したフォロー中ユーザーを返却する
+	return followingUserList, nil
 }
 
 // Follow ユーザIDを取得してユーザをフォローする
@@ -153,7 +195,7 @@ func (u *User) Follow(c *gin.Context) error {
 	}
 
 	if err := conn.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Create(&relation).Error; err != nil {
+		if err := tx.Debug().Create(&relation).Error; err != nil {
 			if err == sql.ErrNoRows {
 				return fmt.Errorf("フォローに失敗しました。")
 			}
@@ -200,4 +242,21 @@ func (u *User) Unfollow(c *gin.Context) error {
 
 	// 登録成功
 	return nil
+}
+
+// isFollowUser フォロー中判定
+func isFollowUser(conn *gorm.DB, myUserID string, followingUserID string) bool {
+	var count int64
+	if err := conn.Debug().Table(`"user_relation_ship"`).
+		Select(`"Count(1) AS count"`).
+		Where(`user_relation_ship.user_id = ? AND user_relation_ship.following_id = ?`, myUserID, followingUserID).
+		Count(&count).Error; err != nil {
+		return false
+	}
+
+	if count > 0 {
+		return true
+	} else {
+		return false
+	}
 }

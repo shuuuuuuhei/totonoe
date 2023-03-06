@@ -10,7 +10,7 @@ import { useCookies } from 'react-cookie';
 import { ErrorPageProps } from '../@types/ErrorPage';
 import { useNavigate } from 'react-router-dom';
 import { ConvertErrorMessageToErrorPageProps, ConvertErrorCodeToErrorMessage } from '../common/Convert';
-import { BaseURI } from '../utils/constants';
+import { BaseURI, GetTokenSilentlyParams } from '../utils/constants';
 
 // 権限申請中
 const applyingActiveMode = 1;
@@ -42,10 +42,7 @@ export const AdminPage = () => {
     const checkIsAdminUser = async () => {
         let accessToken = "";
         try {
-            accessToken = await getAccessTokenSilently({
-                audience: 'https://totonoe-app.com',
-                scope: 'read:posts',
-            })
+            accessToken = await getAccessTokenSilently({ authorizationParams: GetTokenSilentlyParams });
             if (IsNullOrUndefinedOrEmpty(cookies.userID)) {
                 throw new Error("クッキー情報がありません")
             }
