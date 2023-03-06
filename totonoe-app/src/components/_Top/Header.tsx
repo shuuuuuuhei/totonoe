@@ -117,10 +117,10 @@ export const Header: React.VFC<headerProps> = (props) => {
             />
 
             <div className="header row m-0 py-3" style={{ backgroundColor: "#FFCC66" }}>
-                <div className="header-top d-flex justify-content-between">
-                    <div className="header-top-left">
+                <div className="header-top text-end">
+                    {/* <div className="header-top-left">
                         <Link to={'saunas/new'}><GiHotSpices size={50} /></Link>
-                    </div>
+                    </div> */}
                     <div className="row text-end">
                         <IconContext.Provider value={{ color: '#000000', size: '50' }}>
                             {isAuthenticated ?
