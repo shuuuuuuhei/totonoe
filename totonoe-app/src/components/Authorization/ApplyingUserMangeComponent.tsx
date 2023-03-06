@@ -1,9 +1,9 @@
-import React, { Component, useState, Fragment, useEffect } from 'react'
-import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
+import React, { useState, Fragment, useEffect } from 'react'
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useCookies } from 'react-cookie';
 import { ApplyingUser } from '../../@types/ApplyingUser';
-import { TableHead, TableRow, TableCell, Checkbox, TableSortLabel, Button } from '@mui/material';
+import { Button } from '@mui/material';
 import { toast } from 'react-toastify';
 import { ErrorPageProps } from '../../@types/ErrorPage';
 import { useNavigate } from 'react-router-dom';
