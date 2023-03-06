@@ -15,16 +15,14 @@ function rand() {
     return Math.round(Math.random() * 20) - 10;
 }
 
-const modalStyle = {
+const modalStyle: React.CSSProperties = {
     position: 'absolute' as 'absolute',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: 400,
-    bgcolor: 'background.paper',
+    background: 'white',
     border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
 };
 
 export const FollowUserModal: React.VFC<FollowUserModalProps> = (props) => {
@@ -38,14 +36,14 @@ export const FollowUserModal: React.VFC<FollowUserModalProps> = (props) => {
                 aria-describedby="simple-modal-description"
             >
                 <div style={modalStyle} >
-                    <h2 id="simple-modal-title" className="text-center border-bottom">{props.modalTitle}</h2>
+                    <h2 id="simple-modal-title" className="text-center border-bottom py-4">{props.modalTitle}</h2>
                     <div id="simple-modal-description" className="py-4 px-2">
                         {props.userList ?
                             <ul>
                                 {props.userList.map((user, index) => {
                                     return (
-                                        <li id={index.toString()}>
-                                            <a href={`/profile/${user.user_id}/`}>{user.name}</a>
+                                        <li id={index.toString()} className="py-2 border-bottom">
+                                            <a href={`/profile/${user.user_id}/`}><p>{user.name}</p></a>
                                         </li>
                                     )
                                 })}
