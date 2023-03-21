@@ -27,4 +27,4 @@ jobs:
                 docker-compose up -d --build -f COMPOSE_FILE
         -   name: Run frontend tests
             run: |
-              docker exec  totonoe_frontend_1
+              docker-compose exec totonoe_frontend_1
