@@ -24,7 +24,7 @@ jobs:
         # Docker Composeで実行する
         -   name: run test on docker-compose
             run: |
-                docker-compose up -d --build -f COMPOSE_FILE
+                docker-compose up -d -f COMPOSE_FILE
         -   name: Run frontend tests
             run: |
-              docker-compose exec totonoe_frontend_1
+              docker-compose exec totonoe_frontend_1 npm run test
