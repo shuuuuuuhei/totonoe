@@ -20,8 +20,11 @@ jobs:
             with:
             # PRのHEADブランチを使う
              ref: ${{ github.event.pull_request.head.sha }}
-        
+
         # Docker Composeで実行する
         -   name: run test on docker-compose
             run: |
-                docker-compose -f ${COMPOSE_FILE}
+                docker-compose up -d --build
+        -   name: Run frontend tests
+            run: |
+              docker exec  totonoe_frontend_1
