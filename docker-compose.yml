@@ -37,7 +37,7 @@ services:
     backend:
         build: 
             context: .
-            dockerfile: ./backend/Dockerfile
+            dockerfile: ./backend/Dockerfile.dev
         depends_on: 
             - totonoe
         tty: true

@@ -39,8 +39,10 @@ export const FacilityList = (props: FacilityListProps) => {
                             </div>
                             <p className="facility-address">{facility.address}</p>
                             <div className="row">
-                                <p className="col-2">入浴料：{facility.price}円</p>
-                                <p className="col-2">営業：{StrConvertStrTime(facility.eigyo_start, facility.eigyo_end)}</p>
+                                <p className="col-2 price">入浴料：{facility.price}円</p>
+                            </div>
+                            <div className="row">
+                                <p className="col-2 time">営業：{StrConvertStrTime(facility.eigyo_start, facility.eigyo_end)}</p>
                             </div>
                         </div>
                     </div>
