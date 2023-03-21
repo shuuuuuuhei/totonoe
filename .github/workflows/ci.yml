@@ -28,7 +28,7 @@ jobs:
 
         # フロントエンドのサービスが立ち上がるまで待機する
         -   name: Wait for services to start
-            run: docker-compose run --rm app sh -c "while ! nc -z api 3000; do sleep 1; done"
+            run: docker-compose run --rm totonoe_frontend_1 sh -c "while ! nc -z api 3000; do sleep 1; done"
         
         # フロントエンドのテストを実行する
         -   name: Run frontend tests
